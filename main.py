@@ -6,7 +6,7 @@ import time
 pygame.init()
 
 # Window setup
-WIDTH, HEIGHT = 1000, 600
+WIDTH, HEIGHT = 1400, 800
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Boolean Bakery")
 
@@ -120,7 +120,7 @@ def main():
         slots.append(s)
         slot_start_y += 90
 
-    check_button = Button(WIDTH - 200, HEIGHT - 80, "Check!")
+    check_button = Button(WIDTH - 200, HEIGHT - 100, "Check!")
     start_time = time.time()
     solved = False
     score = 0
@@ -210,13 +210,23 @@ def main():
             add_instr_surf = FONT.render("Sleep de stappen in de juiste volgorde en klik op 'Check!'", True, WHITE)
             SCREEN.blit(add_instr_surf, (WIDTH//2 - add_instr_surf.get_width()//2, 160))
 
-        # Draw steps
-        for ds in draggable_steps:
-            ds.draw(SCREEN)
-
         # Draw slots
         for slot in slots:
             slot.draw(SCREEN)
+            
+        # Draw steps
+        if dragged_step:
+            
+            # Draw all steps except the one currently dragged
+            for ds in draggable_steps:
+                if ds != dragged_step:
+                    ds.draw(SCREEN)
+            # Draw the dragged step last so it appears on top
+            dragged_step.draw(SCREEN)
+        else:
+            # If no step is being dragged, just draw them normally
+            for ds in draggable_steps:
+                ds.draw(SCREEN)
 
         # Draw button if not solved
         if not solved:
