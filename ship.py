@@ -2,11 +2,10 @@ import pygame
 import constante as c
 from kogel import Kogel
 
-
 class Ship(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('images/Galaga_Fighter.png').convert_alpha() # Laadt de foto van het schip in image, convert is zodat de game niet lagt
+        self.image = pygame.image.load('images/laptop.png').convert_alpha() # Laadt de foto van het schip in image, convert is zodat de game niet lagt
         self.image = pygame.transform.scale(self.image, (self.image.get_width()//c.SCHIP_GROOTTE, self.image.get_height()//c.SCHIP_GROOTTE))
         self.rect = self.image.get_rect() # Maakt een rechthoek rond de foto
         self.rect.x = c.DISPLAY_WIDTH//2 - self.rect.width//2 # Zet het schip in het midden van het scherm
@@ -14,8 +13,7 @@ class Ship(pygame.sprite.Sprite):
         self.kogels = pygame.sprite.Group()
         self.vel_x = 0 # Snelheid van het schip in de x richting
         self.vel_y = 0 # Snelheid van het schip in de y richting    
-        self.speed = 10 # Snelheid van het schip
-
+        self.speed = 15 # Snelheid van het schip
 
     def update(self):
         self.kogels.update()
@@ -28,7 +26,6 @@ class Ship(pygame.sprite.Sprite):
         elif self.rect.x >= c.DISPLAY_WIDTH - self.rect.width:
             self.rect.x = c.DISPLAY_WIDTH - self.rect.width
         self.rect.y += self.vel_y
-
 
     def shiet(self):
         new_kogel = Kogel()
