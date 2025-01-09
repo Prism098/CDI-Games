@@ -5,7 +5,7 @@ import os
 # Lijst van games met paden naar de submappen
 games = [
     {"name": "Data Cleaning Game", "script": "CDI-Games-DataEngineering/DataMain.py"},
-   # {"name": "Website Interface Builder Game", "script": "CDI-Games-HCI/HCIMain.py"},
+    {"name": "Website Interface Builder Game", "script": "CDI-Games-HCI/HCIMain.py"},
     {"name": "Network Invaders", "script": "CDI-Games-SecurityCloud/SecurityMain.py"},
     {"name": "Boolean Bakery", "script": "CDI-Games-SoftwareDevelopment/SoftwareMain.py"}
 ]
@@ -18,12 +18,12 @@ def run_game(game):
     global total_score
     try:
         print(f"Starting {game['name']}...")
-        
+
         # Controleer of het script bestaat
         if not os.path.exists(game["script"]):
             print(f"Error: Script {game['script']} not found!")
             return
-        
+
         # Voer de game uit als subprocess
         result = subprocess.run(
             [sys.executable, game["script"]],
@@ -38,15 +38,23 @@ def run_game(game):
         print(result.stderr)
 
         # Score verwerken vanuit de uitvoer
+        score_found = False
+        final_score = 0
         for line in result.stdout.splitlines():
             if "Score:" in line:
                 try:
-                    score = int(line.split(":")[1].strip())
-                    print(f"Score for {game['name']}: {score}")
-                    total_score += score
-                    break
+                    # Probeer de score als float of int te verwerken
+                    final_score = float(line.split(":")[1].strip())
+                    score_found = True
                 except ValueError:
                     print(f"Invalid score format in {game['name']} output: {line}")
+
+        if score_found:
+            print(f"Score for {game['name']}: {final_score}")
+            total_score += final_score
+        else:
+            print(f"No valid score found in output for {game['name']}.")
+
     except subprocess.TimeoutExpired:
         print(f"Error: {game['name']} timed out!")
     except Exception as e:

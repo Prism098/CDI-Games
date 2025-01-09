@@ -1,101 +1,84 @@
 import pygame
 import sys
-from persona import Persona
-from ui_element import UIElement
 
+# Initialize Pygame and the font module
 pygame.init()
+pygame.font.init()
 
-# Scherminstellingen
+from game import GameState
+
+# Screen dimensions
+ORANGE = (255, 98, 40)
 WIDTH, HEIGHT = 1200, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Website Interface Builder Game")
 
-# Kleuren
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-ORANGE = (255, 98, 40)
-
-# Fonts
-FONT = pygame.font.SysFont("arial", 24)
-
-class GameState:
-    def __init__(self):
-        self.running = True
-        self.score = 0
-        self.stage = "colors"
-        self.timer = 20  # Tijdslimiet in seconden
-        self.start_time = pygame.time.get_ticks()
-
-        # Persona object
-        self.persona = Persona(
-            "CDI-Games-HCI/assets/Childpersona.png",
-            (75, 250),
-            "Design een passend interface \n voor de persoon in de onderstaande foto:"
-        )
-
-        # UI Elements
-        self.ui_elements = [
-            UIElement(540, 650, 125, 125, color=ORANGE),
-            UIElement(770, 650, 125, 125, color=(150, 150, 150)),
-            UIElement(990, 650, 125, 125, color=(77, 55, 50)),
-        ]
-
-    def handle_event(self, event):
-        # Verwerk muisgebeurtenissen voor de UI
-        if event.type == pygame.MOUSEBUTTONUP:
-            for element in self.ui_elements:
-                if element.rect.collidepoint(event.pos) and self.stage == "colors":
-                    # Als de juiste kleur wordt gekozen, verhoog de score
-                    if element.color == ORANGE:
-                        self.score += 1000
-                    self.stage = "complete"  # Ga naar de volgende stage
-
-    def update_timer(self):
-        elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000
-        if elapsed_time >= self.timer:
-            self.running = False
-
-    def draw(self, screen):
-        # Achtergrond tekenen
-        screen.fill(WHITE)
-
-        # Persona tekenen
-        self.persona.draw(screen)
-
-        # UI Elements tekenen
-        if self.stage == "colors":
-            for element in self.ui_elements:
-                element.draw(screen)
-
-        # Timer tekenen
-        timer_font = pygame.font.SysFont("arial", 36)
-        timer_text = timer_font.render(f"Tijd: {max(0, self.timer - int((pygame.time.get_ticks() - self.start_time) / 1000))}s", True, BLACK)
-        screen.blit(timer_text, (20, 20))
-
-        # Score tekenen
-        score_text = FONT.render(f"Score: {self.score}", True, BLACK)
-        screen.blit(score_text, (20, 60))
+def calculate_score(game_state):
+    """Calculate total score based on all correct choices"""
+    score = 0
+    
+    # Check for orange color
+    if game_state.grey_color == ORANGE and not game_state.color_condition_met:
+        score += 1000
+        game_state.color_condition_met = True  # Mark that we've met the color condition
+    
+    # Check for happy sticker
+    if game_state.sticker_placed and game_state.ui_stickers[0].placed and not game_state.sticker_condition_met:
+        score += 1000
+        game_state.sticker_condition_met = True  # Mark that we've met the sticker condition
+    
+    # Check for Comic Sans
+    if game_state.font_name == "comicsansms" and not game_state.font_condition_met:
+        score += 1000
+        game_state.font_condition_met = True  # Mark that we've met the font condition
+    
+    return score
 
 def main():
-    # Initialiseer game state
     game_state = GameState()
     clock = pygame.time.Clock()
-
-    while game_state.running:
+    running = True
+    total_score = 0
+    previous_score = total_score  # Initialize previous_score
+    
+    # Print the initial score when the app starts
+    print(f"Score: {total_score}")
+    
+    while running:
         dt = clock.tick(60) / 1000
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_state.running = False
+                running = False
+            
+            # Handle the event
             game_state.handle_event(event)
-
-        game_state.update_timer()
+            
+            # Calculate score if conditions are met
+            score_change = calculate_score(game_state)
+            total_score += score_change
+            
+            # Ensure the score does not exceed 3000
+            total_score = min(total_score, 3000)
+            
+            # Update the score in game state
+            game_state.score = total_score
+            
+            # Print the score only if it has changed
+            if total_score != previous_score:
+                print(f"Score: {total_score}")
+                previous_score = total_score
+        
+        # Update timer and check for time-based scoring
+        game_state.update_timer(dt)
+        
+        # Draw everything
         game_state.draw(screen)
         pygame.display.flip()
-
-    # Print de uiteindelijke score
-    final_score = game_state.score
+        
     pygame.quit()
-    print(f"Score: {final_score}")
+    print(f"Score: {total_score}")
+    sys.exit()
 
 if __name__ == "__main__":
     main()

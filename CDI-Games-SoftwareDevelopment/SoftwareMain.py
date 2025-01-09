@@ -144,6 +144,7 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                print(f"Score: {int(score)}")
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -256,7 +257,7 @@ def main():
         pygame.display.flip()
 
     # Print final score
-    print(f"Score: {score}")
-
+    print(f"Score: {int(score)}")
+    
 if __name__ == "__main__":
     main()
