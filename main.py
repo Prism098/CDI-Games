@@ -42,7 +42,7 @@ def main():
     previous_score = total_score  # Initialize previous_score
     
     # Print the initial score when the app starts
-    print(f"Total score: {total_score}")
+    print(f"Score: {total_score}")
     
     while running:
         dt = clock.tick(60) / 1000
@@ -66,7 +66,7 @@ def main():
             
             # Print the score only if it has changed
             if total_score != previous_score:
-                print(f"Total score: {total_score}")
+                print(f"Score: {total_score}")
                 previous_score = total_score
         
         # Update timer and check for time-based scoring
