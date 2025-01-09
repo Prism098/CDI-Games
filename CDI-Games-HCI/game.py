@@ -60,7 +60,6 @@ class GameState:
         self.grey_square = pygame.Rect(500, 10, 650, 600)
         self.grey_color = (200, 200, 200)
         self.placed_elements = []
-        self.score = 0
 
         self.header_text = "Webinterface"
         self.description_text = (
@@ -169,9 +168,9 @@ class GameState:
         pygame.draw.rect(screen, WHITE, window_rect)
         pygame.draw.rect(screen, BLACK, window_rect, 2)
 
-        score_text = FONT.render(f"Jouw Score: {self.score}", True, BLACK)
-        score_text_rect = score_text.get_rect(center=window_rect.center)
-        screen.blit(score_text, score_text_rect)
+        end_text = FONT.render("Game Over", True, BLACK)
+        end_text_rect = end_text.get_rect(center=window_rect.center)
+        screen.blit(end_text, end_text_rect)
 
     def wrap_text(self, text, screen, x, y, width, font):
         words = text.split(" ")
@@ -214,18 +213,13 @@ class GameState:
             for element in elements:
                 if self.grey_square.colliderect(element.rect) and element.visible:
                     if self.stage == "colors" and element.color:
-                        # Check if the correct color is chosen
-                        if element.color == ORANGE:
-                            self.score += 1000
                         self.grey_color = element.color
                         self.stage = "sticker"
                         return
 
                     if self.stage == "sticker" and self.photo_rect.colliderect(element.rect):
-                        # Scale and place sticker in the center
                         scaled_width = int(element.original_width * 2)
                         scaled_height = int(element.original_height * 2)
-
                         element.rect = pygame.Rect(
                             self.photo_rect.centerx - scaled_width // 2,
                             self.photo_rect.centery - scaled_height // 2,
@@ -238,25 +232,13 @@ class GameState:
                         element.draggable = False
                         element.placed = True
                         self.sticker_placed = True
-
-                        if element.image == self.ui_stickers[0].image:  # Cheerful
-                            self.correct_sticker_chosen = True
-                            self.score += 1000
-
                         self.stage = "fonts"
                         return
 
                     if self.stage == "fonts" and element.font_name:
-                        if element.font_name == "comicsansms":
-                            self.score += 1000
-
                         self.update_description_and_header_font(element.font_name)
-
                         self.show_score_window = True
                         return
-
-        # Debugging score
-        print(f"Score: {self.score}")
 
     def update_description_and_header_font(self, font_name):
         self.font = pygame.font.SysFont(font_name, self.font_size)
@@ -276,4 +258,3 @@ class GameState:
             if self.time_left <= 0:
                 self.time_left = 0
                 self.show_score_window = True
-                print("Time's up!")
