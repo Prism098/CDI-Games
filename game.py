@@ -291,8 +291,7 @@ class GameState:
                         self.show_score_window = True
                         return
 
-                # Debugging score
-                print(f"Score: {self.score}")
+             
 
     def update_description_and_header_font(self, font_name):
         self.font = pygame.font.SysFont(font_name, self.font_size)

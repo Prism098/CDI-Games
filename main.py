@@ -39,6 +39,10 @@ def main():
     clock = pygame.time.Clock()
     running = True
     total_score = 0
+    previous_score = total_score  # Initialize previous_score
+    
+    # Print the initial score when the app starts
+    print(f"Total score: {total_score}")
     
     while running:
         dt = clock.tick(60) / 1000
@@ -59,6 +63,11 @@ def main():
             
             # Update the score in game state
             game_state.score = total_score
+            
+            # Print the score only if it has changed
+            if total_score != previous_score:
+                print(f"Total score: {total_score}")
+                previous_score = total_score
         
         # Update timer and check for time-based scoring
         game_state.update_timer(dt)
@@ -67,11 +76,6 @@ def main():
         game_state.draw(screen)
         pygame.display.flip()
         
-        # Debug output
-        if score_change != 0:
-            print(f"Score change: {score_change}")
-            print(f"Total score: {total_score}")
-    
     pygame.quit()
     sys.exit()
 
