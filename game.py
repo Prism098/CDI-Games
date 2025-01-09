@@ -20,19 +20,26 @@ RED = (255, 0, 0)
 # Fonts
 FONT = pygame.font.SysFont("arial", 24)
 
+
 class GameState:
     def __init__(self):
         # Game state initialization
+        # Game state initialization
         self.stage = "colors"
         self.font_size = 20
-        self.font = pygame.font.SysFont("arial", self.font_size)
-        self.header_font = pygame.font.SysFont("arial", 40)
-        
-        # Persona object
+        self.font_name = "arial"  # Store the font name here
+        self.font = pygame.font.SysFont(self.font_name, self.font_size)
+        self.header_font = pygame.font.SysFont(self.font_name, 40)
+
+        # Flags to track the score conditions (if they have been earned once)
+        self.color_condition_met = False  # Initialize this flag
+        self.sticker_condition_met = False  # Initialize this flag
+        self.font_condition_met = False  # Initialize this flag
+
         self.persona = Persona(
             "assets/Childpersona.png",
             (75, 250),
-            "Design een passend interface \n voor de persoon in de onderstaande foto:"
+            "Design een passend interface \n voor de persoon in de onderstaande foto:",
         )
 
         # UI Elements
@@ -41,21 +48,45 @@ class GameState:
             UIElement(770, 650, 125, 125, color=GREY),
             UIElement(990, 650, 125, 125, color=BROWN),
         ]
-        
+
         # Stickers UI Elements
         self.ui_stickers = [
             UIElement(540, 640, 100, 150, image_path="assets/CartoonHappy.png"),
             UIElement(770, 650, 125, 125, image_path="assets/CartoonBored.png"),
             UIElement(990, 640, 100, 150, image_path="assets/CartoonSad.png"),
         ]
-        
+
         # Font UI Elements
         self.font_elements = [
-            UIElement(500, 650, 125, 125, text="Aa", font=pygame.font.SysFont("timesnewroman", 50), font_name="timesnewroman"),
-            UIElement(762, 650, 125, 125, text="Aa", font=pygame.font.SysFont("comicsansms", 50), font_name="comicsansms"),
-            UIElement(1025, 650, 125, 125, text="Aa", font=pygame.font.SysFont("couriernew", 50), font_name="couriernew"),
+            UIElement(
+                500,
+                650,
+                125,
+                125,
+                text="Aa",
+                font=pygame.font.SysFont("timesnewroman", 50),
+                font_name="timesnewroman",
+            ),
+            UIElement(
+                762,
+                650,
+                125,
+                125,
+                text="Aa",
+                font=pygame.font.SysFont("comicsansms", 50),
+                font_name="comicsansms",
+            ),
+            UIElement(
+                1025,
+                650,
+                125,
+                125,
+                text="Aa",
+                font=pygame.font.SysFont("couriernew", 50),
+                font_name="couriernew",
+            ),
         ]
-        
+
         # Additional elements
         self.grey_square = pygame.Rect(500, 10, 650, 600)
         self.grey_color = (200, 200, 200)
@@ -69,13 +100,13 @@ class GameState:
             "Koester de eenvoudige momenten — een warme zonsopgang, het lachen met vrienden of de stille rust van de natuur. "
             "Dit zijn de ware vreugden van het leven."
         )
-        
+
         self.photo_rect = pygame.Rect(
             self.grey_square.centerx - 150, self.grey_square.top + 340, 300, 200
         )
-        
+
         self.sticker_placed = False
-        
+
         # Timer settings
         self.total_time = 20  # Total time in seconds
         self.time_left = self.total_time
@@ -112,7 +143,9 @@ class GameState:
 
         # Draw header and description
         header_surface = self.header_font.render(self.header_text, True, BLACK)
-        header_rect = header_surface.get_rect(center=(self.grey_square.centerx, self.grey_square.top + 50))
+        header_rect = header_surface.get_rect(
+            center=(self.grey_square.centerx, self.grey_square.top + 50)
+        )
         screen.blit(header_surface, header_rect)
 
         self.wrap_text(
@@ -128,13 +161,21 @@ class GameState:
         self.persona.draw(screen)
 
         # Draw timer bar
-        timer_bar_current_width = int((self.time_left / self.total_time) * self.timer_bar_width)
-        pygame.draw.rect(screen, self.timer_bar_color, (0, 0, timer_bar_current_width, self.timer_bar_height))
+        timer_bar_current_width = int(
+            (self.time_left / self.total_time) * self.timer_bar_width
+        )
+        pygame.draw.rect(
+            screen,
+            self.timer_bar_color,
+            (0, 0, timer_bar_current_width, self.timer_bar_height),
+        )
 
         # Draw label below the grey square
         if label_text:
             label_surface = FONT.render(label_text, True, BLACK)
-            label_rect = label_surface.get_rect(center=(self.grey_square.centerx, self.grey_square.bottom + 20))
+            label_rect = label_surface.get_rect(
+                center=(self.grey_square.centerx, self.grey_square.bottom + 20)
+            )
             screen.blit(label_surface, label_rect)
 
         # Draw photo placeholder or placed sticker
@@ -202,9 +243,9 @@ class GameState:
             return
 
         elements = (
-            self.ui_elements if self.stage == "colors" else
-            self.ui_stickers if self.stage == "sticker" else
-            self.font_elements
+            self.ui_elements
+            if self.stage == "colors"
+            else self.ui_stickers if self.stage == "sticker" else self.font_elements
         )
 
         for element in elements:
@@ -214,14 +255,13 @@ class GameState:
             for element in elements:
                 if self.grey_square.colliderect(element.rect) and element.visible:
                     if self.stage == "colors" and element.color:
-                        # Check if the correct color is chosen
-                        if element.color == ORANGE:
-                            self.score += 1000
                         self.grey_color = element.color
                         self.stage = "sticker"
                         return
 
-                    if self.stage == "sticker" and self.photo_rect.colliderect(element.rect):
+                    if self.stage == "sticker" and self.photo_rect.colliderect(
+                        element.rect
+                    ):
                         # Scale and place sticker in the center
                         scaled_width = int(element.original_width * 2)
                         scaled_height = int(element.original_height * 2)
@@ -238,25 +278,21 @@ class GameState:
                         element.draggable = False
                         element.placed = True
                         self.sticker_placed = True
-
-                        if element.image == self.ui_stickers[0].image:  # Cheerful
-                            self.correct_sticker_chosen = True
-                            self.score += 1000
-
                         self.stage = "fonts"
                         return
 
                     if self.stage == "fonts" and element.font_name:
-                        if element.font_name == "comicsansms":
-                            self.score += 1000
-
+                        # Update the font and set the flag for scoring
                         self.update_description_and_header_font(element.font_name)
-
+                        self.font_name = element.font_name  # Set the selected font name
+                        self.font_condition_met = (
+                            False  # Reset condition for next selection
+                        )
                         self.show_score_window = True
                         return
 
-        # Debugging score
-        print(f"Score: {self.score}")
+                # Debugging score
+                print(f"Score: {self.score}")
 
     def update_description_and_header_font(self, font_name):
         self.font = pygame.font.SysFont(font_name, self.font_size)
@@ -264,9 +300,9 @@ class GameState:
 
     def is_any_element_dragging(self):
         elements = (
-            self.ui_elements if self.stage == "colors" else
-            self.ui_stickers if self.stage == "sticker" else
-            self.font_elements
+            self.ui_elements
+            if self.stage == "colors"
+            else self.ui_stickers if self.stage == "sticker" else self.font_elements
         )
         return any(element.is_dragging() for element in elements)
 
