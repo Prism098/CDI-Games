@@ -117,6 +117,7 @@ class GameState:
         # Score window settings
         self.show_score_window = False
 
+    
     def draw(self, screen):
         # Draw background and main elements
         screen.fill(WHITE)
@@ -191,28 +192,8 @@ class GameState:
 
         # Draw score window if needed
         if self.show_score_window:
-            self.draw_score_window(screen)
-
-    def draw_score_window(self, screen):
-        overlay = pygame.Surface((WIDTH, HEIGHT))
-        overlay.set_alpha(150)
-        overlay.fill(BLACK)
-        screen.blit(overlay, (0, 0))
-
-        window_width = 400
-        window_height = 200
-        window_rect = pygame.Rect(
-            (WIDTH - window_width) // 2,
-            (HEIGHT - window_height) // 2,
-            window_width,
-            window_height,
-        )
-        pygame.draw.rect(screen, WHITE, window_rect)
-        pygame.draw.rect(screen, BLACK, window_rect, 2)
-
-        score_text = FONT.render(f"Jouw Score: {self.score}", True, BLACK)
-        score_text_rect = score_text.get_rect(center=window_rect.center)
-        screen.blit(score_text, score_text_rect)
+            # Removed this part. It will be moved to main()
+            pass
 
     def wrap_text(self, text, screen, x, y, width, font):
         words = text.split(" ")

@@ -9,6 +9,9 @@ from game import GameState
 
 # Screen dimensions
 ORANGE = (255, 98, 40)
+BLACK = (0, 0, 0)
+WHITE= (255, 255, 255)
+FONT = pygame.font.SysFont("arial", 24)
 WIDTH, HEIGHT = 1200, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Website Interface Builder Game")
@@ -33,6 +36,27 @@ def calculate_score(game_state):
         game_state.font_condition_met = True  # Mark that we've met the font condition
     
     return score
+
+def draw_score_window(screen, total_score):
+    overlay = pygame.Surface((WIDTH, HEIGHT))
+    overlay.set_alpha(150)
+    overlay.fill(BLACK)
+    screen.blit(overlay, (0, 0))
+
+    window_width = 400
+    window_height = 200
+    window_rect = pygame.Rect(
+        (WIDTH - window_width) // 2,
+        (HEIGHT - window_height) // 2,
+        window_width,
+        window_height,
+    )
+    pygame.draw.rect(screen, WHITE, window_rect)
+    pygame.draw.rect(screen, BLACK, window_rect, 2)
+
+    score_text = FONT.render(f"Jouw Score: {total_score}", True, BLACK)
+    score_text_rect = score_text.get_rect(center=window_rect.center)
+    screen.blit(score_text, score_text_rect)
 
 def main():
     game_state = GameState()
@@ -74,6 +98,11 @@ def main():
         
         # Draw everything
         game_state.draw(screen)
+        
+        # Draw the score window if the flag is set
+        if game_state.show_score_window:
+            draw_score_window(screen, total_score)
+        
         pygame.display.flip()
         
     pygame.quit()
