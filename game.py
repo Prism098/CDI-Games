@@ -191,9 +191,7 @@ class GameState:
                     sticker.draw(screen, self.show_score_window)
 
         # Draw score window if needed
-        if self.show_score_window:
-            # Removed this part. It will be moved to main()
-            pass
+       
 
     def wrap_text(self, text, screen, x, y, width, font):
         words = text.split(" ")
