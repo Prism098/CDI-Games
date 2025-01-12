@@ -132,6 +132,14 @@ class GameState:
             label_text = "Kleur"
             for element in self.ui_elements:
                 element.draw(screen, self.show_score_window)
+
+            # Add instructional text for the "colors" stage
+            self.draw_instructions(
+                screen,
+                "Sleep de objecten \n naar het grijze gebied! ",
+                x=WIDTH // 3,
+                y=HEIGHT - 100,
+            )
         elif self.stage == "sticker":
             label_text = "Sticker"
             for sticker in self.ui_stickers:
@@ -189,30 +197,20 @@ class GameState:
                 if sticker.placed:
                     sticker.draw(screen, self.show_score_window)
 
-        # Draw score window if needed
-        if self.show_score_window:
-            self.draw_score_window(screen)
+    def draw_instructions(self, screen, text, x, y):
+        """Draw multi-line instructional text at the given position."""
+        instruction_font = pygame.font.SysFont("arial", 17)
+        lines = text.split("\n")  # Split the text into multiple lines
 
-    def draw_score_window(self, screen):
-        overlay = pygame.Surface((WIDTH, HEIGHT))
-        overlay.set_alpha(150)
-        overlay.fill(BLACK)
-        screen.blit(overlay, (0, 0))
-
-        window_width = 400
-        window_height = 200
-        window_rect = pygame.Rect(
-            (WIDTH - window_width) // 2,
-            (HEIGHT - window_height) // 2,
-            window_width,
-            window_height,
-        )
-        pygame.draw.rect(screen, WHITE, window_rect)
-        pygame.draw.rect(screen, BLACK, window_rect, 2)
-
-        score_text = FONT.render(f"Jouw Score: {self.score}", True, BLACK)
-        score_text_rect = score_text.get_rect(center=window_rect.center)
-        screen.blit(score_text, score_text_rect)
+        line_height = (
+            instruction_font.get_height() + 5
+        )  # Add some spacing between lines
+        for i, line in enumerate(lines):
+            instruction_surface = instruction_font.render(line, True, BLACK)
+            instruction_rect = instruction_surface.get_rect(
+                center=(x, y + i * line_height)
+            )
+            screen.blit(instruction_surface, instruction_rect)
 
     def wrap_text(self, text, screen, x, y, width, font):
         words = text.split(" ")
@@ -259,10 +257,10 @@ class GameState:
                         self.stage = "sticker"
                         return
 
-                    if self.stage == "sticker" and self.photo_rect.colliderect(
+                    if self.stage == "sticker" and self.grey_square.colliderect(
                         element.rect
                     ):
-                        # Scale and place sticker in the center
+                        # Automatically place the sticker in the "Foto hier" area
                         scaled_width = int(element.original_width * 2)
                         scaled_height = int(element.original_height * 2)
 
@@ -290,8 +288,6 @@ class GameState:
                         )
                         self.show_score_window = True
                         return
-
-             
 
     def update_description_and_header_font(self, font_name):
         self.font = pygame.font.SysFont(font_name, self.font_size)
