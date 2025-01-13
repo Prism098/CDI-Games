@@ -65,7 +65,7 @@ grid = [
 run_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 100, 200, 50)
 
 # Load and scale car image
-CAR_IMAGE = pygame.image.load("images/Car_Green_Front.svg")
+CAR_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Car_Green_Front.svg")
 CAR_IMAGE = pygame.transform.scale(CAR_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
 CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)  # Rotate to face RIGHT
 
@@ -170,7 +170,10 @@ def move_forward():
     # Check if the car reaches the yellow block (destination)
     if (player_x, player_y) == destination:
         score += 100  # Award points for reaching the destination
+        print(f"Score: {int(score)}")
+
         end_game(0)
+    
 
 def turn_left():
     global player_dir
@@ -286,7 +289,9 @@ def main():
                     handle_mouse_click(event.pos)
 
         pygame.display.flip()
+
         clock.tick(30)
+
 
 if __name__ == "__main__":
     main()
