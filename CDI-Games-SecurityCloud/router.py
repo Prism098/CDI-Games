@@ -35,7 +35,7 @@ class Router(pygame.sprite.Sprite):
         fill = (self.hp / self.max_hp) * bar_width
         outline_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, fill, bar_height)
-        pygame.draw.rect(surface, (255, 0, 0), fill_rect)
+        pygame.draw.rect(surface, ("#a7f070"), fill_rect)
         pygame.draw.rect(surface, (255, 255, 255), outline_rect, 1)
 
     def update(self):

@@ -13,7 +13,7 @@ class Ship(pygame.sprite.Sprite):
         self.kogels = pygame.sprite.Group()
         self.vel_x = 0 # Snelheid van het schip in de x richting
         self.vel_y = 0 # Snelheid van het schip in de y richting    
-        self.speed = 15 # Snelheid van het schip
+        self.speed = 10 # Snelheid van het schip
 
     def update(self):
         self.kogels.update()

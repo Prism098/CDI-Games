@@ -31,7 +31,10 @@ class EnemySpawner:
                 firewall_height = firewall_image.get_height() // c.SCHIP_GROOTTE
                 firewall_y = (c.DISPLAY_SIZE[1] - firewall_height) // 1.4
                 
-                enemy = Enemy(self.firewall_positions[i], firewall_y, self, self.score)
+                # Calculate stop_y to be halfway up the firewall
+                stop_y = firewall_y - firewall_height // 2
+                
+                enemy = Enemy(self.firewall_positions[i], stop_y, self, self.score)
                 self.enemy_group.add(enemy)
                 self.enemy_lanes[i] = enemy
                 break
