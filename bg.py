@@ -3,18 +3,15 @@ import constante as c
 from ster import Ster
 import random as r
 
-
 class BG(pygame.sprite.Sprite):
     def __init__(self):
         super(BG, self).__init__()
         self.image = pygame.Surface(c.DISPLAY_SIZE)
-        self.color = (0, 0, 15)
+        self.color = ("#29366f")
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.sterren = pygame.sprite.Group()
         self.timer = r.randrange(1, 10)
-
-
 
     def update(self):
         self.sterren.update()
