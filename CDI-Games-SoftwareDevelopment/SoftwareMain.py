@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 import time
 
 pygame.init()
@@ -8,256 +7,286 @@ pygame.init()
 # Window setup
 WIDTH, HEIGHT = 1400, 800
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Boolean Bakery")
+pygame.display.set_caption("Code Racer")
 
 # Fonts & Colors
 TITLE_FONT = pygame.font.SysFont("Arial", 48, bold=True)
 INSTR_FONT = pygame.font.SysFont("Arial", 32)
 FONT = pygame.font.SysFont("Arial", 24)
-SMALL_FONT = pygame.font.SysFont("Arial", 20)
 
-# Color palette based on mockups
-RED_BG = (194, 0, 48)   # Background red
+RED_BG = (194, 0, 48)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-ORANGE = (242, 159, 93)
 GREEN = (135, 211, 124)
-RED = (235, 106, 106)
-LIGHT_GREY = (230, 230, 230)
+YELLOW = (255, 255, 0)
+BLUE = (93, 173, 226)
+GRAY = (169, 169, 169)
 
-# Game constants
-STEPS = [
-    "Pak alle tools & ingrediënten",
-    "Vul de bakblik met bakmix",
-    "Mix de Ingrediënten",
-    "Bak de cake"
+# Game settings
+GRID_SIZE = 5
+TILE_SIZE = 100
+COMMANDS = ["Move Forward", "Turn Left", "Turn Right"]
+player_x, player_y = 0, 4
+player_dir = "RIGHT"
+commands = []
+destination = (4, 0)
+
+# Timer and scoring
+TIME_LIMIT = 60  # in seconds
+timer_start = time.time()
+score = 0
+final_score_displayed = False
+
+# Drop Zone
+MAX_STEPS = 5  # Number of drop zones
+DROP_ZONE_PADDING = 20
+drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
+
+# Command positions
+COMMAND_BLOCK_X = 300
+COMMAND_BLOCK_Y = 50
+COMMAND_SPACING = 70
+
+# Grid alignment
+GRID_PADDING_RIGHT = 40
+GRID_OFFSET_X = WIDTH - GRID_PADDING_RIGHT - (GRID_SIZE * TILE_SIZE)
+GRID_OFFSET_Y = 200
+
+# Grid layout
+grid = [
+    ["R", "R", "R", "R", "D"],
+    ["G", "G", "G", "R", "G"],
+    ["G", "G", "G", "R", "G"],
+    ["G", "G", "C", "R", "G"],
+    ["R", "C", "R", "R", "C"],
 ]
-CORRECT_ORDER = STEPS[:]  # The correct order is as defined above
-TIME_LIMIT = 60  # 60 seconds to solve
-POINTS_PER_CORRECT = 10
 
-class Button:
-    def __init__(self, x, y, text, width=120, height=50):
+# Run Button
+run_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 100, 200, 50)
+
+# Load and scale car image
+CAR_IMAGE = pygame.image.load("images/Car_Green_Front.svg")
+CAR_IMAGE = pygame.transform.scale(CAR_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)  # Rotate to face RIGHT
+
+# Classes for Command Blocks
+class CommandBlock:
+    def __init__(self, text, x, y, color):
         self.text = text
-        self.rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(x, y, 150, 50)
+        self.color = color
 
-    def draw(self, surf):
-        # Draw a white rounded button
-        pygame.draw.rect(surf, WHITE, self.rect, border_radius=25)
+    def draw(self):
+        pygame.draw.rect(SCREEN, self.color, self.rect, border_radius=25)
         txt_surf = FONT.render(self.text, True, BLACK)
         txt_rect = txt_surf.get_rect(center=self.rect.center)
-        surf.blit(txt_surf, txt_rect)
+        SCREEN.blit(txt_surf, txt_rect)
 
-    def clicked(self, pos):
-        return self.rect.collidepoint(pos)
+# Create command blocks
+command_blocks = [
+    CommandBlock("Move Forward", COMMAND_BLOCK_X, COMMAND_BLOCK_Y, GREEN),
+    CommandBlock("Turn Left", COMMAND_BLOCK_X, COMMAND_BLOCK_Y + COMMAND_SPACING, BLUE),
+    CommandBlock("Turn Right", COMMAND_BLOCK_X, COMMAND_BLOCK_Y + 2 * COMMAND_SPACING, YELLOW),
+]
 
-class DraggableStep:
-    def __init__(self, text, x, y, width=300, height=50):
-        self.text = text
-        self.rect = pygame.Rect(x, y, width, height)
-        self.dragging = False
-        self.offset_x = 0
-        self.offset_y = 0
-        self.correct = False
-        self.checked = False
+# Draw grid and elements
+def draw_grid():
+    for x in range(GRID_SIZE):
+        for y in range(GRID_SIZE):
+            tile_type = grid[y][x]
+            color = GRAY if tile_type == "R" else WHITE
+            if tile_type == "D":
+                color = YELLOW
+            rect = pygame.Rect(
+                GRID_OFFSET_X + x * TILE_SIZE,
+                GRID_OFFSET_Y + y * TILE_SIZE,
+                TILE_SIZE,
+                TILE_SIZE,
+            )
+            pygame.draw.rect(SCREEN, color, rect)
+            pygame.draw.rect(SCREEN, BLACK, rect, 1)
 
-    def draw(self, surf):
-        # White pill-shaped rectangle with black text
-        color = WHITE if not self.checked else (GREEN if self.correct else RED)
-        pygame.draw.rect(surf, color, self.rect, border_radius=25)
-        txt_surf = FONT.render(self.text, True, BLACK if color == WHITE else WHITE)
-        txt_rect = txt_surf.get_rect(center=self.rect.center)
-        surf.blit(txt_surf, txt_rect)
+def draw_car():
+    global player_dir
+    car_image = CAR_IMAGE
 
-        # If checked, draw symbol next to it
-        if self.checked:
-            symbol = "✓" if self.correct else "✗"
-            sym_color = WHITE if not self.correct else BLACK
-            sym_surf = FONT.render(symbol, True, sym_color)
-            sym_rect = sym_surf.get_rect(midleft=(self.rect.right + 10, self.rect.centery))
-            surf.blit(sym_surf, sym_rect)
+    if player_dir == "RIGHT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, -90)
+    elif player_dir == "LEFT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 90)
+    elif player_dir == "UP":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 0)
+    elif player_dir == "DOWN":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 180)
 
-class Slot:
-    def __init__(self, x, y, width=300, height=50, index=1):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.filled_by = None
-        self.index = index
+    car_rect = car_image.get_rect(center=(
+        GRID_OFFSET_X + player_x * TILE_SIZE + TILE_SIZE // 2,
+        GRID_OFFSET_Y + player_y * TILE_SIZE + TILE_SIZE // 2,
+    ))
+    SCREEN.blit(car_image, car_rect)
 
-    def draw(self, surf):
-        # Show a circle with the index on the left and white rectangle slot to the right
-        circle_radius = 25
-        circle_center = (self.rect.left - 60, self.rect.centery)
-        
-        # Draw circle with index
-        pygame.draw.circle(surf, WHITE, circle_center, circle_radius)
-        num_surf = FONT.render(str(self.index), True, BLACK)
-        num_rect = num_surf.get_rect(center=circle_center)
-        surf.blit(num_surf, num_rect)
+def draw_timer():
+    # Calculate time left
+    elapsed_time = time.time() - timer_start
+    time_left = TIME_LIMIT - elapsed_time
 
-        # Draw the slot as a white pill-shaped rectangle
-        pygame.draw.rect(surf, WHITE, self.rect, border_radius=25)
+    # Timer circle
+    timer_x, timer_y = WIDTH - 100, 50
+    pygame.draw.circle(SCREEN, YELLOW if time_left > 30 else RED_BG, (timer_x, timer_y), 40)
+    timer_text = FONT.render(str(max(0, int(time_left))), True, BLACK)
+    timer_rect = timer_text.get_rect(center=(timer_x, timer_y))
+    SCREEN.blit(timer_text, timer_rect)
 
+    return time_left
+
+def draw_score():
+    score_text = FONT.render(f"Score: {score}", True, WHITE)
+    score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT - 50))
+    SCREEN.blit(score_text, score_rect)
+
+def end_game(time_left):
+    global final_score_displayed
+
+    # Show the final score at the bottom of the screen for 10 seconds
+    if not final_score_displayed:
+        draw_score()
+        pygame.display.flip()
+        pygame.time.wait(10000)
+        final_score_displayed = True
+        pygame.quit()
+        sys.exit()
+
+def move_forward():
+    global player_x, player_y, score
+    if player_dir == "RIGHT" and player_x < GRID_SIZE - 1:
+        player_x += 1
+    elif player_dir == "LEFT" and player_x > 0:
+        player_x -= 1
+    elif player_dir == "UP" and player_y > 0:
+        player_y -= 1
+    elif player_dir == "DOWN" and player_y < GRID_SIZE - 1:
+        player_y += 1
+
+    # Check if the car reaches the yellow block (destination)
+    if (player_x, player_y) == destination:
+        score += 100  # Award points for reaching the destination
+        end_game(0)
+
+def turn_left():
+    global player_dir
+    if player_dir == "RIGHT":
+        player_dir = "UP"
+    elif player_dir == "UP":
+        player_dir = "LEFT"
+    elif player_dir == "LEFT":
+        player_dir = "DOWN"
+    elif player_dir == "DOWN":
+        player_dir = "RIGHT"
+
+def turn_right():
+    global player_dir
+    if player_dir == "RIGHT":
+        player_dir = "DOWN"
+    elif player_dir == "DOWN":
+        player_dir = "LEFT"
+    elif player_dir == "LEFT":
+        player_dir = "UP"
+    elif player_dir == "UP":
+        player_dir = "RIGHT"
+
+def draw_drop_zones():
+    for i, zone in enumerate(drop_zones):
+        pygame.draw.rect(SCREEN, WHITE, zone, border_radius=15)
+        pygame.draw.rect(SCREEN, BLACK, zone, 2, border_radius=15)
+        step_txt = FONT.render(f"S{i + 1}:  ", True, BLACK)
+        step_rect = step_txt.get_rect(midleft=(zone.left + 10, zone.centery))
+        SCREEN.blit(step_txt, step_rect)
+
+        if i < len(commands):
+            x_button_rect = pygame.Rect(zone.right - 40, zone.top + 10, 30, 30)
+            pygame.draw.rect(SCREEN, RED_BG, x_button_rect, border_radius=5)
+            x_txt = FONT.render("X", True, WHITE)
+            x_txt_rect = x_txt.get_rect(center=x_button_rect.center)
+            SCREEN.blit(x_txt, x_txt_rect)
+
+def draw_run_button():
+    pygame.draw.rect(SCREEN, WHITE, run_button, border_radius=15)
+    pygame.draw.rect(SCREEN, BLACK, run_button, 2, border_radius=15)
+    run_txt = FONT.render("RUN", True, BLACK)
+    run_rect = run_txt.get_rect(center=run_button.center)
+    SCREEN.blit(run_txt, run_rect)
+
+def execute_commands():
+    global player_x, player_y
+    for cmd in commands:
+        pygame.time.wait(100)
+        if cmd == "Move Forward":
+            move_forward()
+        elif cmd == "Turn Left":
+            turn_left()
+        elif cmd == "Turn Right":
+            turn_right()
+        draw_grid()
+        draw_car()
+        pygame.display.update()
+        pygame.time.wait(100)
+    commands.clear()
+
+def handle_mouse_click(pos):
+    global commands
+
+    for block in command_blocks:
+        if block.rect.collidepoint(pos):
+            if len(commands) < MAX_STEPS:
+                commands.append(block.text)
+
+    for i, zone in enumerate(drop_zones):
+        if i < len(commands):
+            x_button_rect = pygame.Rect(zone.right - 40, zone.top + 10, 30, 30)
+            if x_button_rect.collidepoint(pos):
+                commands.pop(i)
+                break
 
 def main():
-    # Shuffle steps on the left side
-    puzzle_steps = STEPS[:]
-    random.shuffle(puzzle_steps)
-
-    # Create draggable steps
-    # Left column: steps at x=100, y starting at 150
-    step_y = 200
-    draggable_steps = []
-    for step in puzzle_steps:
-        ds = DraggableStep(step, 100, step_y)
-        draggable_steps.append(ds)
-        step_y += 90
-
-    # Create slots on the right side
-    slot_start_y = 200
-    slots = []
-    for i in range(len(CORRECT_ORDER)):
-        s = Slot(WIDTH - 400, slot_start_y, index=i+1)
-        slots.append(s)
-        slot_start_y += 90
-
-    check_button = Button(WIDTH - 200, HEIGHT - 100, "Check!")
-    start_time = time.time()
-    solved = False
-    score = 0
-    dragged_step = None
-
+    global commands, score
+    clock = pygame.time.Clock()
     running = True
 
     while running:
-        dt = pygame.time.Clock().tick(60) / 1000.0
-        # Time left
-        elapsed = time.time() - start_time
-        time_left = TIME_LIMIT - elapsed
-        if time_left <= 0 and not solved:
-            # Time's up, force check
-            for slot in slots:
-                if slot.filled_by:
-                    slot.filled_by.checked = True
-                    slot.filled_by.correct = (slot.filled_by.text == CORRECT_ORDER[slot.index-1])
-            score = sum(POINTS_PER_CORRECT for slot in slots if slot.filled_by and slot.filled_by.correct)
-            solved = True
+        SCREEN.fill(RED_BG)
+
+        title_surf = TITLE_FONT.render("Code Racer", True, WHITE)
+        SCREEN.blit(title_surf, (50, 10))
+        instr_surf = INSTR_FONT.render("Click commands to add them to the sequence!", True, WHITE)
+        SCREEN.blit(instr_surf, (50, 60))
+
+        for block in command_blocks:
+            block.draw()
+
+        draw_drop_zones()
+        for i, cmd in enumerate(commands):
+            cmd_txt = FONT.render(cmd, True, BLACK)
+            cmd_rect = cmd_txt.get_rect(center=drop_zones[i].center)
+            SCREEN.blit(cmd_txt, cmd_rect)
+
+        draw_grid()
+        draw_car()
+        draw_run_button()
+        draw_timer()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print(f"Score: {int(score)}")
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                pos = event.pos
-                if not solved:
-                    for ds in draggable_steps:
-                        if ds.rect.collidepoint(pos):
-                            dragged_step = ds
-                            ds.dragging = True
-                            ds.offset_x = ds.rect.x - pos[0]
-                            ds.offset_y = ds.rect.y - pos[1]
-                            break
-                # Check button
-                if check_button.clicked(pos) and not solved:
-                    for slot in slots:
-                        if slot.filled_by:
-                            slot.filled_by.checked = True
-                            correct_text = CORRECT_ORDER[slot.index-1]
-                            slot.filled_by.correct = (slot.filled_by.text == correct_text)
-                    correct_count = sum(1 for s in slots if s.filled_by and s.filled_by.correct)
-                    score = correct_count * POINTS_PER_CORRECT
-                    if correct_count == len(CORRECT_ORDER):
-                        score += int(time_left)  # time bonus if all correct
-                    solved = True
-
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                if dragged_step:
-                    # Snap to slot if overlapping
-                    placed = False
-                    for slot in slots:
-                        if slot.rect.colliderect(dragged_step.rect):
-                            # If slot empty, place here
-                            if slot.filled_by is None:
-                                slot.filled_by = dragged_step
-                                dragged_step.rect.topleft = slot.rect.topleft
-                                placed = True
-                            # If filled, leave as is
-                    dragged_step.dragging = False
-                    dragged_step = None
-
-            elif event.type == pygame.MOUSEMOTION:
-                if dragged_step and dragged_step.dragging:
-                    mx, my = event.pos
-                    dragged_step.rect.x = mx + dragged_step.offset_x
-                    dragged_step.rect.y = my + dragged_step.offset_y
-
-        # Draw background
-        SCREEN.fill(RED_BG)
-
-        # Draw title (white pill at top center)
-        title_w = 300
-        title_h = 60
-        title_rect = pygame.Rect(WIDTH//2 - title_w//2, 50, title_w, title_h)
-        pygame.draw.rect(SCREEN, WHITE, title_rect, border_radius=30)
-        title_surf = SMALL_FONT.render("Boolean Bakery", True, BLACK)
-        title_txt_rect = title_surf.get_rect(center=title_rect.center)
-        SCREEN.blit(title_surf, title_txt_rect)
-
-        # Instructions if not solved:
-        if not solved:
-            instr_surf = INSTR_FONT.render("Let's break down baking a cake", True, WHITE)
-            SCREEN.blit(instr_surf, (WIDTH//2 - instr_surf.get_width()//2, 120))
-            # Another line of instruction could be:
-            add_instr_surf = FONT.render("Sleep de stappen in de juiste volgorde en klik op 'Check!'", True, WHITE)
-            SCREEN.blit(add_instr_surf, (WIDTH//2 - add_instr_surf.get_width()//2, 160))
-
-        # Draw slots
-        for slot in slots:
-            slot.draw(SCREEN)
-            
-        # Draw steps
-        if dragged_step:
-            # Draw all steps except the one currently dragged
-            for ds in draggable_steps:
-                if ds != dragged_step:
-                    ds.draw(SCREEN)
-            # Draw the dragged step last so it appears on top
-            dragged_step.draw(SCREEN)
-        else:
-            # If no step is being dragged, just draw them normally
-            for ds in draggable_steps:
-                ds.draw(SCREEN)
-
-        # Draw button if not solved
-        if not solved:
-            check_button.draw(SCREEN)
-
-        # Draw timer (top right) as a simple white circle with remaining time
-        timer_x = WIDTH - 100
-        timer_y = 50
-        pygame.draw.circle(SCREEN, WHITE, (timer_x, timer_y), 40)
-        time_txt = str(int(time_left)) if time_left > 0 else "0"
-        time_surf = FONT.render(time_txt, True, BLACK)
-        time_rect = time_surf.get_rect(center=(timer_x, timer_y))
-        SCREEN.blit(time_surf, time_rect)
-
-        # If solved, show score feedback
-        if solved:
-            result_surf = FONT.render(f"Score: {score}", True, WHITE)
-            SCREEN.blit(result_surf, (WIDTH//2 - result_surf.get_width()//2, HEIGHT - 140))
-
-            correct_count = sum(1 for s in slots if s.filled_by and s.filled_by.correct)
-            if correct_count == len(CORRECT_ORDER):
-                msg = "Goed gedaan! Alle stappen zijn correct!"
-            else:
-                msg = "Niet alle stappen zijn correct, probeer het opnieuw!"
-            msg_surf = FONT.render(msg, True, WHITE)
-            SCREEN.blit(msg_surf, (WIDTH//2 - msg_surf.get_width()//2, HEIGHT - 100))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if run_button.collidepoint(event.pos):
+                    execute_commands()
+                else:
+                    handle_mouse_click(event.pos)
 
         pygame.display.flip()
+        clock.tick(30)
 
-    # Print final score
-    print(f"Score: {int(score)}")
-    
 if __name__ == "__main__":
     main()
