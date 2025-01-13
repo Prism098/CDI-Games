@@ -4,12 +4,13 @@ import constante as c
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, initial_x, stop_y, enemy_spawner, score):
         super(Enemy, self).__init__()
-        self.image = pygame.image.load('images/hacker_sprite.png').convert_alpha()
+        self.image = pygame.image.load('CDI-Games-SecurityCloud/images/hacker_sprite.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.image.get_width() // c.SCHIP_GROOTTE, self.image.get_height() // c.SCHIP_GROOTTE))
         self.rect = self.image.get_rect()
         self.rect.x = initial_x
         self.rect.y = -self.rect.height
         self.hp = 3
+        self.max_hp = 3  # Store the maximum HP for the HP bar
         self.vel_x = 0
         self.vel_y = 4
         self.stop_y = stop_y
@@ -42,3 +43,13 @@ class Enemy(pygame.sprite.Sprite):
             self.damage_timer = c.FPS  # Reset timer to 1 second
         else:
             self.damage_timer -= 1
+
+    def draw_hp_bar(self, surface):
+        # Draw the HP bar above the enemy
+        bar_width = self.rect.width
+        bar_height = 5
+        fill = (self.hp / self.max_hp) * bar_width
+        outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
+        fill_rect = pygame.Rect(self.rect.x, self.rect.y - 10, fill, bar_height)
+        pygame.draw.rect(surface, ("#b13e53"), fill_rect)
+        pygame.draw.rect(surface, (255, 255, 255), outline_rect, 1)

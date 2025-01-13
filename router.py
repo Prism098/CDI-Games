@@ -4,7 +4,7 @@ import constante as c
 class Router(pygame.sprite.Sprite):
     def __init__(self, score):
         super(Router, self).__init__()
-        self.image = pygame.image.load('images/router.png').convert_alpha()
+        self.image = pygame.image.load('CDI-Games-SecurityCloud/images/router.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.image.get_width() // c.SCHIP_GROOTTE, self.image.get_height() // c.SCHIP_GROOTTE))
         self.rect = self.image.get_rect()
         self.rect.x = c.DISPLAY_WIDTH // 2 - self.rect.width // 2
@@ -35,7 +35,7 @@ class Router(pygame.sprite.Sprite):
         fill = (self.hp / self.max_hp) * bar_width
         outline_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, fill, bar_height)
-        pygame.draw.rect(surface, (255, 0, 0), fill_rect)
+        pygame.draw.rect(surface, ("#a7f070"), fill_rect)
         pygame.draw.rect(surface, (255, 255, 255), outline_rect, 1)
 
     def update(self):

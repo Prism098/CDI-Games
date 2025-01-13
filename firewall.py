@@ -5,7 +5,7 @@ from firewall_bullet import FirewallBullet
 class Firewall(pygame.sprite.Sprite):
     def __init__(self, initial_x, initial_y, router, score):
         super(Firewall, self).__init__()
-        self.image = pygame.image.load('images/firewall_concept_sprite.png').convert_alpha()
+        self.image = pygame.image.load('CDI-Games-SecurityCloud/images/firewall_concept_sprite.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.image.get_width() // c.SCHIP_GROOTTE, self.image.get_height() // c.SCHIP_GROOTTE))
         self.rect = self.image.get_rect()
         self.rect.x = initial_x
@@ -52,5 +52,5 @@ class Firewall(pygame.sprite.Sprite):
         fill = (self.hp / self.max_hp) * bar_width
         outline_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height + 2, fill, bar_height)
-        pygame.draw.rect(surface, (255, 0, 0), fill_rect)
+        pygame.draw.rect(surface, ("#a7f070"), fill_rect)
         pygame.draw.rect(surface, (255, 255, 255), outline_rect, 1)

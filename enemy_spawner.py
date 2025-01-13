@@ -27,11 +27,14 @@ class EnemySpawner:
         r.shuffle(lane_indices)
         for i in lane_indices:
             if self.enemy_lanes[i] is None:
-                firewall_image = pygame.image.load('images/firewall_concept_sprite.png')
+                firewall_image = pygame.image.load('CDI-Games-SecurityCloud/images/firewall_concept_sprite.png')
                 firewall_height = firewall_image.get_height() // c.SCHIP_GROOTTE
                 firewall_y = (c.DISPLAY_SIZE[1] - firewall_height) // 1.4
                 
-                enemy = Enemy(self.firewall_positions[i], firewall_y, self, self.score)
+                # Calculate stop_y to be halfway up the firewall
+                stop_y = firewall_y - firewall_height // 2
+                
+                enemy = Enemy(self.firewall_positions[i], stop_y, self, self.score)
                 self.enemy_group.add(enemy)
                 self.enemy_lanes[i] = enemy
                 break

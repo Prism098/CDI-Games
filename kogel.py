@@ -9,7 +9,7 @@ class Kogel(pygame.sprite.Sprite):
         self.height = self.width * 2
         self.size = (self.width, self.height)
         self.image = pygame.Surface(self.size)
-        self.color = (255, 0, 0)
+        self.color = ("#41a6f6")
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.vel_x = 0

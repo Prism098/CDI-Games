@@ -73,8 +73,9 @@ enemy_spawner = EnemySpawner(firewall_positions, enemy_lanes, score)
 kaboem_spawner = KaboemSpawner()
 
 def game_over_screen(final_score):
+    print(f"Score: {final_score}")
     font = pygame.font.Font(custom_font_path, 74)  # Use custom font for game over screen
-    text = font.render("Game Over", True, (255, 0, 0))
+    text = font.render("Game Over", True, ("#b13e53"))
     text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
 
     score_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for score
@@ -98,13 +99,14 @@ def game_over_screen(final_score):
         display.fill(black)
         display.blit(text, text_rect)
         display.blit(score_text, score_rect)
-        pygame.draw.rect(display, (255, 0, 0), button_rect.inflate(20, 20))
+        pygame.draw.rect(display, ("#b13e53"), button_rect.inflate(20, 20))
         display.blit(button_text, button_rect)
         pygame.display.update()
 
 def you_survived_screen(final_score):
+    print(f"Score: {final_score}")
     font = pygame.font.Font(custom_font_path, 74)  # Use custom font for "You Survived" screen
-    text = font.render("You Survived", True, (0, 255, 0))
+    text = font.render("You Survived", True, ("#38b764"))
     text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
 
     score_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for score
@@ -215,6 +217,8 @@ while running:
     router_group.draw(display)
     router.draw_hp_bar(display)  # Draw the router's HP bar
     enemy_spawner.enemy_group.draw(display)  # Draw enemies after firewalls
+    for enemy in enemy_spawner.enemy_group:
+        enemy.draw_hp_bar(display)  # Draw the HP bar for each enemy
     kaboem_spawner.kaboem_group.draw(display)
 
     # Draw the banner

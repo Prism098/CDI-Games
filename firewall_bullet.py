@@ -4,7 +4,7 @@ import constante as c
 class FirewallBullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(FirewallBullet, self).__init__()
-        self.image = pygame.image.load('images/kogels_concept.png').convert_alpha()
+        self.image = pygame.image.load('CDI-Games-SecurityCloud/images/kogels_concept.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.image.get_width() // c.SCHIP_GROOTTE, self.image.get_height() // c.SCHIP_GROOTTE))
         self.rect = self.image.get_rect()
         self.rect.centerx = x  # Center the bullet horizontally
