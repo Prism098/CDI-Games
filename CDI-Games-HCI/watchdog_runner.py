@@ -37,7 +37,7 @@ class RestartHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     path = "."  # Current directory (where your game script is located)
-    script_name = "main.py"  # The name of your game script
+    script_name = "HCIMain.py"  # The name of your game script
     watchdog_script = "watchdog_runner.py"  # The name of your watchdog script
     event_handler = RestartHandler(script_name, watchdog_script)
     observer = Observer()
