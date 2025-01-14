@@ -1,6 +1,6 @@
 import pygame
 import constante as c
-from ship import Ship
+from ship2 import Ship
 from bg import BG
 from enemy_spawner import EnemySpawner
 from kaboem_spawner import KaboemSpawner
@@ -37,17 +37,14 @@ bg = BG()
 bg_group = pygame.sprite.Group()
 bg_group.add(bg)
 
-player = Ship()
-spritegroup = pygame.sprite.Group()
-spritegroup.add(player)
+firewall_group = pygame.sprite.Group()
+firewall_image = pygame.image.load('CDI-Games-SecurityCloud/images/firewall_concept_sprite.png')
+firewall_width = firewall_image.get_width() // c.SCHIP_GROOTTE
+
 
 router = Router(score)
 router_group = pygame.sprite.Group()
 router_group.add(router)
-
-firewall_group = pygame.sprite.Group()
-firewall_image = pygame.image.load('CDI-Games-SecurityCloud/images/firewall_concept_sprite.png')
-firewall_width = firewall_image.get_width() // c.SCHIP_GROOTTE
 
 def calculate_firewall_positions():
     spacing = (display.get_width() - 4 * firewall_width) // 5
@@ -65,6 +62,12 @@ firewall_y = calculate_firewall_y_position()
 for firewall_x in firewall_positions:
     firewall = Firewall(firewall_x, firewall_y, router, score)
     firewall_group.add(firewall)
+
+player = Ship(firewall_positions)
+spritegroup = pygame.sprite.Group()
+spritegroup.add(player)
+
+
 
 enemy_lanes = [None] * 4  # Track which lanes have enemies
 
@@ -228,9 +231,9 @@ while running:
         # Handle input
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player.vel_x = -player.speed
+                player.snap_to_lane("left")
             elif event.key == pygame.K_RIGHT:
-                player.vel_x = player.speed
+                player.snap_to_lane("right")
 
             if event.key == pygame.K_SPACE:
                 player.shiet()

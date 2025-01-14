@@ -9,10 +9,10 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = initial_x
         self.rect.y = -self.rect.height
-        self.hp = 3
-        self.max_hp = 3  # Store the maximum HP for the HP bar
+        self.hp = 2
+        self.max_hp = 2  # Store the maximum HP for the HP bar
         self.vel_x = 0
-        self.vel_y = 4
+        self.vel_y = 3
         self.stop_y = stop_y
         self.damage_timer = 0  # Timer to control damage rate
         self.enemy_spawner = enemy_spawner  # Reference to the enemy spawner
