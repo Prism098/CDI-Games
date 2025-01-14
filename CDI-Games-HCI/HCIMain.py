@@ -17,7 +17,7 @@ DARK_GREY = (150, 150, 150)
 FONT = None
 TITLE_FONT = None
 BUTTON_FONT = None
-WIDTH, HEIGHT = 1200, 800
+WIDTH, HEIGHT = 1400, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Website Interface Builder Game")
 
