@@ -16,9 +16,9 @@ ERROR_COLOR = (177, 62, 83) # Hex #b13e53
 
 
 # Vensterafmetingen
-WIDTH = 1920
-HEIGHT = 1080
-INFO_PANEL_WIDTH = 350
+WIDTH = 1400
+HEIGHT = 800
+INFO_PANEL_WIDTH = 250
 
 # Celafmetingen
 TITLE_HEIGHT = 80  # Hoogte van de kolomtitels

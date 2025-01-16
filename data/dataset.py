@@ -49,9 +49,9 @@ def generate_dataset():
                 if status == "missing":
                     value_str = ""
                 elif status == "incorrect":
-                    value_str = "helicopter"  # Onrealistisch
+                    value_str = "Helicopter"  # Onrealistisch
                 else:
-                    value_str = random.choice(["car", "train", "bike", "foot"])
+                    value_str = random.choice(["Auto", "Trein", "Fiets", "Te voet"])
             elif c == 2:  # Average Grade (Geen outliers)
                 if status == "missing":
                     value_str = ""
