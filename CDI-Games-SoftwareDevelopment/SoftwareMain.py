@@ -1,6 +1,7 @@
 import pygame
 import sys
 import time
+from pygame.locals import * 
 
 pygame.init()
 
@@ -65,9 +66,34 @@ grid = [
 run_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 100, 200, 50)
 
 # Load and scale car image
-CAR_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Car_Green_Front.svg")
+CAR_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\Car_Green_Front.svg")
 CAR_IMAGE = pygame.transform.scale(CAR_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
 CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)  # Rotate to face RIGHT
+
+FINISHLINE_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\FinishLine.svg")
+FINISHLINE_IMAGE = pygame.transform.scale(FINISHLINE_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+GRASS_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\gras.svg")
+GRASS_IMAGE = pygame.transform.scale(GRASS_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+ROAD_TOPLEFT_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_links_boven.svg")
+ROAD_TOPLEFT_IMAGE = pygame.transform.scale(ROAD_TOPLEFT_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+ROAD_BOTTOMLEFT_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_links_onder.svg")
+ROAD_BOTTOMLEFT_IMAGE = pygame.transform.scale(ROAD_BOTTOMLEFT_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+ROAD_STRAIGHT_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_normaal.svg")
+ROAD_STRAIGHT_IMAGE = pygame.transform.scale(ROAD_STRAIGHT_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+ROAD_TOPRIGHT_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_rechts_boven.svg")
+ROAD_TOPRIGHT_IMAGE = pygame.transform.scale(ROAD_TOPRIGHT_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+ROAD_BOTTOMRIGHT_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_rechts_onder.svg")
+ROAD_BOTTOMRIGHT_IMAGE = pygame.transform.scale(ROAD_BOTTOMRIGHT_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
+FLAG_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\vlag.svg") #Does not get recognized, not sure why
+FLAG_IMAGE = pygame.transform.scale(FLAG_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
+
 
 # Classes for Command Blocks
 class CommandBlock:
@@ -97,8 +123,12 @@ def draw_grid():
             color = GRAY if tile_type == "R" else WHITE
             if tile_type == "D":
                 color = YELLOW
-            if tile_type == "C":
-                color = BLUE
+            elif tile_type == "C":
+                SCREEN.blit(
+                    GRASS_IMAGE,
+                    (GRID_OFFSET_X + x * TILE_SIZE + 2, GRID_OFFSET_Y + y * TILE_SIZE + 2)
+                )
+               
             rect = pygame.Rect(
                 GRID_OFFSET_X + x * TILE_SIZE,
                 GRID_OFFSET_Y + y * TILE_SIZE,
@@ -108,7 +138,25 @@ def draw_grid():
             pygame.draw.rect(SCREEN, color, rect)
             pygame.draw.rect(SCREEN, BLACK, rect, 1)
 
+            # If the tile is "D", draw the finish line image
+            if tile_type == "D":
+                SCREEN.blit(
+                    FINISHLINE_IMAGE,
+                    (GRID_OFFSET_X + x * TILE_SIZE + 2, GRID_OFFSET_Y + y * TILE_SIZE + 2)
+                )
+            elif tile_type == "C":
+                SCREEN.blit(
+                    FLAG_IMAGE,
+                    (GRID_OFFSET_X + x * TILE_SIZE + 2, GRID_OFFSET_Y + y * TILE_SIZE + 2)
+                )
+            elif tile_type == "G":
+                SCREEN.blit(
+                    GRASS_IMAGE,
+                    (GRID_OFFSET_X + x * TILE_SIZE + 2, GRID_OFFSET_Y + y * TILE_SIZE + 2)
+                )
+
 def draw_car():
+
     global player_dir
     car_image = CAR_IMAGE
 
@@ -126,7 +174,12 @@ def draw_car():
         GRID_OFFSET_Y + player_y * TILE_SIZE + TILE_SIZE // 2,
     ))
     SCREEN.blit(car_image, car_rect)
-
+def wait():
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN: # return on any key pressed
+                return
+            
 def draw_timer():
     # Calculate time left
     elapsed_time = time.time() - timer_start
@@ -142,7 +195,7 @@ def draw_timer():
     return time_left
 
 def draw_score():
-    score_text = FONT.render(f"Score: {score}", True, WHITE)
+    score_text = FONT.render(f"Score: {score} Press any key to continue", True, WHITE)
     score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT - 50))
     SCREEN.blit(score_text, score_rect)
 
@@ -153,10 +206,11 @@ def end_game(time_left):
     if not final_score_displayed:
         draw_score()
         pygame.display.flip()
-        pygame.time.wait(10000)
         final_score_displayed = True
+        wait()
         pygame.quit()
         sys.exit()
+
 
 def move_forward():
     global player_x, player_y, score
@@ -175,7 +229,7 @@ def move_forward():
         print(f"Score: {int(score)}")
 
         end_game(0)
-    
+
 
 def turn_left():
     global player_dir
