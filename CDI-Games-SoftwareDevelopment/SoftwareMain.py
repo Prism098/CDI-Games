@@ -20,7 +20,7 @@ BLACK = (0, 0, 0)
 GREEN = (135, 211, 124)
 YELLOW = (255, 255, 0)
 BLUE = (93, 173, 226)
-GRAY = (169, 169, 169)
+GRAY = (51, 60, 87)
 
 # Game settings
 GRID_SIZE = 5
@@ -97,6 +97,8 @@ def draw_grid():
             color = GRAY if tile_type == "R" else WHITE
             if tile_type == "D":
                 color = YELLOW
+            if tile_type == "C":
+                color = BLUE
             rect = pygame.Rect(
                 GRID_OFFSET_X + x * TILE_SIZE,
                 GRID_OFFSET_Y + y * TILE_SIZE,
