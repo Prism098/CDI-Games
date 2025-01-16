@@ -17,7 +17,7 @@ TITLE_FONT = None
 BUTTON_FONT = None
 WIDTH, HEIGHT = 1200, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Website Interface Builder Game")
+pygame.display.set_caption("Persona Perfect")
 
 # Initialize fonts
 def initialize_fonts():
@@ -85,11 +85,11 @@ def draw_page(screen, page_number, video_playing=False):
 
     # Define specific content for each page
     if page_number == 1:
-        content_text = "Bekijk de karakters en hou rekening met de gegeven kenmerken."
+        content_text = "Bekijk deze persoon en hou rekening met de gegeven kenmerken."
     elif page_number == 2:
         content_text = "Sleep de objecten naar het vlak."
     elif page_number == 3:
-        content_text = "Design een passende website voor de karakter.\nDenk goed na over welke elementen het meest passen bij de karakter."
+        content_text = "Design een passende website voor deze persoon.\nDenk goed na over welke elementen het meest passen bij deze persoon."
     else:
         content_text = "Onbekende inhoud"
 
@@ -139,7 +139,7 @@ def draw_navigation_buttons(screen, current_page):
     if current_page == 3:
         start_button_rect = pygame.Rect((WIDTH - button_width) // 2, HEIGHT - 150, button_width, button_height)
         pygame.draw.rect(screen, ORANGE, start_button_rect)
-        start_text = BUTTON_FONT.render("Start Game", True, BLACK)
+        start_text = BUTTON_FONT.render("Start!", True, BLACK)
         start_text_rect = start_text.get_rect(center=start_button_rect.center)
         screen.blit(start_text, start_text_rect)
 

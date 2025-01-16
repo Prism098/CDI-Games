@@ -24,7 +24,7 @@ FONT = pygame.font.SysFont("arial", 24)
 class GameState:
     def __init__(self):
         # Game state initialization
-        # Game state initialization
+        self.timer_font = pygame.font.SysFont("Minecraftia", 38) #Timer font
         self.stage = "colors"
         self.font_size = 20
         self.font_name = "arial"  # Store the font name here
@@ -108,7 +108,7 @@ class GameState:
         self.sticker_placed = False
 
         # Timer settings
-        self.total_time = 20  # Total time in seconds
+        self.total_time = 35  # Total time in seconds
         self.time_left = self.total_time
         self.timer_bar_width = WIDTH
         self.timer_bar_height = 10
@@ -168,15 +168,11 @@ class GameState:
         # Draw the persona image
         self.persona.draw(screen)
 
-        # Draw timer bar
-        timer_bar_current_width = int(
-            (self.time_left / self.total_time) * self.timer_bar_width
-        )
-        pygame.draw.rect(
-            screen,
-            self.timer_bar_color,
-            (0, 0, timer_bar_current_width, self.timer_bar_height),
-        )
+        #timer
+        timer_text = f"{int(self.time_left)}" 
+        timer_surface = self.timer_font.render(timer_text, True, RED)
+        timer_rect = timer_surface.get_rect(topright=(1145, 20)) 
+        screen.blit(timer_surface, timer_rect)
 
         # Draw label below the grey square
         if label_text:
