@@ -2,7 +2,6 @@ import pygame
 import subprocess
 import sys
 import os
-import json
 import requests
 
 # Stel de werkmap in
@@ -49,9 +48,34 @@ font = pygame.font.Font(None, 36)
 title_font = pygame.font.Font(None, 64)
 label_font = pygame.font.Font(None, 28)
 
-def save_user_data(name, email):
+# Kleuren
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (100, 149, 237)
+ORANGE = (255, 165, 0)
+LIGHT_BLUE = (173, 216, 230)
+
+# Status
+state = "login"  # Mogelijke staten: login, running, finished
+total_score = 0
+first_name, last_name, email = "", "", ""
+
+# Inputvelden
+input_boxes = [
+    pygame.Rect(250, 200, 300, 40),  # Voornaam
+    pygame.Rect(250, 260, 300, 40),  # Achternaam
+    pygame.Rect(250, 320, 300, 40),  # E-mail
+]
+active_box = 0
+input_text = ["", "", ""]
+
+# Knoppen
+submit_button = pygame.Rect(300, 400, 200, 50)
+
+# Functies voor gebruikersgegevens
+def save_user_data(first_name, last_name, email):
     data = {
-        "name": name,
+        "name": f"{first_name} {last_name}",
         "email": email,
         "status": "active",
         "totalScore": 0
@@ -65,7 +89,6 @@ def save_user_data(name, email):
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
 
-# Totaalscore bijwerken na games
 def update_total_score(total_score):
     try:
         response = requests.post(f"{SERVER_URL}/add-score", json={"totalScore": total_score})
@@ -75,29 +98,6 @@ def update_total_score(total_score):
             print(f"Fout bij toevoegen van totaalscore: {response.text}")
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
-
-# Kleuren
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BLUE = (100, 149, 237)
-ORANGE = (255, 165, 0)
-LIGHT_BLUE = (173, 216, 230)
-
-# Status
-state = "login"  # Mogelijke staten: login, running, finished
-total_score = 0
-name, email = "", ""
-
-# Inputvelden
-input_boxes = [
-    pygame.Rect(200, 200, 400, 50),  # Naam
-    pygame.Rect(200, 300, 400, 50),  # E-mail
-]
-active_box = 0
-input_text = ["", ""]
-
-# Knoppen
-start_button = pygame.Rect(300, 400, 200, 50)
 
 # Hoofdloop
 running = True
@@ -110,12 +110,10 @@ while running:
 
         if state == "login":
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.collidepoint(event.pos):
-                    name, email = input_text
-                    if name and email:
-                        # Verstuur gebruikersgegevens naar MongoDB
-                        save_user_data(name, email)
-
+                if submit_button.collidepoint(event.pos):
+                    first_name, last_name, email = input_text
+                    if first_name and last_name and email:
+                        save_user_data(first_name, last_name, email)
                         state = "running"
                     else:
                         print("Vul alle velden in.")
@@ -128,11 +126,9 @@ while running:
                 if event.key == pygame.K_TAB:
                     active_box = (active_box + 1) % len(input_boxes)
                 elif event.key == pygame.K_RETURN:
-                    name, email = input_text
-                    if name and email:
-                        # Verstuur gebruikersgegevens naar MongoDB
-                        save_user_data(name, email)
-
+                    first_name, last_name, email = input_text
+                    if first_name and last_name and email:
+                        save_user_data(first_name, last_name, email)
                         state = "running"
                     else:
                         print("Vul alle velden in.")
@@ -142,32 +138,36 @@ while running:
                     input_text[active_box] += event.unicode
 
         elif state == "running":
-            # Games draaien
             for game in games:
                 total_score += run_game(game)
-
-            # Update de totaalscore in de database
             update_total_score(total_score)
-
             state = "finished"
 
     # Login scherm tekenen
     if state == "login":
-        draw_text = title_font.render("Welkom bij Super Game!", True, BLACK)
-        screen.blit(draw_text, (WIDTH // 2 - draw_text.get_width() // 2, 100))
+        title_surface = title_font.render("SUPER GAME", True, BLUE)
+        screen.blit(title_surface, (WIDTH // 2 - title_surface.get_width() // 2, 100))
 
         for i, box in enumerate(input_boxes):
-            pygame.draw.rect(screen, ORANGE if i == active_box else BLACK, box, 2)
+            pygame.draw.rect(screen, WHITE, box)
+            pygame.draw.rect(screen, BLUE, box, 2)
             text_surface = font.render(input_text[i], True, BLACK)
             screen.blit(text_surface, (box.x + 10, box.y + 10))
 
-            label_text = "Naam:" if i == 0 else "E-mail:"
+            label_text = ["Voornaam:", "Achternaam:", "Email:"][i]
             label_surface = label_font.render(label_text, True, BLACK)
-            screen.blit(label_surface, (box.x - 100, box.y + 15))
+            screen.blit(label_surface, (box.x - 120, box.y + 5))
 
-        pygame.draw.rect(screen, ORANGE, start_button)
-        start_text = font.render("Start", True, BLACK)
-        screen.blit(start_text, (start_button.x + 50, start_button.y + 10))
+        pygame.draw.rect(screen, ORANGE, submit_button)
+        submit_text = font.render("Submit", True, WHITE)
+        screen.blit(submit_text, (submit_button.x + 50, submit_button.y + 10))
+
+        footer_font = pygame.font.Font(None, 20)
+        footer_surface = footer_font.render("Zuyd Hogeschool", True, BLACK)
+        screen.blit(footer_surface, (20, HEIGHT - 30))
+
+        zuyd_surface = footer_font.render("ZUYD", True, (255, 0, 0))
+        screen.blit(zuyd_surface, (WIDTH - 70, HEIGHT - 30))
 
     elif state == "finished":
         finish_text = font.render(f"All games finished! Total Score: {total_score}", True, BLACK)
