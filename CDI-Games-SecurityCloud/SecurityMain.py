@@ -76,15 +76,20 @@ def game_over_screen(final_score):
     print(f"Score: {final_score}")
     font = pygame.font.Font(custom_font_path, 74)  # Use custom font for game over screen
     text = font.render("Game Over", True, ("#b13e53"))
-    text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
+    text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 100))
+
+    # New text
+    message_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for message
+    message_text = message_font.render("Al je data is gelekt...", True, (255, 255, 255))
+    message_rect = message_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
 
     score_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for score
-    score_text = score_font.render(f"Final Score: {final_score}", True, (255, 255, 255))
-    score_rect = score_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2))
+    score_text = score_font.render(f"Score: {final_score}", True, (255, 255, 255))
+    score_rect = score_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 50))
 
     button_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for button
     button_text = button_font.render("Exit", True, (255, 255, 255))
-    button_rect = button_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 50))
+    button_rect = button_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 100))
 
     while True:
         for event in pygame.event.get():
@@ -98,6 +103,7 @@ def game_over_screen(final_score):
 
         display.fill(black)
         display.blit(text, text_rect)
+        display.blit(message_text, message_rect)  # Blit the new message text
         display.blit(score_text, score_rect)
         pygame.draw.rect(display, ("#b13e53"), button_rect.inflate(20, 20))
         display.blit(button_text, button_rect)
@@ -106,16 +112,21 @@ def game_over_screen(final_score):
 def you_survived_screen(final_score):
     print(f"Score: {final_score}")
     font = pygame.font.Font(custom_font_path, 74)  # Use custom font for "You Survived" screen
-    text = font.render("You Survived", True, ("#38b764"))
-    text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
+    text = font.render("Router Beschermd!", True, ("#38b764"))
+    text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 100))
+
+    # New text
+    message_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for message
+    message_text = message_font.render("Hmm, er lijkt toch wat van je data te zijn gelekt...", True, (255, 255, 255))
+    message_rect = message_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
 
     score_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for score
-    score_text = score_font.render(f"Final Score: {final_score}", True, (255, 255, 255))
-    score_rect = score_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2))
+    score_text = score_font.render(f"Score: {final_score}", True, (255, 255, 255))
+    score_rect = score_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 50))
 
     button_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for button
     button_text = button_font.render("Exit", True, (255, 255, 255))
-    button_rect = button_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 50))
+    button_rect = button_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 100))
 
     while True:
         for event in pygame.event.get():
@@ -129,6 +140,7 @@ def you_survived_screen(final_score):
 
         display.fill(black)
         display.blit(text, text_rect)
+        display.blit(message_text, message_rect)  # Blit the new message text
         display.blit(score_text, score_rect)
         pygame.draw.rect(display, (0, 255, 0), button_rect.inflate(20, 20))
         display.blit(button_text, button_rect)
