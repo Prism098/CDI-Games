@@ -14,11 +14,14 @@ class DraggableUIElement:
         if isinstance(self.color_or_image, tuple):
             self.is_image = False
             self.color = self.color_or_image  # Color is a tuple like (255, 98, 40)
-        else:
+        elif self.color_or_image is not None:
             self.is_image = True
             self.image = pygame.image.load(self.color_or_image)  # Load the image if it's a path
             self.image = pygame.transform.scale(self.image, (self.width, self.height))  # Scale to element size
-        
+        else:
+            self.is_image = False  # Set to False since there's no image or color
+            self.color = None  # No color or image for font-based elements
+
         # Store the initial position
         self.initial_x = x
         self.initial_y = y
@@ -39,15 +42,22 @@ class DraggableUIElement:
             if self.dragging:
                 self.dragging = False
                 if self.rect.collidepoint(event.pos) and canvas_rect.colliderect(self.rect):
-                    return self.color  # Return the color if dropped within the canvas
+                    if self.is_image:
+                        return self.image  # Return the image if dropped within the canvas
+                    elif self.color:
+                        return self.color  # Return the color if dropped within the canvas
+                    elif self.text:
+                        return self.text  # Return the text if dropped within the canvas
         return None
 
     def draw(self, screen):
         if self.is_image:
             screen.blit(self.image, (self.x, self.y))  # Draw the image
-        else:
+        elif self.color:
             pygame.draw.rect(screen, self.color, self.rect)  # Draw the color (if not an image)
-
-        # Draw the text if it's set
+        
+        # Draw the text if it's set (for fonts)
         if self.text:
-            screen.blit(self.text_surface, self.text_rect.topleft)
+            text_surface = self.font.render(self.text, True, (0, 0, 0))  # Black text
+            text_rect = text_surface.get_rect(center=self.rect.center)
+            screen.blit(text_surface, text_rect.topleft)
