@@ -23,3 +23,7 @@ class Timer:
     def is_time_up(self):
         # Check if the timer has finished (i.e., time_left is 0)
         return self.time_left <= 0
+    def stop(self):
+        """Stop the timer from counting down"""
+        self.running = False
+        self.time_left = 0
