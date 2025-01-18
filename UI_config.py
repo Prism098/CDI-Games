@@ -38,8 +38,8 @@ def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_eleme
             900, 650, 125, 125,
             color_or_image=None,
             text="Aa",
-            font=pygame.font.SysFont("couriernew", 50),
-            font_name="couriernew"
+            font=pygame.font.SysFont("brushscript", 50),
+            font_name="brushscript"
         )
     ]
     
