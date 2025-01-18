@@ -2,7 +2,7 @@ import pygame
 
 PERSONA_STORIES = {
     "timesnewroman": """John is een drukke professional die efficiëntie en duidelijke communicatie waardeert. Hij begint elke dag om 6 uur 's ochtends met het doornemen van e-mails, terwijl hij geniet van zijn ochtendkoffie. Zijn zorgvuldig georganiseerde agenda helpt hem om klantvergaderingen en teammanagementverantwoordelijkheden in balans te houden.""",
-    "comicsansms": """Timmy houdt ervan om tijd door te brengen in zijn gezellige speelkamer! Zijn favoriete activiteiten zijn het tekenen van plaatjes van dinosaurussen, het bouwen van enorme Lego kastelen en het verzinnen van spannende verhalen met zijn actiefiguren. Elke dag is een nieuw avontuur!""",
+    "comicsansms": """Timmy houdt ervan om tijd door te brengen in zijn gezellige speelkamer! Zijn favoriete activiteiten zijn het tekenen van plaatjes van dinosaurussen, spelen met zijn speelgoed raceauto's en het verzinnen van spannende verhalen met zijn actiefiguren. Elke dag is een nieuw avontuur!""",
     "brushscript":
 """Albert geniet van zijn rustige pensioen dagen in de tuin en het delen van verhalen met zijn kleinkinderen. Zijn wijsheid komt van decennia aan ervaring en hij is trots op het doorgeven van familietradities aan de jongere generaties.""",
 }
