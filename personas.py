@@ -53,7 +53,7 @@ def randomize_personas_positions(screen_height):
         Persona("assets/AdultPersona.png",  40, 200, 175, 175, 
                 BROWN, "assets/ProfessionalManPhoto.png", "timesnewroman", "John", 35, "Houd van professionaliteit."),
         Persona("assets/OldManPersona.png",  40, 200, 175, 175, 
-                GREY, "assets/OldManPhoto.png", "couriernew", "Albert", 75, "Houd van niet felle kleuren.")
+                GREY, "assets/Gramophone.png", "couriernew", "Albert", 75, "Houd van niet felle kleuren.")
     ]
 
     # Randomly select and return a persona

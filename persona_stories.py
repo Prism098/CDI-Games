@@ -35,8 +35,10 @@ def draw_story_text(screen, story, font_name, canvas_rect, color=(0, 0, 0)):
     lines = []
     current_line = []
     
+    # Adjust max_width to allow some padding inside the canvas
     max_width = int(canvas_rect.width * 0.8)
     
+    # Wrap the text into lines
     for word in words:
         test_line = ' '.join(current_line + [word])
         test_surface = story_font.render(test_line, True, color)
@@ -45,19 +47,21 @@ def draw_story_text(screen, story, font_name, canvas_rect, color=(0, 0, 0)):
         else:
             lines.append(' '.join(current_line))
             current_line = [word]
-    lines.append(' '.join(current_line))
+    lines.append(' '.join(current_line))  # Add the last line
     
-    line_height = story_font.get_linesize()
-    total_height = line_height * len(lines)
+    line_height = story_font.get_linesize()  # Get the height of each line of text
     
-    start_y = canvas_rect.top + (canvas_rect.height * 0.3)
+    # Set the starting Y position to near the top of the canvas
+    start_y = canvas_rect.top + 20  # 20 pixels margin from the top of the canvas
     
+    # Draw each line of text
     for i, line in enumerate(lines):
         text_surface = story_font.render(line, True, color)
         text_rect = text_surface.get_rect()
         text_rect.centerx = canvas_rect.centerx
         text_rect.top = start_y + (i * line_height)
         screen.blit(text_surface, text_rect)
+
 
 def get_story_for_persona(font_name):
     """

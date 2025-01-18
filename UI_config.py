@@ -16,7 +16,7 @@ def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_eleme
     ui_elements_photo = [
         DraggableUIElement(270, 650, 125, 125, "assets/ProfessionalManPhoto.png"),
         DraggableUIElement(590, 630, 125, 150, "assets/CartoonHappyPhoto.png"),
-        DraggableUIElement(900, 650, 125, 125, "assets/OldManPhoto.png")
+        DraggableUIElement(900, 650, 125, 125, "assets/Gramophone.png")
     ]
     
     ui_elements_font = [

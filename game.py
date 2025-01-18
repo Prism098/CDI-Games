@@ -25,8 +25,12 @@ class GameState:
         # Initialize the font for the timer
         self.timer_font = pygame.font.SysFont('Arial', 36)
 
-        # Initialize the timer with a total duration of 20 seconds
-        self.timer = Timer(total_seconds=20, x=screen.get_width() - 100, y=10, font=self.timer_font)
+        # Timer for deduction visual effect
+        self.deduction_timer = 0
+        self.deduction_amount = 0  # Amount to deduct (for animation)
+
+        # Initialize the timer with a total duration of 30 seconds
+        self.timer = Timer(total_seconds=30, x=screen.get_width() - 100, y=10, font=self.timer_font)
 
 
 class Button:
@@ -79,10 +83,6 @@ def draw_score_screen(screen, score, exit_button):
     score_text = font_normal.render(f"Eind score: {score}", True, (0, 0, 0))
     score_rect = score_text.get_rect(centerx=screen.get_width()//2, top=box_y + 120)
     screen.blit(score_text, score_rect)
-
-    next_text = font_normal.render("", True, (0, 0, 0))
-    next_rect = next_text.get_rect(centerx=screen.get_width()//2, top=box_y + 200)
-    screen.blit(next_text, next_rect)
 
     exit_button.draw(screen)
 
@@ -150,6 +150,8 @@ def run_game():
                                 game_state.feedback_message = None
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.deduction_amount = game_state.score_system.penalty
+                                game_state.deduction_timer = pygame.time.get_ticks()
                                 game_state.feedback_message = "Hou rekening\nmet de persona!"
                                 ui_element.reset_position()
 
@@ -157,19 +159,17 @@ def run_game():
                     for ui_element in ui_elements_photo:
                         if ui_element.handle_event(event, canvas_rect):
                             if ui_element.color_or_image == game_state.selected_persona.correct_image:
-                                margin = 20
                                 image = pygame.image.load(ui_element.color_or_image)
                                 image = pygame.transform.scale(image, (200, 200))
                                 image_rect = image.get_rect()
-                                image_rect.bottomright = (
-                                    canvas_rect.right - margin,
-                                    canvas_rect.bottom - margin
-                                )
+                                image_rect.midbottom = (canvas_rect.centerx, canvas_rect.bottom - 20)
                                 game_state.canvas_image = (image, image_rect)
                                 game_state.round = 3
                                 game_state.feedback_message = None
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.deduction_amount = game_state.score_system.penalty
+                                game_state.deduction_timer = pygame.time.get_ticks()
                                 game_state.feedback_message = "Hou rekening\nmet de persona!"
                                 ui_element.reset_position()
 
@@ -179,12 +179,14 @@ def run_game():
                             if ui_element.font_name == game_state.selected_persona.correct_font:
                                 game_state.canvas_font = ui_element.font_name
                                 game_state.story_text = get_story_for_persona(ui_element.font_name)
-                                game_state.timer.stop()  # Stop the timer
+                                game_state.timer.stop()
                                 game_state.showing_score = True
                                 game_state.score_screen_timer = pygame.time.get_ticks()
                                 game_state.feedback_message = None
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.deduction_amount = game_state.score_system.penalty
+                                game_state.deduction_timer = pygame.time.get_ticks()
                                 game_state.feedback_message = "Hou rekening\nmet de persona!"
                                 ui_element.reset_position()
 
@@ -221,6 +223,18 @@ def run_game():
         font = pygame.font.SysFont('Arial', 30)
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
+
+        # Render the deduction effect if active
+        deduction_display_duration = 1000  # Milliseconds (1 second)
+        if game_state.deduction_timer > 0:
+            elapsed_time = pygame.time.get_ticks() - game_state.deduction_timer
+            if elapsed_time < deduction_display_duration:
+                deduction_text = font.render(f"-{game_state.deduction_amount}", True, (255, 0, 0))
+                deduction_rect = deduction_text.get_rect()
+                deduction_rect.topleft = (10, 50)  # Position below the score
+                screen.blit(deduction_text, deduction_rect)
+            else:
+                game_state.deduction_timer = 0  # Reset after the display duration
 
         if game_state.feedback_message:
             feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
