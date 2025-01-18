@@ -1,25 +1,31 @@
-# persona.py
 import pygame
 import random
 
 class Persona:
-    def __init__(self, image_path, x, y, width, height):
+    def __init__(self, image_path, x, y, width, height, correct_color, correct_image, correct_font):
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (width, height))  # Scale the image to desired size
+        self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect(topleft=(x, y))
+        self.correct_color = correct_color
+        self.correct_image = correct_image
+        self.correct_font = correct_font
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
 
-# Function to position personas at fixed locations
 def randomize_personas_positions(screen_height):
     """Place personas at fixed positions on the left side of the screen"""
+    BROWN = (77, 55, 50)
+    ORANGE = (255, 98, 40)
+    GREY = (150, 150, 150)
+    
     personas_list = [
-        Persona("assets/ChildPersona.png", 40, 200, 175, 175),  # Fixed position for ChildPersona
-        Persona("assets/AdultPersona.png", 40, 200, 175, 175),  # Fixed position for AdultPersona
-        Persona("assets/OldManPersona.png", 40, 200, 175, 175),  # Fixed position for OldManPersona
+        Persona("assets/ChildPersona.png", 40, 200, 175, 175, 
+                ORANGE, "assets/CartoonHappyPhoto.png", "comicsansms"),
+        Persona("assets/AdultPersona.png", 40, 200, 175, 175, 
+                BROWN, "assets/ProfessionalManPhoto.png", "timesnewroman"),
+        Persona("assets/OldManPersona.png", 40, 200, 175, 175, 
+                GREY, "assets/OldManPhoto.png", "couriernew")
     ]
     
-    # You can select any persona from the list; for example, just returning a random one
-    selected_persona = random.choice(personas_list)  # You can change this to any persona you want
-    return selected_persona
+    return random.choice(personas_list)
