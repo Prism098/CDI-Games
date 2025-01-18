@@ -136,7 +136,7 @@ def start_game():
 
         # Teken kolomtitels
         font_title = pygame.font.SysFont(None, 30)
-        titles = ["Afstand", "Transport", "Gemiddelde cijfer", "Hoogste cijfer", "Geboorte datum", "Start datum"]
+        titles = ["Afstand", "Transport", "Gemiddelde cijfer", "Hoogste cijfer", "Geboortedatum", "Startdatum"]
         for i, title in enumerate(titles):
             rect = pygame.Rect(i * cell_width + STUDENT_NUMBER_WIDTH, 0, cell_width, TITLE_HEIGHT)
             pygame.draw.rect(screen, COLUMN_COLOR, rect)

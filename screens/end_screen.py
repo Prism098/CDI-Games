@@ -17,14 +17,14 @@ def show_end_screen(screen, score, elapsed_time, found_outliers, total_outliers,
         text_font = pygame.font.SysFont(None, 50)
 
         title_text = title_font.render("Game Over", True, WHITE)
-        score_text = text_font.render(f"Final Score: {score}", True, WHITE)
-        time_text = text_font.render(f"Time Taken: {elapsed_time}s", True, WHITE)
-        instruction_text = text_font.render("Press Enter to Exit", True, WHITE)
+        score_text = text_font.render(f"Score: {score}", True, WHITE)
+        time_text = text_font.render(f"Tijd over: {elapsed_time}s", True, WHITE)
+        instruction_text = text_font.render("Druk op Enter om te stoppen", True, WHITE)
 
         # Found values in bijhorende kleuren
-        outliers_text = text_font.render(f"Outliers Found: {found_outliers}/{total_outliers}", True, OUTLIER_COLOR)
-        missing_text = text_font.render(f"Missing Values Found: {found_missing}/{total_missing}", True, MISSING_COLOR)
-        incorrect_text = text_font.render(f"Incorrect Values Found: {found_incorrect}/{total_incorrect}", True, INCORRECT_COLOR)
+        outliers_text = text_font.render(f"Outliers gevonden: {found_outliers}/{total_outliers}", True, OUTLIER_COLOR)
+        missing_text = text_font.render(f"Missing Values gevonden: {found_missing}/{total_missing}", True, MISSING_COLOR)
+        incorrect_text = text_font.render(f"Incorrect Values gevonden: {found_incorrect}/{total_incorrect}", True, INCORRECT_COLOR)
 
         # Positioneer teksten
         screen.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, HEIGHT // 4))
