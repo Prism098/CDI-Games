@@ -25,7 +25,7 @@ class GameState:
         self.timer_font = pygame.font.SysFont('Arial', 36)  # You can adjust the size here
 
         # Initialize the timer with a total duration of 30 seconds
-        self.timer = Timer(total_seconds=5, x=screen.get_width() - 100, y=10, font=self.timer_font)
+        self.timer = Timer(total_seconds=20, x=screen.get_width() - 100, y=10, font=self.timer_font)
 
 
 class Button:
