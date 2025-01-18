@@ -3,6 +3,7 @@ from UI_element import DraggableUIElement
 from UI_config import create_ui_elements
 from personas import randomize_personas_positions
 from score import ScoreSystem
+from text_renderer import render_multiline_text  # Import the new text rendering logic
 
 
 class GameState:
@@ -15,8 +16,11 @@ class GameState:
         self.selected_persona = None
         self.showing_score = False  # New state for score screen
         self.score_screen_timer = 0  # Timer for score screen
+        self.feedback_message = None  # New attribute to hold feedback
+        self.feedback_timer = 0  # To track feedback duration
+        self.score_printed = False  # Flag to check if score is printed
 
-        
+
 class Button:
     def __init__(self, x, y, width, height, text, font, text_color, bg_color, hover_color):
         self.rect = pygame.Rect(x, y, width, height)
@@ -45,7 +49,6 @@ class Button:
             if self.rect.collidepoint(event.pos):
                 return True  # Return True if the button is clicked
         return False
-
 
 
 def draw_score_screen(screen, score, exit_button):
@@ -146,8 +149,10 @@ def run_game():
                             if color == game_state.selected_persona.correct_color:
                                 game_state.canvas_color = color
                                 game_state.round = 2  # Move to image selection
+                                game_state.feedback_message = None  # Clear feedback after correct answer
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.feedback_message = "Hou rekening\nmet de persona!"  # Wrong color feedback
                                 ui_element.reset_position()
 
                 elif game_state.round == 2:  # Image selection
@@ -164,8 +169,10 @@ def run_game():
                                 )
                                 game_state.canvas_image = (image, image_rect)
                                 game_state.round = 3  # Move to font selection
+                                game_state.feedback_message = None  # Clear feedback after correct answer
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.feedback_message = "Hou rekening\nmet de persona!"  # Wrong image feedback
                                 ui_element.reset_position()
 
                 elif game_state.round == 3:  # Font selection
@@ -176,8 +183,10 @@ def run_game():
                                 # Show score screen
                                 game_state.showing_score = True
                                 game_state.score_screen_timer = pygame.time.get_ticks()
+                                game_state.feedback_message = None  # Clear feedback after correct answer
                             else:
                                 game_state.score_system.apply_penalty()
+                                game_state.feedback_message = "Hou rekening\nmet de persona!"  # Wrong font feedback
                                 ui_element.reset_position()
 
         # Draw everything
@@ -218,14 +227,20 @@ def run_game():
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
 
+        # Handle feedback message with line breaks
+        if game_state.feedback_message:
+            feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
+            render_multiline_text(screen, game_state.feedback_message, feedback_font, (255, 0, 0), screen.get_width() - 200, screen.get_height() - 700)
+
         # Handle score screen
         if game_state.showing_score:
             draw_score_screen(screen, game_state.score_system.get_score(), exit_button)
 
+            # Print the score to the terminal only once
+            if not game_state.score_printed:
+                print(f"Final score: {game_state.score_system.get_score()}")
+                game_state.score_printed = True  # Set the flag to prevent printing again
+
         pygame.display.flip()
 
     pygame.quit()
-
-
-if __name__ == "__main__":
-    run_game()
