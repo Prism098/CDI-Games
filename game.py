@@ -4,21 +4,28 @@ from UI_config import create_ui_elements
 from personas import randomize_personas_positions
 from score import ScoreSystem
 from text_renderer import render_multiline_text  # Import the new text rendering logic
+from timer import Timer  # Import the Timer class
 
 
 class GameState:
-    def __init__(self):
+    def __init__(self, screen):
         self.canvas_color = (250, 250, 250)  # GREY
         self.canvas_image = None
         self.canvas_font = None
         self.round = 1
         self.score_system = ScoreSystem(initial_score=2100, penalty=300)
         self.selected_persona = None
-        self.showing_score = False  # New state for score screen
-        self.score_screen_timer = 0  # Timer for score screen
-        self.feedback_message = None  # New attribute to hold feedback
-        self.feedback_timer = 0  # To track feedback duration
-        self.score_printed = False  # Flag to check if score is printed
+        self.showing_score = False
+        self.score_screen_timer = 0
+        self.feedback_message = None
+        self.feedback_timer = 0
+        self.score_printed = False
+
+        # Initialize the font for the timer
+        self.timer_font = pygame.font.SysFont('Arial', 36)  # You can adjust the size here
+
+        # Initialize the timer with a total duration of 30 seconds
+        self.timer = Timer(total_seconds=5, x=screen.get_width() - 100, y=10, font=self.timer_font)
 
 
 class Button:
@@ -115,8 +122,8 @@ def run_game():
         canvas_x, canvas_y, canvas_width, canvas_height, 50
     )
 
-    # Initialize game state
-    game_state = GameState()
+    # Initialize game state and pass screen to it
+    game_state = GameState(screen)
     game_state.selected_persona = randomize_personas_positions(screen_height)
 
     # Create the exit button (button is drawn on the score screen)
@@ -131,6 +138,15 @@ def run_game():
 
     while running:
         clock.tick(60)
+
+        # Update the timer
+        game_state.timer.update()
+
+        # Check if timer reaches 0, stop the game and show end screen
+        if game_state.timer.time_left <= 0:
+            game_state.showing_score = True
+            game_state.score_system.reset_score()  # Reset the score to 0
+            game_state.score_screen_timer = pygame.time.get_ticks()  # Start the score screen
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -227,10 +243,13 @@ def run_game():
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
 
-        # Handle feedback message with line breaks
+        # Draw feedback message
         if game_state.feedback_message:
             feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
             render_multiline_text(screen, game_state.feedback_message, feedback_font, (255, 0, 0), screen.get_width() - 200, screen.get_height() - 700)
+
+        # Draw the timer
+        game_state.timer.draw(screen)
 
         # Handle score screen
         if game_state.showing_score:
@@ -239,8 +258,10 @@ def run_game():
             # Print the score to the terminal only once
             if not game_state.score_printed:
                 print(f"Final score: {game_state.score_system.get_score()}")
-                game_state.score_printed = True  # Set the flag to prevent printing again
+                game_state.score_printed = True
 
         pygame.display.flip()
 
-    pygame.quit()
+
+if __name__ == "__main__":
+    run_game()
