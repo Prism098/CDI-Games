@@ -8,34 +8,34 @@ def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_eleme
     GREY = (150, 150, 150)   # Old Person
     
     ui_elements_color = [
-        DraggableUIElement(270, 650, 125, 125, BROWN),      # Adult
-        DraggableUIElement(590, 650, 125, 125, ORANGE),     # Child
-        DraggableUIElement(900, 650, 125, 125, GREY)        # Old Person
+        DraggableUIElement(320, 650, 125, 125, BROWN),      # Adult
+        DraggableUIElement(640, 650, 125, 125, ORANGE),     # Child
+        DraggableUIElement(960, 650, 125, 125, GREY)        # Old Person
     ]
     
     ui_elements_photo = [
-        DraggableUIElement(270, 650, 125, 125, "assets/SuitcaseMoney.png"),
-        DraggableUIElement(590, 630, 125, 150, "assets/ToyCar.png"),
-        DraggableUIElement(900, 650, 125, 125, "assets/Gramophone.png")
+        DraggableUIElement(320, 650, 125, 125, "assets/SuitcaseMoney.png"),
+        DraggableUIElement(640, 630, 125, 150, "assets/ToyCar.png"),
+        DraggableUIElement(960, 650, 125, 125, "assets/Gramophone.png")
     ]
     
     ui_elements_font = [
         DraggableUIElement(
-            270, 650, 125, 125,
+            320, 650, 125, 125,
             color_or_image=None,
             text="Aa",
             font=pygame.font.SysFont("timesnewroman", 50),
             font_name="timesnewroman"
         ),
         DraggableUIElement(
-            590, 650, 125, 125,
+            640, 650, 125, 125,
             color_or_image=None,
             text="Aa",
             font=pygame.font.SysFont("comicsansms", 50),
             font_name="comicsansms"
         ),
         DraggableUIElement(
-            900, 650, 125, 125,
+            960, 650, 125, 125,
             color_or_image=None,
             text="Aa",
             font=pygame.font.SysFont("brushscript", 50),

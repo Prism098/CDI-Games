@@ -95,7 +95,7 @@ def run_game():
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Persona Design Game")
 
-    canvas_x = 250
+    canvas_x = 300
     canvas_y = 100
     canvas_width = 800
     canvas_height = 500
@@ -136,9 +136,11 @@ def run_game():
             if event.type == pygame.QUIT:
                 running = False
 
+            # Exit button event handling: quit the game
             if game_state.showing_score and exit_button.handle_event(event):
-                running = False
-
+               pygame.quit()  # Ensure pygame is properly quit
+             # 
+               
             if not game_state.showing_score:
                 if game_state.round == 1:  # Color selection
                     for ui_element in ui_elements_color:
@@ -191,7 +193,7 @@ def run_game():
                                 ui_element.reset_position()
 
         screen.fill((255, 255, 255))
-        screen.blit(browser_image, (250, 10))
+        screen.blit(browser_image, (300, 10))
         
         pygame.draw.rect(screen, game_state.canvas_color, canvas_rect)
         
@@ -239,7 +241,7 @@ def run_game():
         if game_state.feedback_message:
             feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
             render_multiline_text(screen, game_state.feedback_message, feedback_font, (255, 0, 0), 
-                                screen.get_width() - 200, screen.get_height() - 700)
+                                screen.get_width() - 175, screen.get_height() - 700)
 
         if not game_state.showing_score:
             game_state.timer.draw(screen)
@@ -252,7 +254,3 @@ def run_game():
                 game_state.score_printed = True
 
         pygame.display.flip()
-
-
-if __name__ == "__main__":
-    run_game()

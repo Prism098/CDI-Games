@@ -20,24 +20,38 @@ class Persona:
         self.text_color = (0, 0, 0)  # Black color for text
 
     def draw(self, screen):
-        # Draw persona image
-        screen.blit(self.image, self.rect.topleft)
+    # Draw persona image
+     screen.blit(self.image, self.rect.topleft)
 
-        # Draw characteristics below the persona's image
-        font = pygame.font.SysFont('Arial', 24)  # Set font size
-        name_text = font.render(f"Naam: {self.name}", True, self.text_color)
-        age_text = font.render(f"Leeftijd: {self.age}", True, self.text_color)
-        description_text = font.render(f" {self.description}", True, self.text_color)
+    # Font for text
+     font = pygame.font.SysFont('Arial', 24)  # Set font size
+     name_lines = f"Naam: {self.name}".split('\n')
+     age_lines = f"Leeftijd: {self.age}".split('\n')
+     description_lines = self.description.split('\n')
 
-        # Get the positions for the characteristics below the persona image
-        name_rect = name_text.get_rect(centerx=self.rect.centerx, top=self.rect.bottom + 5)
-        age_rect = age_text.get_rect(centerx=self.rect.centerx, top=name_rect.bottom + 5)
-        description_rect = description_text.get_rect(centerx=self.rect.centerx, top=age_rect.bottom + 5)
+    # Set initial positions for the text
+     name_rect = pygame.Rect(self.rect.centerx - 90, self.rect.bottom + 5, 180, 30)
+     age_rect = pygame.Rect(self.rect.centerx - 90, name_rect.bottom + 5, 180, 30)
+     description_rect = pygame.Rect(self.rect.centerx - 90, age_rect.bottom + 5, 180, 30)
 
-        # Draw the text
-        screen.blit(name_text, name_rect)
-        screen.blit(age_text, age_rect)
-        screen.blit(description_text, description_rect)
+    # Draw each line of the name
+     for line in name_lines:
+        name_text = font.render(line, True, self.text_color)
+        screen.blit(name_text, name_rect.topleft)
+        name_rect.top += name_text.get_height()  # Move down for the next line
+
+    # Draw each line of the age
+     for line in age_lines:
+        age_text = font.render(line, True, self.text_color)
+        screen.blit(age_text, age_rect.topleft)
+        age_rect.top += age_text.get_height()  # Move down for the next line
+
+    # Draw each line of the description
+     for line in description_lines:
+        description_text = font.render(line, True, self.text_color)
+        screen.blit(description_text, description_rect.topleft)
+        description_rect.top += description_text.get_height()  # Move down for the next line
+
 
 
 def randomize_personas_positions(screen_height):
@@ -49,11 +63,11 @@ def randomize_personas_positions(screen_height):
     # Define the personas with characteristics (name, age, description)
     personas_list = [
         Persona("assets/ChildPersona.png", 40, 200, 175, 175, 
-                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houd van kleur en race auto's."),
+                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houd van kleur en \nrace auto's."),
         Persona("assets/AdultPersona.png",  40, 200, 175, 175, 
-                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houd van de kleur bruin \nen geld."),
+                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houd van professionaliteit, \nde kleur bruin en geld."),
         Persona("assets/OldManPersona.png",  40, 200, 175, 175, 
-                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houd van niet felle kleuren \nHoud van klassieke muziek.")
+                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houd niet van felle kleuren. \nLuistert graag naar \nklassieke muziek.")
     ]
 
     # Randomly select and return a persona

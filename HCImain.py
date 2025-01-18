@@ -1,8 +1,13 @@
-import game  # Import the game logic from game.py
+import pygame
+import demonstration
 
-# Main function to run the game
+import sys
+
 def main():
-    game.run_game()  # Call the run_game function from game.py
+    pygame.init()
+    demonstration.show_demo_page()
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
-    main()  # Start the game when running hcimain.py
+    main()
