@@ -1,5 +1,5 @@
 class ScoreSystem:
-    def __init__(self, initial_score=700, penalty=300):
+    def __init__(self, initial_score, penalty):
         self.score = initial_score
         self.penalty = penalty
 
