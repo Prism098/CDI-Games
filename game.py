@@ -134,13 +134,13 @@ def run_game():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                running = False  # Set running to False when quitting
 
             # Exit button event handling: quit the game
             if game_state.showing_score and exit_button.handle_event(event):
-               pygame.quit()  # Ensure pygame is properly quit
-             # 
-               
+                pygame.quit()  # Properly quit Pygame
+                running = False  # Exit the game loop properly
+                
             if not game_state.showing_score:
                 if game_state.round == 1:  # Color selection
                     for ui_element in ui_elements_color:
@@ -191,6 +191,9 @@ def run_game():
                                 game_state.deduction_timer = pygame.time.get_ticks()
                                 game_state.feedback_message = "Hou rekening\nmet de persona!"
                                 ui_element.reset_position()
+
+        if not running:  # Exit loop if game is quit
+            break
 
         screen.fill((255, 255, 255))
         screen.blit(browser_image, (300, 10))

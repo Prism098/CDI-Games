@@ -65,10 +65,14 @@ def show_demo_page():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()  # Quit pygame safely
 
             if start_button.handle_event(event):  # If button is clicked, start the game
                 from game import run_game  # Import and run the game
                 run_game()
+
+        if not pygame.get_init():
+            break  # If pygame has been quit, stop the loop
 
         screen.fill((255, 255, 255))  # Set the background to white
 
@@ -90,8 +94,5 @@ def show_demo_page():
 
         pygame.display.flip()
 
-    pygame.quit()
-
-
-
+    pygame.quit()  # Ensure that pygame.quit() is called when the loop ends
 
