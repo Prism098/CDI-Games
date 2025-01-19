@@ -94,7 +94,7 @@ def run_game():
     screen_width = 1400
     screen_height = 800
     screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("Persona Design Game")
+    pygame.display.set_caption("Interface Design Game")
 
     canvas_x = 517
     canvas_y = 108
@@ -161,7 +161,7 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Houd rekening\nmet de lievelingskleur \nvan deze persoon!"
+                                game_state.feedback_message = "Houd rekening\nmet de kenmerken \nvan deze persoon!"
                                 ui_element.reset_position()
 
                 elif game_state.round == 2:  # Image selection
@@ -180,7 +180,7 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Houd rekening\nmet de intresse \nvan deze persoon!"
+                                game_state.feedback_message = "Houd rekening\nmet de kenmerken \nvan deze persoon!"
                                 ui_element.reset_position()
 
                 elif game_state.round == 3:  # Font selection
@@ -198,7 +198,7 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Houd rekening\nmet het lettertype \nvan deze persoon!"
+                                game_state.feedback_message = "Houd rekening\nmet het kenemerken \nvan deze persoon!"
                                 ui_element.reset_position()
 
         if not running:  # Exit loop if game is quit
