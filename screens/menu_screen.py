@@ -8,7 +8,7 @@ def show_menu():
 
     # Laad de afbeelding van de game
     assets_path = "assets"
-    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen1.png")
+    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen2.png")
     game_preview_image = pygame.transform.scale(game_preview_image, (700, 400))  # Schaal de afbeelding
 
     running = True
@@ -22,33 +22,32 @@ def show_menu():
 
         # Titel
         title = title_font.render("Welkom bij de Dataset Cleaning Game", True, WHITE)
-        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 12))  # Titel hoger geplaatst
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 20))
 
         # Initialiseer explanation_start_y
-        explanation_start_y = HEIGHT // 5  # Correcte initiatie van explanation_start_y
+        explanation_start_y = HEIGHT // 5
 
         # Uitleg
+        explanation_title = text_font.render("Hieronder volgt de uitleg over welke waarden je moet opruimen (op klikken):", True, WHITE)
         explanation1 = text_font.render("Missing Value: Geen waarde ingevuld in de dataset.", True, MISSING_COLOR)
         explanation2 = text_font.render("Outlier: Waarde die significant buiten het bereik valt.", True, OUTLIER_COLOR)
         explanation3 = text_font.render("Incorrect: Waarde die niet klopt (zoals een foutieve eenheid).", True, INCORRECT_COLOR)
 
+        explanation_gap = 40  # Afstand tussen uitlegregels
+        screen.blit(explanation_title, (WIDTH // 2 - explanation_title.get_width() // 2, explanation_start_y - 50))
         screen.blit(explanation1, (WIDTH // 2 - explanation1.get_width() // 2, explanation_start_y))
-        screen.blit(explanation2, (WIDTH // 2 - explanation2.get_width() // 2, explanation_start_y + 50))
-        screen.blit(explanation3, (WIDTH // 2 - explanation3.get_width() // 2, explanation_start_y + 100))
+        screen.blit(explanation2, (WIDTH // 2 - explanation2.get_width() // 2, explanation_start_y + explanation_gap))
+        screen.blit(explanation3, (WIDTH // 2 - explanation3.get_width() // 2, explanation_start_y + 2 * explanation_gap))
 
-        # de game-preview-afbeelding
+        # Afbeelding
         preview_x = WIDTH // 2 - game_preview_image.get_width() // 2
-        preview_y = explanation_start_y + 150
+        preview_y = explanation_start_y + 3 * explanation_gap + 20
         screen.blit(game_preview_image, (preview_x, preview_y))
 
         # Instructies met gekleurde woorden
         instruction_part1 = info_font.render("Druk op", True, WHITE)
         instruction_enter = info_font.render(" Enter ", True, (56, 183, 100))  # Groen (#38b764)
-        instruction_part2 = info_font.render("om te starten.", True, WHITE)
-
-        #instruction_part3 = info_font.render("Druk op", True, WHITE)
-        #instruction_esc = info_font.render(" Esc ", True, (177, 62, 83))  # Rood (#b13e53)
-        #instruction_part4 = info_font.render("om te stoppen.", True, WHITE)
+        instruction_part2 = info_font.render("om te starten. Je hebt 30 seconden.", True, WHITE)
 
         # Bereken y-positie van de instructies
         instructions_y = preview_y + game_preview_image.get_height() + 30
@@ -59,13 +58,6 @@ def show_menu():
         screen.blit(instruction_enter, (WIDTH // 2 - total_width_start // 2 + instruction_part1.get_width(), instructions_y))
         screen.blit(instruction_part2, (
             WIDTH // 2 - total_width_start // 2 + instruction_part1.get_width() + instruction_enter.get_width(), instructions_y))
-
-        # "Druk op Esc om te stoppen."
-        #total_width_stop = instruction_part3.get_width() + instruction_esc.get_width() + instruction_part4.get_width()
-        #screen.blit(instruction_part3, (WIDTH // 2 - total_width_stop // 2, instructions_y + 50))
-        #screen.blit(instruction_esc, (WIDTH // 2 - total_width_stop // 2 + instruction_part3.get_width(), instructions_y + 50))
-        #screen.blit(instruction_part4, (
-        #    WIDTH // 2 - total_width_stop // 2 + instruction_part3.get_width() + instruction_esc.get_width(), instructions_y + 50))
 
         pygame.display.flip()
 
