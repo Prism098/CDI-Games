@@ -13,7 +13,7 @@ class GameState:
         self.canvas_image = None
         self.canvas_font = None
         self.round = 1
-        self.score_system = ScoreSystem(initial_score=2100, penalty=300)
+        self.score_system = ScoreSystem(initial_score=2500, penalty=300)
         self.selected_persona = None
         self.showing_score = False
         self.score_screen_timer = 0
@@ -90,19 +90,19 @@ def draw_score_screen(screen, score, exit_button):
 def run_game():
     pygame.init()
     
-    screen_width = 1300
+    screen_width = 1400
     screen_height = 800
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Persona Design Game")
 
-    canvas_x = 300
-    canvas_y = 100
-    canvas_width = 800
-    canvas_height = 500
+    canvas_x = 517
+    canvas_y = 108
+    canvas_width = 567
+    canvas_height = 380
     canvas_rect = pygame.Rect(canvas_x, canvas_y, canvas_width, canvas_height)
 
     browser_image = pygame.image.load("assets/Browser.png")
-    browser_image = pygame.transform.scale(browser_image, (800, 600))
+    browser_image = pygame.transform.scale(browser_image, (1000, 800))
 
     ui_elements_color, ui_elements_photo, ui_elements_font = create_ui_elements(
         canvas_x, canvas_y, canvas_width, canvas_height, 50

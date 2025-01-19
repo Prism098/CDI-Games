@@ -62,12 +62,12 @@ def randomize_personas_positions(screen_height):
 
     # Define the personas with characteristics (name, age, description)
     personas_list = [
-        Persona("assets/ChildPersona.png", 40, 200, 175, 175, 
-                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houd van kleur en \nrace auto's."),
-        Persona("assets/AdultPersona.png",  40, 200, 175, 175, 
-                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houd van professionaliteit, \nde kleur bruin en geld."),
-        Persona("assets/OldManPersona.png",  40, 200, 175, 175, 
-                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houd niet van felle kleuren. \nLuistert graag naar \nklassieke muziek.")
+        Persona("assets/ChildPersona.png", 40, 200, 250, 250, 
+                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houdt van felle kleuren, \nrace auto's en \nspeelse lettertypes."),
+        Persona("assets/AdultPersona.png",  40, 200, 250, 250, 
+                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houdt van professionaliteit en \nmoderne lettertypes, \nbruin is zijn lievelingskleur en \nveel geld is zijn doel."),
+        Persona("assets/OldManPersona.png",  40, 200, 250, 250, 
+                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houdt van zwart en grijs \nLuistert graag naar \nklassieke muziek. \nen leest graag boeken met dikgedrukte \nlettertypes.")
     ]
 
     # Randomly select and return a persona

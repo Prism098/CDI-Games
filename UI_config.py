@@ -8,37 +8,37 @@ def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_eleme
     GREY = (150, 150, 150)   # Old Person
     
     ui_elements_color = [
-        DraggableUIElement(320, 650, 125, 125, BROWN),      # Adult
-        DraggableUIElement(640, 650, 125, 125, ORANGE),     # Child
-        DraggableUIElement(960, 650, 125, 125, GREY)        # Old Person
+        DraggableUIElement(425, 650, 125, 125, BROWN),      # Adult
+        DraggableUIElement(735, 650, 125, 125, ORANGE),     # Child
+        DraggableUIElement(1050, 650, 125, 125, GREY)        # Old Person
     ]
     
     ui_elements_photo = [
-        DraggableUIElement(320, 650, 125, 125, "assets/SuitcaseMoney.png"),
-        DraggableUIElement(640, 630, 125, 150, "assets/ToyCar.png"),
-        DraggableUIElement(960, 650, 125, 125, "assets/Gramophone.png")
+        DraggableUIElement(425, 650, 125, 125, "assets/SuitcaseMoney.png"),
+        DraggableUIElement(735, 630, 125, 150, "assets/ToyCar.png"),
+        DraggableUIElement(1050, 650, 125, 125, "assets/Gramophone.png")
     ]
     
     ui_elements_font = [
         DraggableUIElement(
-            320, 650, 125, 125,
+            425, 630, 125, 125,
             color_or_image=None,
             text="Aa",
-            font=pygame.font.SysFont("timesnewroman", 50),
+            font=pygame.font.SysFont("timesnewroman", 100),
             font_name="timesnewroman"
         ),
         DraggableUIElement(
-            640, 650, 125, 125,
+            735, 630, 125, 125,
             color_or_image=None,
             text="Aa",
-            font=pygame.font.SysFont("comicsansms", 50),
+            font=pygame.font.SysFont("comicsansms", 100),
             font_name="comicsansms"
         ),
         DraggableUIElement(
-            960, 650, 125, 125,
+            1050, 640, 125, 125,
             color_or_image=None,
             text="Aa",
-            font=pygame.font.SysFont("brushscript", 50),
+            font=pygame.font.SysFont("brushscript", 130),
             font_name="brushscript"
         )
     ]
