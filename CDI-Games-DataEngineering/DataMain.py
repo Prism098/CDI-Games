@@ -3,11 +3,11 @@ import sys
 import time
 import random
 
-pygame.init()
+# pygame.init()
 
 # --- CONSTANTEN & VENSTEREIGENSCHAPPEN ---
 WIDTH = 1400
-HEIGHT = 720
+HEIGHT = 800
 INFO_PANEL_WIDTH = 300  # Paneel aan de rechterkant
 FPS = 60
 
@@ -23,6 +23,7 @@ YELLOW = (255, 255, 0)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dataset Cleaning Game")
+pygame.font.init()
 
 clock = pygame.time.Clock()
 

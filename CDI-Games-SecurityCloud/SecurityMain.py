@@ -6,16 +6,25 @@ from enemy_spawner import EnemySpawner
 from kaboem_spawner import KaboemSpawner
 from router import Router
 from firewall import Firewall
+import os
+
 
 # Initialize Pygame and font module
 pygame.init()
 pygame.font.init()
 
+pygame.event.set_grab(True)  # Direct all input to this process
+pygame.mouse.set_visible(True)  # Optional: Adjust mouse visibility
+
+
 # display info
-display = pygame.display.set_mode((c.DISPLAY_SIZE), pygame.RESIZABLE)
+display = pygame.display.set_mode((c.DISPLAY_SIZE))
 fps = c.FPS
 clock = pygame.time.Clock()
 black = (0, 0, 0)
+
+print("SDL_WINDOWID:", os.environ.get("SDL_WINDOWID"))
+
 
 # Initialize score
 score = [2500]  # Use a list to pass by reference
@@ -158,6 +167,7 @@ controls_image_spatie = pygame.transform.scale(controls_image_spatie, (400, 300)
 
 while Startscherm:
     for event in pygame.event.get():
+        print(event)  # Log all events for debugging
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
