@@ -13,7 +13,7 @@ class GameState:
         self.canvas_image = None
         self.canvas_font = None
         self.round = 1
-        self.score_system = ScoreSystem(initial_score=2500, penalty=300)
+        self.score_system = ScoreSystem(initial_score=100, penalty=300)
         self.selected_persona = None
         self.showing_score = False
         self.score_screen_timer = 0
@@ -129,7 +129,7 @@ def run_game():
 
         if game_state.timer.time_left <= 0 and not game_state.showing_score:
             game_state.showing_score = True
-            game_state.score_system.reset_score()
+            #game_state.score_system.reset_score()
             game_state.score_screen_timer = pygame.time.get_ticks()
 
         for event in pygame.event.get():
@@ -147,6 +147,7 @@ def run_game():
                         color = ui_element.handle_event(event, canvas_rect)
                         if color:
                             if color == game_state.selected_persona.correct_color:
+                                game_state.score_system.add_score()
                                 game_state.canvas_color = color
                                 game_state.round = 2
                                 game_state.feedback_message = None
@@ -154,7 +155,7 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Hou rekening\nmet de persona!"
+                                game_state.feedback_message = "Houd rekening\nmet de lievelingskleur \nvan deze persoon!"
                                 ui_element.reset_position()
 
                 elif game_state.round == 2:  # Image selection
@@ -166,13 +167,14 @@ def run_game():
                                 image_rect = image.get_rect()
                                 image_rect.midbottom = (canvas_rect.centerx, canvas_rect.bottom - 20)
                                 game_state.canvas_image = (image, image_rect)
+                                game_state.score_system.add_score()
                                 game_state.round = 3
                                 game_state.feedback_message = None
                             else:
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Hou rekening\nmet de persona!"
+                                game_state.feedback_message = "Houd rekening\nmet de intresse \nvan deze persoon!"
                                 ui_element.reset_position()
 
                 elif game_state.round == 3:  # Font selection
@@ -181,6 +183,7 @@ def run_game():
                             if ui_element.font_name == game_state.selected_persona.correct_font:
                                 game_state.canvas_font = ui_element.font_name
                                 game_state.story_text = get_story_for_persona(ui_element.font_name)
+                                game_state.score_system.add_score()
                                 game_state.timer.stop()
                                 game_state.showing_score = True
                                 game_state.score_screen_timer = pygame.time.get_ticks()
@@ -189,7 +192,7 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Hou rekening\nmet de persona!"
+                                game_state.feedback_message = "Houd rekening\nmet het lettertype \nvan deze persoon!"
                                 ui_element.reset_position()
 
         if not running:  # Exit loop if game is quit
@@ -225,7 +228,7 @@ def run_game():
             for ui_element in current_elements:
                 ui_element.draw(screen)
 
-        font = pygame.font.SysFont('Arial', 30)
+        font = pygame.font.SysFont('Minecraftia', 30)
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
 
@@ -234,7 +237,7 @@ def run_game():
         if game_state.deduction_timer > 0:
             elapsed_time = pygame.time.get_ticks() - game_state.deduction_timer
             if elapsed_time < deduction_display_duration:
-                deduction_text = font.render(f"-{game_state.deduction_amount}", True, (255, 0, 0))
+                deduction_text = font.render(f"-{game_state.deduction_amount}", True, (250, 0, 0))
                 deduction_rect = deduction_text.get_rect()
                 deduction_rect.topleft = (10, 50)  # Position below the score
                 screen.blit(deduction_text, deduction_rect)
@@ -243,8 +246,8 @@ def run_game():
 
         if game_state.feedback_message:
             feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
-            render_multiline_text(screen, game_state.feedback_message, feedback_font, (255, 0, 0), 
-                                screen.get_width() - 175, screen.get_height() - 700)
+            render_multiline_text(screen, game_state.feedback_message, feedback_font, (250, 0, 0), 
+                                screen.get_width() - 270, screen.get_height() - 700)
 
         if not game_state.showing_score:
             game_state.timer.draw(screen)

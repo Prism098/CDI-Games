@@ -5,6 +5,9 @@ class ScoreSystem:
 
     def apply_penalty(self):
         self.score = max(0, self.score - self.penalty)
+    
+    def add_score(self):
+        self.score = self.score + 800
 
     def get_score(self):
         return self.score
