@@ -136,7 +136,7 @@ def run_game():
 
         if game_state.timer.time_left <= 0 and not game_state.showing_score:
             game_state.showing_score = True
-            #game_state.score_system.reset_score()
+            game_state.score_system.reset_score()  # Reset the score to 0 when the timer ends
             game_state.score_screen_timer = pygame.time.get_ticks()
 
         for event in pygame.event.get():
@@ -154,7 +154,6 @@ def run_game():
                         color = ui_element.handle_event(event, canvas_rect)
                         if color:
                             if color == game_state.selected_persona.correct_color:
-                          
                                 game_state.canvas_color = color
                                 game_state.round = 2
                                 game_state.feedback_message = None
