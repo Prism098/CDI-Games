@@ -30,7 +30,7 @@ def show_demo_page():
     pygame.init()
 
     # Set screen dimensions
-    screen_width = 1300
+    screen_width = 1200
     screen_height = 800
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("HCI game - Tutorial")
@@ -52,7 +52,7 @@ def show_demo_page():
     # Create the "Start Game" button at the bottom
     start_button = Button(
         x=(screen_width // 2) - 100, y=screen_height - 75, width=200, height=50,
-        text="Start Game", font=button_font, text_color=(0, 0, 0), bg_color=(150, 150, 150), hover_color=(200, 200, 200)
+        text="Start Game", font=button_font, text_color=(0, 0, 0), bg_color=(239, 125, 87), hover_color=(200, 200, 200)
     )
 
     running = True
@@ -74,7 +74,7 @@ def show_demo_page():
         if not pygame.get_init():
             break  # If pygame has been quit, stop the loop
 
-        screen.fill((255, 255, 255))  # Set the background to white
+        screen.fill((59, 92, 201))  # Set the background to white
 
         # Draw the TutorialHCI image (fits between the header and the button)
         # Position the image in the center horizontally and below the header
@@ -83,7 +83,7 @@ def show_demo_page():
 
         # Title text (move higher by setting a smaller top value)
         title_font = pygame.font.SysFont("Arial", 48, bold=True)
-        title_text = title_font.render("HCI game - Tutorial", True, (0, 0, 0))
+        title_text = title_font.render("HCI game - Tutorial", True, (255, 255, 255))
         
         # Adjust the title's position (move it closer to the top)
         title_rect = title_text.get_rect(centerx=screen_width // 2, top=10)  # Set top to 10px for higher placement

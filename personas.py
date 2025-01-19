@@ -56,7 +56,7 @@ class Persona:
 
 def randomize_personas_positions(screen_height):
     """Place personas at fixed positions on the left side of the screen"""
-    BROWN = (77, 55, 50)
+    BROWN = (97, 62, 62)
     ORANGE = (255, 98, 40)
     GREY = (150, 150, 150)
 

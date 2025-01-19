@@ -3,7 +3,7 @@ import pygame
 
 def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_element_height):
     # Colors that match the personas exactly
-    BROWN = (77, 55, 50)     # Adult
+    BROWN = (97, 62, 62)     # Adult
     ORANGE = (255, 98, 40)   # Child
     GREY = (150, 150, 150)   # Old Person
     
