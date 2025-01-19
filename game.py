@@ -13,7 +13,7 @@ class GameState:
         self.canvas_image = None
         self.canvas_font = None
         self.round = 1
-        self.score_system = ScoreSystem(initial_score=100, penalty=300)
+        self.score_system = ScoreSystem(initial_score=0, penalty=300)
         self.selected_persona = None
         self.showing_score = False
         self.score_screen_timer = 0
@@ -104,6 +104,12 @@ def run_game():
     browser_image = pygame.image.load("assets/Browser.png")
     browser_image = pygame.transform.scale(browser_image, (1000, 800))
 
+    border_element = pygame.image.load("assets/BorderElement.png")
+    border_element = pygame.transform.scale(border_element, (170, 170))
+
+    persona_border = pygame.image.load("assets/PersonaBorder.png")
+    persona_border = pygame.transform.scale(persona_border, (580, 690))
+
     ui_elements_color, ui_elements_photo, ui_elements_font = create_ui_elements(
         canvas_x, canvas_y, canvas_width, canvas_height, 50
     )
@@ -183,7 +189,7 @@ def run_game():
                             if ui_element.font_name == game_state.selected_persona.correct_font:
                                 game_state.canvas_font = ui_element.font_name
                                 game_state.story_text = get_story_for_persona(ui_element.font_name)
-                                game_state.score_system.add_score()
+                                game_state.score_system.add_score_Premium()
                                 game_state.timer.stop()
                                 game_state.showing_score = True
                                 game_state.score_screen_timer = pygame.time.get_ticks()
@@ -198,8 +204,12 @@ def run_game():
         if not running:  # Exit loop if game is quit
             break
 
-        screen.fill((255, 255, 255))
+        screen.fill((59, 92, 201))
         screen.blit(browser_image, (300, 10))
+        screen.blit(persona_border, (-50, 0))
+        screen.blit(border_element, (canvas_x - 115, canvas_y + 519))
+        screen.blit(border_element, (canvas_x + 195, canvas_y + 519))
+        screen.blit(border_element, (canvas_x + 510, canvas_y + 519))
         
         pygame.draw.rect(screen, game_state.canvas_color, canvas_rect)
         
@@ -228,7 +238,7 @@ def run_game():
             for ui_element in current_elements:
                 ui_element.draw(screen)
 
-        font = pygame.font.SysFont('Minecraftia', 30)
+        font = pygame.font.SysFont('Arial', 30)
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
 

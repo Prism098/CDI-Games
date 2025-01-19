@@ -9,6 +9,9 @@ class ScoreSystem:
     def add_score(self):
         self.score = self.score + 800
 
+    def add_score_Premium(self):
+        self.score = self.score + 900
+
     def get_score(self):
         return self.score
     
