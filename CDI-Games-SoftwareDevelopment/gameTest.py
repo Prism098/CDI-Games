@@ -1,6 +1,7 @@
 import pygame
 import sys
 import time
+import random
 
 pygame.init()
 
@@ -55,13 +56,34 @@ GRID_OFFSET_X = WIDTH - GRID_PADDING_RIGHT - (GRID_SIZE * TILE_SIZE)
 GRID_OFFSET_Y = 200
 
 # Grid layout
-grid = [
-    ["R", "R", "R", "R", "R"],
-    ["R", "G", "G", "R", "G"],
-    ["D", "G", "G", "R", "G"],
-    ["G", "G", "C", "R", "G"],
-    ["R", "C", "R", "R", "C"],
-]
+grid1 = (
+    ("R", "C", "R", "G", "D"),  # Finish line at (0, 4)
+    ("R", "G", "R", "R", "C"),
+    ("R", "G", "G", "G", "R"),  # Checkpoints at C , Bonus points (4,0), (0,0),(3,4)
+    ("C", "R", "R", "G", "R"),
+    ("R", "G", "R", "G", "G"),  # Start point at (4, 2)
+)
+
+grid2 = (
+    ("R", "C", "R", "C", "D"),  # Finish line at (0, 4)
+    ("R", "G", "G", "R", "G"),
+    ("R", "G", "R", "R", "G"),  # Checkpoints at C , Bonus points (4,3), (0,0),(2,0)
+    ("G", "G", "C", "G", "G"),
+    ("G", "G", "R", "R", "G"),  # Start point at (4, 2)
+)
+
+grid3 = (
+    ("R", "G", "G", "R", "D"),  # Finish line at (0, 4)
+    ("C", "R", "R", "C", "G"),
+    ("R", "G", "G", "R", "R"),  # Checkpoints at C , Bonus points (0,0), (2,4),(3,2)
+    ("R", "G", "C", "G", "G"),
+    ("R", "R", "R", "G", "G"),  # Start point at (4, 2)
+)
+
+grids = [grid1,  grid2, grid3]
+
+# Randomly select a grid
+grid = random.choice(grids)
 
 # Run Button
 run_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 100, 200, 50)
