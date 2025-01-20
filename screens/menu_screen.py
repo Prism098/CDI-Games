@@ -13,7 +13,7 @@ def show_menu():
 
     running = True
     while running:
-        screen.fill(BACKGROUND_COLOR)  # Achtergrondkleur aangepast
+        screen.fill(BACKGROUND_COLOR)
 
         # Fonts instellen
         title_font = pygame.font.Font(None, 80)  # Grote titel
@@ -29,7 +29,7 @@ def show_menu():
 
         # Uitleg
         explanation_title = text_font.render("Hieronder volgt de uitleg over welke waarden je moet opruimen (op klikken):", True, WHITE)
-        explanation1 = text_font.render("Missing Value: Geen waarde ingevuld in de dataset.", True, MISSING_COLOR)
+        explanation1 = text_font.render("Missing Value: Geen waarde ingevuld in het vakje.", True, MISSING_COLOR)
         explanation2 = text_font.render("Outlier: Waarde die significant buiten het bereik valt.", True, OUTLIER_COLOR)
         explanation3 = text_font.render("Incorrect: Waarde die niet klopt (zoals een foutieve eenheid).", True, INCORRECT_COLOR)
 

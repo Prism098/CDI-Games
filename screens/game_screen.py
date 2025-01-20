@@ -116,10 +116,11 @@ def start_game():
             return
 
         if remaining_time <= 0:
+            elapsed_time = TIMER_SECONDS  # De volledige tijd is gebruikt
             show_end_screen(
                 screen,
                 round(score),
-                TIMER_SECONDS,
+                0,  # Geef 0 door als de tijd volledig is verstreken
                 found_outliers,
                 total_outliers,
                 found_missing,
