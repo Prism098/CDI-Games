@@ -96,14 +96,14 @@ def run_game():
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Interface Design Game")
 
-    canvas_x = 517
-    canvas_y = 108
-    canvas_width = 567
-    canvas_height = 380
+    canvas_x = 483
+    canvas_y = 140
+    canvas_width = 636
+    canvas_height = 385
     canvas_rect = pygame.Rect(canvas_x, canvas_y, canvas_width, canvas_height)
 
-    browser_image = pygame.image.load("assets/Browser.png")
-    browser_image = pygame.transform.scale(browser_image, (1000, 800))
+    browser_image = pygame.image.load("assets/Browser6.png")
+    browser_image = pygame.transform.scale(browser_image, (800, 660))
 
     border_element = pygame.image.load("assets/BorderElement.png")
     border_element = pygame.transform.scale(border_element, (170, 170))
@@ -204,12 +204,12 @@ def run_game():
         if not running:  # Exit loop if game is quit
             break
 
-        screen.fill((59, 92, 201))
-        screen.blit(browser_image, (300, 10))
+        screen.fill((26, 28, 44))  # Dark blue background
+        screen.blit(browser_image, (400, -25))
         screen.blit(persona_border, (-50, 0))
-        screen.blit(border_element, (canvas_x - 115, canvas_y + 519))
-        screen.blit(border_element, (canvas_x + 195, canvas_y + 519))
-        screen.blit(border_element, (canvas_x + 510, canvas_y + 519))
+        screen.blit(border_element, (canvas_x - 81, canvas_y + 487))
+        screen.blit(border_element, (canvas_x + 229, canvas_y + 487))
+        screen.blit(border_element, (canvas_x + 544, canvas_y + 487))
         
         pygame.draw.rect(screen, game_state.canvas_color, canvas_rect)
         
