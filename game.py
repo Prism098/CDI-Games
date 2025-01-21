@@ -96,17 +96,17 @@ def run_game():
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
     pygame.display.set_caption("Interface Design Game")
 
-    canvas_x = 483
-    canvas_y = 140
-    canvas_width = 636
-    canvas_height = 385
+    canvas_x = 545
+    canvas_y = 180
+    canvas_width = 1113
+    canvas_height = 580
     canvas_rect = pygame.Rect(canvas_x, canvas_y, canvas_width, canvas_height)
 
     browser_image = pygame.image.load("assets/Browser6.png")
-    browser_image = pygame.transform.scale(browser_image, (800, 660))
+    browser_image = pygame.transform.scale(browser_image, (1400, 1000))
 
     border_element = pygame.image.load("assets/BorderElement.png")
-    border_element = pygame.transform.scale(border_element, (170, 170))
+    border_element = pygame.transform.scale(border_element, (200, 200))
 
     persona_border = pygame.image.load("assets/PersonaBorder.png")
     persona_border = pygame.transform.scale(persona_border, (580, 690))
@@ -120,7 +120,7 @@ def run_game():
 
     font = pygame.font.SysFont('Arial', 32)
     exit_button = Button(
-        x=(1200) // 2, y=(520), width=200, height=50,
+        x=(1720) // 2, y=(662), width=200, height=50,
         text="Exit", font=font, text_color=(0, 0, 0), 
         bg_color=(239, 125, 87), hover_color=(200, 200, 200)
     )
@@ -205,11 +205,11 @@ def run_game():
             break
 
         screen.fill((26, 28, 44))  # Dark blue background
-        screen.blit(browser_image, (400, -25))
-        screen.blit(persona_border, (-50, 0))
-        screen.blit(border_element, (canvas_x - 81, canvas_y + 487))
-        screen.blit(border_element, (canvas_x + 229, canvas_y + 487))
-        screen.blit(border_element, (canvas_x + 544, canvas_y + 487))
+        screen.blit(browser_image, (400, -70))
+        screen.blit(persona_border, (-50, 100))
+        screen.blit(border_element, (canvas_x + 142, canvas_y + 608))
+        screen.blit(border_element, (canvas_x + 458, canvas_y + 608))
+        screen.blit(border_element, (canvas_x + 774, canvas_y + 608))
         
         pygame.draw.rect(screen, game_state.canvas_color, canvas_rect)
         
