@@ -21,7 +21,7 @@ BLUE = (0, 100, 255)
 DARKGREY = (50, 50, 50)
 YELLOW = (255, 255, 0)
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Dataset Cleaning Game")
 pygame.font.init()
 

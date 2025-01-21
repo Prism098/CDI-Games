@@ -18,7 +18,7 @@ pygame.mouse.set_visible(True)  # Optional: Adjust mouse visibility
 
 
 # display info
-display = pygame.display.set_mode((c.DISPLAY_SIZE))
+display = pygame.display.set_mode((c.DISPLAY_SIZE), pygame.FULLSCREEN)
 fps = c.FPS
 clock = pygame.time.Clock()
 black = (0, 0, 0)

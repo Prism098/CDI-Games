@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoreboard</title>
+  <link rel="stylesheet" href="scoreboard.css"> <!-- Link naar de externe CSS -->
+</head>
+<body>
+  <div class="scoreboard">
+    <h1>Top Scores</h1>
+    <ol id="scoreList"></ol>
+  </div>
+
+  <!-- Confetti JS -->
+  <script src="confetti/confetti.js"></script>
+
+
+  <script>
+    // Array om de gebruikte namen bij te houden
+    let usedNames = [];
+
+    // Functie om een willekeurige naam te genereren zonder duplicaten
+    function generateRandomName() {
+      const names = ['Bas', 'Reinier', 'Abdul', 'Milan', 'Efdal', 'Max', 'Roel', 'Anne', 'Danny', 'Jasper'];
+      
+      // Krijg een willekeurige naam die nog niet is gebruikt
+      let randomName;
+      do {
+        randomName = names[Math.floor(Math.random() * names.length)];
+      } while (usedNames.includes(randomName)); // Herhaal totdat een unieke naam wordt gevonden
+
+      // Voeg de naam toe aan de lijst van gebruikte namen
+      usedNames.push(randomName);
+      
+      return randomName;
+    }
+
+    // Functie om een willekeurige score te genereren tussen 500 en 1000
+    function generateRandomScore() {
+      return Math.floor(Math.random() * (1000 - 500 + 1)) + 500; 
+    }
+
+    // Functie om de scorelijst te genereren en te sorteren
+    function generateScoreboard() {
+      const scoreList = document.getElementById('scoreList');
+      const numScores = 10; // Aantal scores die we willen tonen
+
+      // Maak een array om de scores en namen op te slaan
+      let scores = [];
+
+      for (let i = 0; i < numScores; i++) {
+        const name = generateRandomName(); // Genereer unieke naam
+        const score = generateRandomScore(); // Genereer score tussen 500 en 1000
+
+        // Voeg naam en score toe aan de scores array
+        scores.push({ name: name, score: score });
+      }
+
+      // Sorteer de array van scores van hoog naar laag
+      scores.sort((a, b) => b.score - a.score);
+
+      // Voeg de gesorteerde lijst toe aan de HTML
+      scores.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${item.name} - ${item.score}`; // Voeg nummer, naam en score toe
+        scoreList.appendChild(li); // Voeg het item toe aan de lijst
+      });
+    }
+
+    // Start de confetti zodra de pagina geladen is
+    window.onload = function() {
+      generateScoreboard(); // Genereer het scorebord
+      confetti.start(); // Start de confetti direct bij het laden van de pagina
+    };
+  </script>
+</body>
+</html>

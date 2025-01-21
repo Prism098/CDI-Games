@@ -7,7 +7,7 @@ pygame.init()
 
 # Window setup
 WIDTH, HEIGHT = 1400, 800
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Boolean Bakery")
 
 # Fonts & Colors

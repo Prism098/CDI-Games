@@ -1,124 +1,88 @@
 import pygame
-import os
 
-
-pygame.init()
-pygame.font.init()
-# Colors
-BLACK = (0, 0, 0)
-
-class UIElement:
-    def __init__(
-        self,
-        x,
-        y,
-        width,
-        height,
-        image_path=None,
-        color=None,
-        text="",
-        font=None,
-        font_name=None,
-        draggable=True,
-    ):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.original_width = width
-        self.original_height = height
-        self.color = color
-        self.image = None
+class DraggableUIElement:
+    def __init__(self, x, y, width, height, color_or_image, text=None, font=None, font_name=None):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color_or_image = color_or_image
         self.text = text
         self.font = font
         self.font_name = font_name
+        
+        # Store the initial position
+        self.initial_x = x
+        self.initial_y = y
+        
+        if isinstance(self.color_or_image, tuple):
+            self.is_image = False
+            self.color = self.color_or_image
+        elif self.color_or_image is not None:
+            self.is_image = True
+            self.image = pygame.image.load(self.color_or_image)
+            self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        else:
+            self.is_image = False
+            self.color = None
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.dragging = False
-        self.draggable = draggable
-        self.original_pos = (x, y)
-        self.visible = True
-        self.hovered = False
-        self.scale_factor = 2
-        self.scale_speed = 0.1
-        self.placed = False
-        self.offset_x = 0
-        self.offset_y = 0
-
-        if image_path and os.path.isfile(image_path):
-            try:
-                self.image = pygame.image.load(image_path).convert_alpha()
-                self.original_image = self.image  # Store the original image
-                self.image = pygame.transform.scale(self.image, (width, height))
-            except pygame.error as e:
-                print(f"Error loading image: {e}")
-
-    def draw(self, screen, show_score_window):
-        if self.visible:
-            mouse_pos = pygame.mouse.get_pos()
-            self.hovered = self.rect.collidepoint(mouse_pos) and not show_score_window
-
-            if self.placed:
-                # When placed, draw at full photo_rect size without scaling effects
-                if self.image:
-                    scaled_image = pygame.transform.scale(
-                        self.original_image, (self.rect.width, self.rect.height)
-                    )
-                    screen.blit(scaled_image, self.rect)
-            else:
-                # Normal drawing behavior for unplaced elements
-                if self.hovered:
-                    self.scale_factor = min(self.scale_factor + self.scale_speed, 1.2)
-                else:
-                    self.scale_factor = max(self.scale_factor - self.scale_speed, 1)
-
-                scaled_width = int(self.original_width * self.scale_factor)
-                scaled_height = int(self.original_height * self.scale_factor)
-
-                scaled_rect = pygame.Rect(
-                    self.rect.centerx - scaled_width // 2,
-                    self.rect.centery - scaled_height // 2,
-                    scaled_width,
-                    scaled_height,
-                )
-
-                if self.image:
-                    scaled_image = pygame.transform.scale(
-                        self.original_image, (scaled_width, scaled_height)
-                    )
-                    screen.blit(scaled_image, scaled_rect.topleft)
-                elif self.color:
-                    pygame.draw.rect(screen, self.color, scaled_rect)
-
-                if self.text and self.font:
-                    text_surface = self.font.render(self.text, True, BLACK)
-                    text_width = int(text_surface.get_width() * self.scale_factor)
-                    text_height = int(text_surface.get_height() * self.scale_factor)
-                    text_surface = pygame.transform.scale(
-                        text_surface, (text_width, text_height)
-                    )
-                    text_rect = text_surface.get_rect(center=scaled_rect.center)
-                    screen.blit(text_surface, text_rect)
-
-    def handle_event(self, event):
-        if not self.visible or not self.draggable:
-            return
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # Left mouse button
-                if self.rect.collidepoint(event.pos):
-                    self.dragging = True
-                    mouse_x, mouse_y = event.pos
-                    self.offset_x = self.rect.x - mouse_x
-                    self.offset_y = self.rect.y - mouse_y
-
-        elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                self.dragging = False
-
-        elif event.type == pygame.MOUSEMOTION:
-            if self.dragging:
-                mouse_x, mouse_y = event.pos
-                self.rect.x = mouse_x + self.offset_x
-                self.rect.y = mouse_y + self.offset_y
+        self.hovering = False  # Track hover state
 
     def reset_position(self):
-        self.rect.topleft = self.original_pos
+        """Reset the element to its initial position"""
+        self.x = self.initial_x
+        self.y = self.initial_y
+        self.rect.topleft = (self.x, self.y)
 
-    def is_dragging(self):
-        return self.dragging
+    def handle_event(self, event, canvas_rect):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.dragging = True
+                return None
+        elif event.type == pygame.MOUSEMOTION:
+            if self.rect.collidepoint(event.pos):
+                self.hovering = True  # Set hovering to True when the mouse is over the element
+            else:
+                self.hovering = False  # Set hovering to False when the mouse moves away
+
+            if self.dragging:
+                # Update position while dragging
+                mouse_x, mouse_y = event.pos
+                self.x = mouse_x - self.width // 2
+                self.y = mouse_y - self.height // 2
+                self.rect.topleft = (self.x, self.y)
+                return None
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if self.dragging:
+                self.dragging = False
+                if canvas_rect.colliderect(self.rect):
+                    if self.is_image:
+                        return self.color_or_image  # Return image path
+                    elif self.color:
+                        return self.color  # Return color tuple
+                    elif self.font_name:
+                        return self.font_name  # Return font name
+                self.reset_position()
+        return None
+
+    def draw(self, screen):
+        # Apply hover effect (e.g., scale up the element)
+        scale_factor = 1.2 if self.hovering else 1  # Increase size on hover
+
+        scaled_width = int(self.width * scale_factor)
+        scaled_height = int(self.height * scale_factor)
+        scaled_x = self.x - (scaled_width - self.width) // 2
+        scaled_y = self.y - (scaled_height - self.height) // 2
+
+        if self.is_image:
+            scaled_image = pygame.transform.scale(self.image, (scaled_width, scaled_height))
+            screen.blit(scaled_image, (scaled_x, scaled_y))
+        elif self.color:
+            pygame.draw.rect(screen, self.color, pygame.Rect(scaled_x, scaled_y, scaled_width, scaled_height))
+        
+        if self.text:
+            text_surface = self.font.render(self.text, True, (0, 0, 0))
+            text_rect = text_surface.get_rect(center=(scaled_x + scaled_width // 2, scaled_y + scaled_height // 2))
+            screen.blit(text_surface, text_rect.topleft)

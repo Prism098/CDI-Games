@@ -1,9 +1,11 @@
 import subprocess
 import sys
 import os
+import pygame
 
 # Lijst van games met paden naar de submappen
 games = [
+    {"name": "Startscherm", "script": "Startscherm.py"},
     {"name": "Data Cleaning Game", "script": "CDI-Games-DataEngineering/DataMain.py"},
     {"name": "Website Interface Builder Game", "script": "CDI-Games-HCI/HCIMain.py"},
     {"name": "Network Invaders", "script": "CDI-Games-SecurityCloud/SecurityMain.py"},
@@ -23,6 +25,11 @@ def run_game(game):
         if not os.path.exists(game["script"]):
             print(f"Error: Script {game['script']} not found!")
             return
+
+        # Set display mode to fullscreen
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
+        os.environ['SDL_VIDEO_CENTERED'] = '0'
+        pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
         # Voer de game uit als subprocess
         result = subprocess.run(
