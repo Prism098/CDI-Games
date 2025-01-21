@@ -91,9 +91,9 @@ def draw_score_screen(screen, score, exit_button):
 def run_game():
     pygame.init()
     
-    screen_width = 1400
-    screen_height = 800
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen_width = 1920
+    screen_height = 1080
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
     pygame.display.set_caption("Interface Design Game")
 
     canvas_x = 483
