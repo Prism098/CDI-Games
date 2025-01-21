@@ -32,16 +32,16 @@ COMMANDS = ["Move Forward", "Turn Left", "Turn Right"]
 player_x, player_y = 2, 4
 player_dir = "UP"
 commands = []
-destination = (0, 2)
+destination = (4, 0)
 
 # Timer and scoring
 TIME_LIMIT = 35  # in seconds
 timer_start = time.time()
-score = 0
+score = 0 
 final_score_displayed = False
 
 # Drop Zone
-MAX_STEPS = 10  # Number of drop zones
+MAX_STEPS = 5  # Number of drop zones
 DROP_ZONE_PADDING = 20
 drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
  
@@ -171,6 +171,26 @@ def draw_car():
         GRID_OFFSET_Y + player_y * TILE_SIZE + TILE_SIZE // 2,
     ))
     SCREEN.blit(car_image, car_rect)
+def draw_car_position(x, y):
+    """
+    Draws the car at an intermediate position on the grid.
+    """
+    car_image = CAR_IMAGE
+    if player_dir == "RIGHT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, -90)
+    elif player_dir == "LEFT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 90)
+    elif player_dir == "UP":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 0)
+    elif player_dir == "DOWN":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 180)
+
+    car_rect = car_image.get_rect(center=(
+        GRID_OFFSET_X + x * TILE_SIZE + TILE_SIZE // 2,
+        GRID_OFFSET_Y + y * TILE_SIZE + TILE_SIZE // 2,
+    ))
+    SCREEN.blit(car_image, car_rect)
+
 
 def draw_timer():
     # Calculate time left
@@ -179,7 +199,7 @@ def draw_timer():
 
     # Timer circle
     timer_x, timer_y = WIDTH - 100, 50
-    pygame.draw.circle(SCREEN, YELLOW if time_left > 30 else RED_BG, (timer_x, timer_y), 40)
+    pygame.draw.circle(SCREEN, YELLOW if time_left > 30 else GREEN, (timer_x, timer_y), 40)
     timer_text = FONT.render(str(max(0, int(time_left))), True, BLACK)
     timer_rect = timer_text.get_rect(center=(timer_x, timer_y))
     SCREEN.blit(timer_text, timer_rect)
@@ -240,11 +260,11 @@ def find_nearest_checkpoint():#Find the nearest checkpoint on the same y-coordin
 
 def move_forward():
     """
-    Move the car forward in the current direction, and handle grass and checkpoints.
+    Move the car forward in the current direction with animation.
     """
     global player_x, player_y, score
 
-    # Calculate the target position based on the current direction
+    # Calculate the target position
     new_x, new_y = player_x, player_y
     if player_dir == "RIGHT" and player_x < GRID_SIZE - 1:
         new_x += 1
@@ -255,14 +275,23 @@ def move_forward():
     elif player_dir == "DOWN" and player_y < GRID_SIZE - 1:
         new_y += 1
 
-    # Check the type of tile at the target position
-    if grid[new_y][new_x] == "R" or grid[new_y][new_x] == "C":  # Road or checkpoint
-        player_x, player_y = new_x, new_y
-        if grid[new_y][new_x] == "C":  # Add points for checkpoint
-            score += 500
-    elif grid[new_y][new_x] == "G":  # Grass
-        print("Hit grass! Resetting to nearest checkpoint.")
-        player_x, player_y = find_nearest_checkpoint()
+    # Animate the movement
+    steps = 10
+    for step in range(steps):
+        intermediate_x = player_x + (new_x - player_x) * (step / steps)
+        intermediate_y = player_y + (new_y - player_y) * (step / steps)
+
+        SCREEN.fill(RED_BG)
+        draw_grid()
+        draw_car_position(intermediate_x, intermediate_y)
+        draw_timer()
+        draw_drop_zones()
+        draw_run_button()
+        pygame.display.flip()
+        pygame.time.wait(50)  # Adjust for smoother/slower animations
+
+    # Update to the new position
+    player_x, player_y = new_x, new_y
 
     # Check if the car reaches the yellow block (destination)
     if (player_x, player_y) == destination:
@@ -271,7 +300,6 @@ def move_forward():
         end_game(0)
 
   
-
 def turn_left():
     global player_dir
     if player_dir == "RIGHT":
@@ -387,7 +415,7 @@ def main():
 
         pygame.display.flip()
 
-        clock.tick(30)
+        clock.tick(60)
 
 
 if __name__ == "__main__":
