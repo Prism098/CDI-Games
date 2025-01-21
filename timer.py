@@ -26,7 +26,7 @@ class Timer:
          # Draw the circular countdown timer
         angle = 360 * (self.time_left / self.total_time)  # Calculate the angle for the arc
         end_angle = math.radians(angle)
-        pygame.draw.arc(screen, (255, 255, 0), (self.x - 30, self.y + 25, self.radius * 2, self.radius * 2), 0, end_angle, 5)
+        pygame.draw.arc(screen, (255, 255, 255), (self.x - 30, self.y, self.radius * 2, self.radius * 2), 0, end_angle, 5)
 
     def is_time_up(self):
         # Check if the timer has finished (i.e., time_left is 0)
