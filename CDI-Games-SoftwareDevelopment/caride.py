@@ -42,6 +42,8 @@ turn_left_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software
 move_forward_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software Dev\caride_Forward.png")
 turn_right_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software Dev\caride_turn_right.png")
 run_button_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software Dev\Run button.png")
+# Load "Memory Full" image
+memory_full_img = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\Car Memory FULL HIT RUN !.png")
 
 # move image down to add timer on screen 
 image_top_padding = 100
@@ -95,6 +97,7 @@ grid_start_x, grid_start_y = (220,300)
 MAX_STEPS = 15  # Number of drop zones
 DROP_ZONE_PADDING = 200
 drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
+memory_full = False  # Flag to track if memory is full
 
 # Grid alignment
 GRID_PADDING_RIGHT = 0
@@ -154,8 +157,10 @@ placed_commands = []
 
 # Add command to grid
 def add_command_to_grid(command_image):
+    global memory_full
+
     if len(placed_commands) >= grid_rows * grid_cols:
-        show_feedback("Memory Full! Hit RUN", RED)
+        memory_full = True  # Set the flag
         return
 
     # Scale the image down by 10%
@@ -168,10 +173,11 @@ def add_command_to_grid(command_image):
     grid_index = len(placed_commands)
     row = grid_index // grid_cols
     col = grid_index % grid_cols
-    x = grid_start_x + col * square_width-10 + (square_width - scaled_image.get_width()) // 2
+    x = grid_start_x + col * square_width + (square_width - scaled_image.get_width()) // 2
     y = grid_start_y + row * square_height + (square_height - scaled_image.get_height()) // 2
 
     placed_commands.append((scaled_image, (x, y)))
+
 # Draw commands in the grid
 def draw_placed_commands():
     for command_image, position in placed_commands:
@@ -403,7 +409,8 @@ def draw_run_button():
 
 
 def execute_commands():
-    global player_x, player_y
+    global player_x, player_y, memory_full
+
     for cmd in commands:
         pygame.time.wait(100)
         if cmd == "Move Forward":
@@ -417,11 +424,11 @@ def execute_commands():
         pygame.display.update()
         pygame.time.wait(100)
 
-    # Clear the commands list after running
+    # Clear commands and reset the memory full flag
     commands.clear()
-
-    # Clear placed commands visually
     placed_commands.clear()
+    memory_full = False
+
 
 
 def handle_mouse_click(pos):
@@ -486,6 +493,13 @@ while running:
     draw_drop_zones()
     draw_grid()
     draw_car()
+
+    # Display the memory full popup if the flag is set
+    if memory_full:
+        popup_x = grid_start_x + (background_width - memory_full_img.get_width()) // 2
+        popup_y = grid_start_y + (background_height - memory_full_img.get_height()) // 2
+        screen.blit(memory_full_img, (popup_x, popup_y))
+
 
     # Update the display
     pygame.display.flip()
