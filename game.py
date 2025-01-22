@@ -1,5 +1,5 @@
 import pygame
-from UI_element import DraggableUIElement
+
 from UI_config import create_ui_elements
 from personas import randomize_personas_positions
 from score import ScoreSystem
@@ -141,12 +141,12 @@ def run_game():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False  # Set running to False when quitting
+                return "exit"  # Exit game entirely
 
             # Exit button event handling: quit the game
-            if game_state.showing_score and exit_button.handle_event(event):
-                pygame.quit()  # Properly quit Pygame
-                running = False  # Exit the game loop properly
+            if exit_button.handle_event(event):
+                return "exit"  # Exit game entirely
+
                 
             if not game_state.showing_score:
                 if game_state.round == 1:  # Color selection
@@ -270,3 +270,4 @@ def run_game():
                 game_state.score_printed = True
 
         pygame.display.flip()
+    return "exit"

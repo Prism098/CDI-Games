@@ -1,7 +1,7 @@
 import pygame
 import cv2
 import numpy as np
-from game import run_game
+from game import run_game  # Ensure this import path matches your project structure
 
 class Button:
     def __init__(self, x, y, width, height, text, font, text_color, bg_color, hover_color):
@@ -68,10 +68,10 @@ def show_demo_page():
     )
 
     # Position video above the image
-    video_x = (screen_width - video_width) - 350  # Center horizontally
-    video_y = image_rect.top - video_height + 250  # Position 250px above the image
+    video_x = (screen_width - video_width) - 350
+    video_y = image_rect.top - video_height + 250
 
-    # Create button
+    # Create Start Game button
     button_width = 200
     start_button = Button(
         x=(screen_width - button_width) // 2,
@@ -85,6 +85,9 @@ def show_demo_page():
         hover_color=(200, 200, 200)
     )
 
+    # Global exit flag to track when the entire program should stop
+    global_exit = False
+
     running = True
     clock = pygame.time.Clock()
 
@@ -93,52 +96,58 @@ def show_demo_page():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                running = False  # Exit the demo page
+                global_exit = True  # Set flag to exit the entire program
+
             if start_button.handle_event(event):
-                video.release()
-                run_game()
+                video.release()  # Release video resources
+                result = run_game()  # Start the game and capture its result
+
+                if result == "exit":
+                    running = False  # Stop the demo page loop
+                    global_exit = True  # Ensure the program exits entirely
+                    break  # Break out of the loop immediately
+
+        if global_exit:  # Exit the entire program
+            break
 
         # Draw background
         screen.fill((26, 28, 44))
 
-        # Draw tutorial image first
+        # Draw tutorial image
         screen.blit(tutorial_image, image_rect)
 
         # Read and display video frame
         ret, frame = video.read()
         if ret:
-            # If the video ends, loop it with a 1-second delay
+            # If video ends, loop it with a 1-second delay
             if video.get(cv2.CAP_PROP_POS_FRAMES) >= video.get(cv2.CAP_PROP_FRAME_COUNT):
-                pygame.time.wait(1000)  # Wait for 1 second (1000 milliseconds)
+                pygame.time.wait(1000)
                 video.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 ret, frame = video.read()
 
-            # Resize frame
+            # Resize and convert frame to display in Pygame
             frame = cv2.resize(frame, (video_width, video_height))
-
-            # Convert frame from BGR to RGB for Pygame
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-            # Convert frame to Pygame surface
             frame_surface = pygame.surfarray.make_surface(np.flipud(np.rot90(frame)))
 
-            # Draw the video on the screen
+            # Display the video frame
             screen.blit(frame_surface, (video_x, video_y))
 
         else:
-            # If video cannot be read, reset to the beginning with a delay
-            pygame.time.wait(1000)  # Wait for 1 second (1000 milliseconds)
+            # Reset video if it can't be read
+            pygame.time.wait(1000)
             video.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-        # Draw title and button after the video and image
+        # Draw title and Start Game button
         screen.blit(title_text, title_rect)
         start_button.draw(screen)
 
         pygame.display.flip()
 
-        if not pygame.get_init():
-            break
-
     # Cleanup
     video.release()
     pygame.quit()
+
+    if global_exit:
+        exit()  # Terminate the entire application
