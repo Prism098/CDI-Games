@@ -269,23 +269,23 @@ def start_game():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Code Racer")
 
-    # Load and initialize images after pygame.display initialization
-    CAR_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment/images/Car_Green_Front.svg")
-    CAR_IMAGE = pygame.transform.scale(CAR_IMAGE, (TILE_SIZE // 2, TILE_SIZE // 1.2))
-    CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)
+    # Load and scale car image
+    CAR_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\Car_Green_Front.svg")
+    CAR_IMAGE = pygame.transform.scale(CAR_IMAGE, (TILE_SIZE / 2, TILE_SIZE / 1.2))
+    CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)  # Rotate to face RIGHT
+    FINISHLINE_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\FinishLine.png")
+    FINISHLINE_IMAGE = pygame.transform.scale(FINISHLINE_IMAGE, (TILE_SIZE , TILE_SIZE - 1))
 
-    FINISHLINE_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment/images/FinishLine.svg")
-    FINISHLINE_IMAGE = pygame.transform.scale(FINISHLINE_IMAGE, (TILE_SIZE - 5, TILE_SIZE - 1))
-
-    GRASS_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment/images/gras.svg")
+    GRASS_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\Lava_CodeRacer.png")
     GRASS_IMAGE = pygame.transform.scale(GRASS_IMAGE, (TILE_SIZE, TILE_SIZE - 1))
 
-    ROAD_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment/images/weg_normaal.jpg")
-    ROAD_IMAGE = pygame.transform.scale(ROAD_IMAGE, (TILE_SIZE, TILE_SIZE - 1))
+    ROAD_IMAGE = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\weg_gravel.png")
+    ROAD_IMAGE = pygame.transform.scale(ROAD_IMAGE, (TILE_SIZE - 3, TILE_SIZE - 3))
 
-    TURN_LEFT_ICON = pygame.image.load("CDI-Games-SoftwareDevelopment/images/draai_icon.png").convert_alpha()
+    TURN_LEFT_ICON = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\draai_icon.png").convert_alpha()
     TURN_LEFT_ICON = pygame.transform.scale(TURN_LEFT_ICON, (30, 30))
-    TURN_RIGHT_ICON = pygame.transform.flip(TURN_LEFT_ICON, True, False)
+
+    TURN_RIGHT_ICON = pygame.transform.flip(TURN_LEFT_ICON, True, False)  # Mirror the image horizontally for "Turn Right"
 
     # Initialize command blocks globally
     command_blocks = [

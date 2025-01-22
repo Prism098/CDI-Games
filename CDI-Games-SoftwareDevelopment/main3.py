@@ -1,20 +1,23 @@
 import pygame
-from screens.menu_screen import show_menu
-from screens.game_screen import start_game
+import sys
 
-def main():
-    pygame.init()
+# Initialize Pygame
+pygame.init()
 
-    while True:
-        
-        choice = show_menu()
-        if choice == "start":
-            start_game()
-        elif choice == "quit":
-            break
+# Set the screen to windowed mode
+screen = pygame.display.set_mode((1400, 800))
 
-    pygame.quit()
+# Start the main loop
+while True:
+    # Check for events
+    for event in pygame.event.get():
+        # Check for the quit event
+        if event.type == pygame.QUIT:
+            # Quit the game
+            pygame.quit()
+            sys.exit()
 
-if __name__ == "__main__":
-    main()
-
+        # Check for the fullscreen toggle event
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
+            # Toggle fullscreen mode
+            pygame.display.toggle_fullscreen()
