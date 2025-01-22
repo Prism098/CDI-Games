@@ -19,19 +19,22 @@ move_forward_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Softw
 turn_right_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software Dev\caride_turn_right.png")
 run_button_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Software Dev\Run button.png")
 
+# move image down to add timer on screen 
+image_top_padding = 50
+
 # Scale images to desired sizes
 turn_left_img = pygame.transform.scale(turn_left_img, (120, 125))
-move_forward_img = pygame.transform.scale(move_forward_img, (80, 80))
-turn_right_img = pygame.transform.scale(turn_right_img, (80, 80))
-run_button_img = pygame.transform.scale(run_button_img, (120, 50))
-background = pygame.transform.scale(background,(480, 820 ))
+move_forward_img = pygame.transform.scale(move_forward_img, (120, 125))
+turn_right_img = pygame.transform.scale(turn_right_img, (120, 125))
+run_button_img = pygame.transform.scale(run_button_img, (245, 68))
+background = pygame.transform.scale(background,(507, 820))
 
 # Positions for the UI elements
 background_pos = (5, 10)
-turn_left_pos = (500, 200)
-move_forward_pos = (620, 200)
-turn_right_pos = (740, 200)
-run_button_pos = (900, 200)
+turn_left_pos = (680, 75 + image_top_padding)
+move_forward_pos = (860, 75 + image_top_padding)
+turn_right_pos = (1040, 75 + image_top_padding)
+run_button_pos = (1220, 100 + image_top_padding)
 
 # Main game loop
 running = True
