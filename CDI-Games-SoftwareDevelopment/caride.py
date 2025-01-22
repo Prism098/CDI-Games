@@ -84,6 +84,17 @@ timer_start = time.time()
 score = 0
 final_score_displayed = False
 
+# Background grid details
+grid_rows, grid_cols = 3, 5
+background_width, background_height = 507, 820
+square_width = background_width / grid_cols
+square_height = background_height / grid_rows
+
+# Starting position of the background
+grid_start_x, grid_start_y = background_pos
+
+
+
 # Drop Zone
 MAX_STEPS = 5  # Number of drop zones
 DROP_ZONE_PADDING = 200
@@ -141,6 +152,35 @@ TURN_LEFT_ICON = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\draai
 TURN_LEFT_ICON = pygame.transform.scale(TURN_LEFT_ICON, (30, 30))
 
 TURN_RIGHT_ICON = pygame.transform.flip(TURN_LEFT_ICON, True, False)  # Mirror the image horizontally for "Turn Right"
+
+# List to store placed commands and their positions
+placed_commands = []
+
+# Add command to grid
+def add_command_to_grid(command_image):
+    if len(placed_commands) >= grid_rows * grid_cols:
+        show_feedback("Memory Full! Hit RUN", RED)
+        return
+
+    # Scale the image down by 10%
+    scaled_image = pygame.transform.scale(
+        command_image, 
+        (int(square_width * 0.9), int(square_height * 0.9))
+    )
+
+    # Determine position in the grid
+    grid_index = len(placed_commands)
+    row = grid_index // grid_cols
+    col = grid_index % grid_cols
+    x = grid_start_x + col * square_width + (square_width - scaled_image.get_width()) // 2
+    y = grid_start_y + row * square_height + (square_height - scaled_image.get_height()) // 2
+
+    placed_commands.append((scaled_image, (x, y)))
+# Draw commands in the grid
+def draw_placed_commands():
+    for command_image, position in placed_commands:
+        screen.blit(command_image, position)
+
 
 # Draw grid and elements
 def draw_grid():
@@ -338,7 +378,7 @@ def draw_timer(screen):
     return time_left
 #######################################adjust #############################
 
-def draw_drop_zones():
+def draw_drop_zones2():
     for i, zone in enumerate(drop_zones):
         pygame.draw.rect(SCREEN, WHITE, zone, border_radius=15)
         pygame.draw.rect(SCREEN, BLACK, zone, 2, border_radius=15)
@@ -352,6 +392,15 @@ def draw_drop_zones():
             x_txt = FONT.render("X", True, WHITE)
             x_txt_rect = x_txt.get_rect(center=x_button_rect.center)
             SCREEN.blit(x_txt, x_txt_rect)
+
+def draw_drop_zones():
+    DROP_ROWS, DROP_COLS = 3, 5  # Drop zone layout
+    drop_zones = [
+        pygame.Rect(DROP_ZONE_PADDING + (i % DROP_COLS) * 160, 
+                    250 + (i // DROP_COLS) * 70, 
+                    150, 50)
+        for i in range(DROP_ROWS * DROP_COLS)
+]
 
 def draw_run_button():
     screen.blit(run_button_img, run_button_rect)
@@ -374,6 +423,24 @@ def execute_commands():
     commands.clear()
 
 def handle_mouse_click(pos):
+    global commands
+
+    if turn_left_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
+        commands.append("Turn Left")
+        add_command_to_grid(turn_left_img)
+    elif move_forward_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
+        commands.append("Move Forward")
+        add_command_to_grid(move_forward_img)
+    elif turn_right_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
+        commands.append("Turn Right")
+        add_command_to_grid(turn_right_img)
+
+    # Check if the run button image was clicked
+    if run_button_rect.collidepoint(pos):
+        execute_commands()
+
+
+def handle_mouse_click2(pos):
     global commands
 
     # Check if a command block image was clicked
@@ -408,6 +475,7 @@ while running:
     # Draw elements
     screen.fill(BLUE)
     screen.blit(background, background_pos)
+    draw_placed_commands()  # Draw scaled-down commands in the grid
     screen.blit(turn_left_img, turn_left_pos)
     screen.blit(move_forward_img, move_forward_pos)
     screen.blit(turn_right_img, turn_right_pos)
