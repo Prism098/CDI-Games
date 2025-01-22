@@ -106,7 +106,7 @@ def run_game():
     browser_image = pygame.transform.scale(browser_image, (1400, 1000))
 
     border_element = pygame.image.load("assets/BorderElement.png")
-    border_element = pygame.transform.scale(border_element, (200, 200))
+    border_element = pygame.transform.scale(border_element, (225, 225))
 
     persona_border = pygame.image.load("assets/PersonaBorder.png")
     persona_border = pygame.transform.scale(persona_border, (580, 690))
@@ -207,9 +207,9 @@ def run_game():
         screen.fill((26, 28, 44))  # Dark blue background
         screen.blit(browser_image, (400, -70))
         screen.blit(persona_border, (-50, 100))
-        screen.blit(border_element, (canvas_x + 142, canvas_y + 608))
-        screen.blit(border_element, (canvas_x + 458, canvas_y + 608))
-        screen.blit(border_element, (canvas_x + 774, canvas_y + 608))
+        screen.blit(border_element, (canvas_x + 120, canvas_y + 635))
+        screen.blit(border_element, (canvas_x + 458, canvas_y + 635))
+        screen.blit(border_element, (canvas_x + 790, canvas_y + 635))
         
         pygame.draw.rect(screen, game_state.canvas_color, canvas_rect)
         
@@ -255,9 +255,9 @@ def run_game():
                 game_state.deduction_timer = 0  # Reset after the display duration
 
         if game_state.feedback_message:
-            feedback_font = pygame.font.SysFont('Arial', 24, bold=True)
+            feedback_font = pygame.font.SysFont('Arial', 36, bold=True)
             render_multiline_text(screen, game_state.feedback_message, feedback_font, (250, 0, 0), 
-                                screen.get_width() - 270, screen.get_height() - 700)
+                                screen.get_width() - 300, screen.get_height() - 200)
 
         if not game_state.showing_score:
             game_state.timer.draw(screen)

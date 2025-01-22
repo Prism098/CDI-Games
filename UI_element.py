@@ -1,7 +1,7 @@
 import pygame
 
 class DraggableUIElement:
-    def __init__(self, x, y, width, height, color_or_image, text=None, font=None, font_name=None):
+    def __init__(self, x, y, width, height, color_or_image, text=None, font=None, font_name=None, text_color=(255, 255, 255)) :
         self.x = x
         self.y = y
         self.width = width
@@ -10,6 +10,7 @@ class DraggableUIElement:
         self.text = text
         self.font = font
         self.font_name = font_name
+        self.text_color = text_color 
         
         # Store the initial position
         self.initial_x = x
@@ -68,21 +69,22 @@ class DraggableUIElement:
         return None
 
     def draw(self, screen):
-        # Apply hover effect (e.g., scale up the element)
-        scale_factor = 1.2 if self.hovering else 1  # Increase size on hover
+    # Apply hover effect (e.g., scale up the element)
+     scale_factor = 1.2 if self.hovering else 1  # Increase size on hover
 
-        scaled_width = int(self.width * scale_factor)
-        scaled_height = int(self.height * scale_factor)
-        scaled_x = self.x - (scaled_width - self.width) // 2
-        scaled_y = self.y - (scaled_height - self.height) // 2
+     scaled_width = int(self.width * scale_factor)
+     scaled_height = int(self.height * scale_factor)
+     scaled_x = self.x - (scaled_width - self.width) // 2
+     scaled_y = self.y - (scaled_height - self.height) // 2
 
-        if self.is_image:
-            scaled_image = pygame.transform.scale(self.image, (scaled_width, scaled_height))
-            screen.blit(scaled_image, (scaled_x, scaled_y))
-        elif self.color:
-            pygame.draw.rect(screen, self.color, pygame.Rect(scaled_x, scaled_y, scaled_width, scaled_height))
-        
-        if self.text:
-            text_surface = self.font.render(self.text, True, (0, 0, 0))
-            text_rect = text_surface.get_rect(center=(scaled_x + scaled_width // 2, scaled_y + scaled_height // 2))
-            screen.blit(text_surface, text_rect.topleft)
+     if self.is_image:
+        scaled_image = pygame.transform.scale(self.image, (scaled_width, scaled_height))
+        screen.blit(scaled_image, (scaled_x, scaled_y))
+     elif self.color:
+        pygame.draw.rect(screen, self.color, pygame.Rect(scaled_x, scaled_y, scaled_width, scaled_height))
+    
+     if self.text:
+        # Use self.text_color instead of hardcoded (0, 0, 0)
+        text_surface = self.font.render(self.text, True, self.text_color)
+        text_rect = text_surface.get_rect(center=(scaled_x + scaled_width // 2, scaled_y + scaled_height // 2))
+        screen.blit(text_surface, text_rect.topleft)
