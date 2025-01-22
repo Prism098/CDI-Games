@@ -67,8 +67,6 @@ move_forward_rect = pygame.Rect(move_forward_pos[0], move_forward_pos[1], 120, 1
 turn_right_rect = pygame.Rect(turn_right_pos[0], turn_right_pos[1], 120, 125)
 run_button_rect = pygame.Rect(run_button_pos[0], run_button_pos[1], 245, 68)
 
-
-
 # Game settings
 GRID_SIZE = 5
 TILE_SIZE = 100
@@ -86,17 +84,15 @@ final_score_displayed = False
 
 # Background grid details
 grid_rows, grid_cols = 3, 5
-background_width, background_height = 507, 820
+background_width, background_height = 530, 320
 square_width = background_width / grid_cols
 square_height = background_height / grid_rows
 
 # Starting position of the background
-grid_start_x, grid_start_y = background_pos
-
-
+grid_start_x, grid_start_y = (220,300)
 
 # Drop Zone
-MAX_STEPS = 5  # Number of drop zones
+MAX_STEPS = 15  # Number of drop zones
 DROP_ZONE_PADDING = 200
 drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
 
@@ -165,14 +161,14 @@ def add_command_to_grid(command_image):
     # Scale the image down by 10%
     scaled_image = pygame.transform.scale(
         command_image, 
-        (int(square_width * 0.9), int(square_height * 0.9))
+        (int(square_width * 0.7), int(square_height * 0.7))
     )
 
     # Determine position in the grid
     grid_index = len(placed_commands)
     row = grid_index // grid_cols
     col = grid_index % grid_cols
-    x = grid_start_x + col * square_width + (square_width - scaled_image.get_width()) // 2
+    x = grid_start_x + col * square_width-10 + (square_width - scaled_image.get_width()) // 2
     y = grid_start_y + row * square_height + (square_height - scaled_image.get_height()) // 2
 
     placed_commands.append((scaled_image, (x, y)))
@@ -420,7 +416,13 @@ def execute_commands():
         draw_car()
         pygame.display.update()
         pygame.time.wait(100)
+
+    # Clear the commands list after running
     commands.clear()
+
+    # Clear placed commands visually
+    placed_commands.clear()
+
 
 def handle_mouse_click(pos):
     global commands
