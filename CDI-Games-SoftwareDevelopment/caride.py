@@ -46,18 +46,18 @@ run_button_img = pygame.image.load("CDI-Games-SoftwareDevelopment\images\Softwar
 memory_full_img = pygame.image.load("CDI-Games-SoftwareDevelopment\\images\\Car Memory FULL HIT RUN !.png")
 
 # move image down to add timer on screen 
-image_top_padding = 100
-image_right_padding = 100
+image_top_padding = 50
+image_right_padding = 5
 
 # Scale images to desired sizes
 turn_left_img = pygame.transform.scale(turn_left_img, (120, 125))
 move_forward_img = pygame.transform.scale(move_forward_img, (120, 125))
 turn_right_img = pygame.transform.scale(turn_right_img, (120, 125))
 run_button_img = pygame.transform.scale(run_button_img, (245, 68))
-background = pygame.transform.scale(background, (507, 820))
+background = pygame.transform.scale(background, (561, 903))
 
 # Positions for the UI elements
-background_pos = (200, 140)
+background_pos = (50, 50)
 turn_left_pos = (680 + image_right_padding, 75 + image_top_padding)
 move_forward_pos = (860+ image_right_padding, 75 + image_top_padding)
 turn_right_pos = (1040+ image_right_padding, 75 + image_top_padding)
@@ -71,7 +71,7 @@ run_button_rect = pygame.Rect(run_button_pos[0], run_button_pos[1], 245, 68)
 
 # Game settings
 GRID_SIZE = 5
-TILE_SIZE = 100
+TILE_SIZE = 110
 COMMANDS = ["Move Forward", "Turn Left", "Turn Right"]
 player_x, player_y = 2, 4
 player_dir = "UP"
@@ -91,18 +91,18 @@ square_width = background_width / grid_cols
 square_height = background_height / grid_rows
 
 # Starting position of the background
-grid_start_x, grid_start_y = (220,300)
+grid_start_x, grid_start_y = (50,200)
 
 # Drop Zone
 MAX_STEPS = 15  # Number of drop zones
-DROP_ZONE_PADDING = 200
+DROP_ZONE_PADDING = 140
 drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
 memory_full = False  # Flag to track if memory is full
 
 # Grid alignment
 GRID_PADDING_RIGHT = 0
-GRID_OFFSET_X = 1500 - GRID_PADDING_RIGHT - (GRID_SIZE * TILE_SIZE)
-GRID_OFFSET_Y = 400
+GRID_OFFSET_X = 1250 - GRID_PADDING_RIGHT - (GRID_SIZE * TILE_SIZE)
+GRID_OFFSET_Y = 390
 
 # Grid layout
 grid1 = (
@@ -174,7 +174,7 @@ def add_command_to_grid(command_image):
     row = grid_index // grid_cols
     col = grid_index % grid_cols
     x = grid_start_x + col * square_width + (square_width - scaled_image.get_width()) // 2
-    y = grid_start_y + row * square_height + (square_height - scaled_image.get_height()) // 2
+    y = grid_start_y + row * (square_height + DROP_ZONE_PADDING) +(square_height - scaled_image.get_height()) // 2
 
     placed_commands.append((scaled_image, (x, y)))
 
@@ -240,10 +240,10 @@ def draw_timer(screen):
     """
     elapsed_time = time.time() - timer_start
     time_left = max(0, TIME_LIMIT - elapsed_time)  # Ensure non-negative time
-    timer_text = pygame.font.SysFont(None, 50).render(f"Time: {int(time_left)}", True, RED)
+    timer_text = pygame.font.SysFont(None, 150).render(f"Time: {int(time_left)}", True, WHITE)
     
     # Position the timer visibly on the screen
-    screen.blit(timer_text, ( 100, 100))  # Top-left corner
+    screen.blit(timer_text, ( 1300, 20))  # Top-left corner
     return time_left
 
 
@@ -260,7 +260,7 @@ def end_game(time_left):
     if time_left >= 10:
         bonus_points = 500
     else:
-        bonus_points = int(500 / max(1, time_left))  # Avoid division by zero
+        bonus_points = int(500-(500 / max(1, time_left)))  # Avoid division by zero
 
     total_score = score + bonus_points
 
@@ -311,13 +311,12 @@ def show_feedback(message, color):
     pygame.display.update()
     pygame.time.wait(1500)  # Pause to show feedback
 
+
+
 def move_forward():
-    """
-    Move the car forward in the current direction, and handle grass, checkpoints, and destination.
-    """
     global player_x, player_y, score
 
-    # Calculate the target position based on the current direction
+    # Calculate the target position
     new_x, new_y = player_x, player_y
     if player_dir == "RIGHT" and player_x < GRID_SIZE - 1:
         new_x += 1
@@ -328,26 +327,43 @@ def move_forward():
     elif player_dir == "DOWN" and player_y < GRID_SIZE - 1:
         new_y += 1
 
-    # Check the type of tile at the target position
-    if grid[new_y][new_x] == "R" or grid[new_y][new_x] == "C":  # Road or checkpoint
-        player_x, player_y = new_x, new_y
-        if grid[new_y][new_x] == "C":  # Add points for checkpoint
-            score += 500
-            show_feedback("Checkpoint! +500 points", GREEN)
-    elif grid[new_y][new_x] == "G":  # Grass
-        show_feedback("Hit grass! Resetting...", RED)
+    # Check tile type
+    if grid[new_y][new_x] == "G":  # Grass
+        show_feedback("Sensors Detect Lava...", RED)
         player_x, player_y = find_nearest_checkpoint()
-    elif grid[new_y][new_x] == "D":  # Finish line
-        player_x, player_y = new_x, new_y
-        score += 1000  # Award points for reaching the destination
-        show_feedback("Destination Reached! +1000 points", YELLOW)
-        end_game()
+        return
+    elif grid[new_y][new_x] == "C":  # Checkpoint
+        score += 500
+        show_feedback("Checkpoint! +500 points", GREEN)
 
-    # Check if the car is already on the finish line (in case of exact destination match)
-    if (player_x, player_y) == destination:
-        score += 1000  # Award points again for final confirmation
-        show_feedback("Destination Reached! +1000 points", YELLOW)
-        end_game()
+    # Update car's position
+    player_x, player_y = new_x, new_y
+
+    # Handle finish line
+    if grid[new_y][new_x] == "D":  # Finish line
+        score += 500
+        show_feedback("Destination Reached! +500 points", YELLOW)
+        time_left = max(0, TIME_LIMIT - (time.time() - timer_start))  # Calculate remaining time
+        end_game(time_left)
+
+
+def draw_car_at_position(x, y):
+    """
+    Draw the car at a specific interpolated position.
+    """
+    car_image = CAR_IMAGE
+    if player_dir == "RIGHT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, -90)
+    elif player_dir == "LEFT":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 90)
+    elif player_dir == "UP":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 0)
+    elif player_dir == "DOWN":
+        car_image = pygame.transform.rotate(CAR_IMAGE, 180)
+
+    car_rect = car_image.get_rect(center=(x, y))
+    screen.blit(car_image, car_rect)
+
 
 
 def turn_left():
@@ -372,12 +388,7 @@ def turn_right():
     elif player_dir == "UP":
         player_dir = "RIGHT"
 
-def draw_timer(screen):
-    elapsed_time = time.time() - timer_start
-    time_left = max(0, TIME_LIMIT - elapsed_time)
-    timer_text = pygame.font.SysFont(None, 50).render(f"Time: {int(time_left)}", True, WHITE)
-    screen.blit(timer_text, (SCREEN_WIDTH - 500, 150))
-    return time_left
+
 #######################################adjust #############################
 
 def draw_drop_zones2():
@@ -397,11 +408,14 @@ def draw_drop_zones2():
 
 def draw_drop_zones():
     DROP_ROWS, DROP_COLS = 3, 5  # Drop zone layout
+    
     drop_zones = [
-        pygame.Rect(DROP_ZONE_PADDING + (i % DROP_COLS) * 160, 
-                    250 + (i // DROP_COLS) * 70, 
-                    150, 50)
-        for i in range(DROP_ROWS * DROP_COLS)
+    pygame.Rect(
+        DROP_ZONE_PADDING + (i % DROP_COLS) * 160,  # Horizontal position
+        250 + (i // DROP_COLS) * (50 + 200),       # Vertical position with padding
+        150, 50                                    # Width and height of the drop zone
+    )
+    for i in range(DROP_ROWS * DROP_COLS)
 ]
 
 def draw_run_button():
@@ -475,12 +489,16 @@ def handle_mouse_click2(pos):
 
 running = True
 while running:
+    time_left = max(0, TIME_LIMIT - (time.time() - timer_start))
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             handle_mouse_click(event.pos)
 
+    # End game if time runs out
+    if time_left <= 0:
+        end_game(time_left)
     # Draw elements
     screen.fill(BLUE)
     screen.blit(background, background_pos)
