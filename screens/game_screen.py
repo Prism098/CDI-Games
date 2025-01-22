@@ -12,6 +12,10 @@ MAX_SCORE = 2500  # Maximale score
 def start_game():
     pygame.init()
 
+    # Maak het scherm fullscreen
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    WIDTH, HEIGHT = screen.get_size()
+
     # Laad de checkmark-, cross- en brush-afbeeldingen
     assets_path = os.path.join(os.path.dirname(__file__), "..", "assets")
     checkmark_image = pygame.image.load(os.path.join(assets_path, "check.png"))
@@ -26,10 +30,9 @@ def start_game():
     # Verberg de standaard cursor
     pygame.mouse.set_visible(False)
 
-    # Setup scherm en dataset
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Dataset Cleaning Game")
 
+    # Setup dataset
     dataset = generate_dataset()
     rows = len(dataset)
     cols = len(dataset[0])
@@ -99,6 +102,9 @@ def start_game():
                                 cell["mark"] = "cross"
                                 cell["color"] = GREY
 
+                            # Zorg ervoor dat de score niet onder 0 gaat
+                            score = max(0, score)
+
         # Controleer of het spel moet eindigen
         if found_outliers == total_outliers and found_missing == total_missing and found_incorrect == total_incorrect:
             show_end_screen(
@@ -116,11 +122,10 @@ def start_game():
             return
 
         if remaining_time <= 0:
-            elapsed_time = TIMER_SECONDS  # De volledige tijd is gebruikt
             show_end_screen(
                 screen,
                 round(score),
-                0,  # Geef 0 door als de tijd volledig is verstreken
+                TIMER_SECONDS,
                 found_outliers,
                 total_outliers,
                 found_missing,
@@ -134,8 +139,8 @@ def start_game():
         screen.fill(BLACK)
 
         # Teken kolomtitels
-        font_title = pygame.font.SysFont(None, 25)
-        titles = ["Studentnummer", "Afstand", "Transport", "Gemiddelde cijfer", "Hoogste cijfer", "Geboortedatum", "Startdatum"]
+        font_title = pygame.font.SysFont(None, 35)
+        titles = ["Student Nr.", "Afstand", "Transport", "Gemiddelde cijfer", "Hoogste cijfer", "Geboortedatum", "Startdatum"]
         for i, title in enumerate(titles):
             if i == 0:  # Eerste kolom voor Studentnummer
                 rect_x = 0
@@ -150,7 +155,7 @@ def start_game():
             screen.blit(title_text, (rect.x + (rect.width - title_text.get_width()) // 2, rect.y + 10))
 
         # Teken de grid en waarden
-        font = pygame.font.SysFont(None, 25)
+        font = pygame.font.SysFont(None, 30)
         for r, row in enumerate(dataset):
             # Teken studentnummer
             student_rect = pygame.Rect(0, r * cell_height + TITLE_HEIGHT, STUDENT_NUMBER_WIDTH, cell_height)
@@ -176,12 +181,11 @@ def start_game():
                     screen.blit(mark_image, mark_rect)
 
         # Teken info-paneel
-        elapsed_time = TIMER_SECONDS - int(remaining_time)
         info_panel_x = WIDTH - INFO_PANEL_WIDTH
         pygame.draw.rect(screen, BLACK, (info_panel_x, 0, INFO_PANEL_WIDTH, HEIGHT))
 
         score_text = font_title.render(f"Score: {round(score)} / {MAX_SCORE}", True, WHITE)
-        time_text = font_title.render(f"Tijd: {int(remaining_time)}s", True, WHITE)
+        time_text = font_title.render(f"Tijd: {int(max(remaining_time, 0))}s", True, WHITE)
         outliers_text = font_title.render(f"Outliers: {found_outliers}/{total_outliers}", True, OUTLIER_COLOR)
         missing_text = font_title.render(f"Missing: {found_missing}/{total_missing}", True, MISSING_COLOR)
         incorrect_text = font_title.render(f"Incorrect: {found_incorrect}/{total_incorrect}", True, INCORRECT_COLOR)

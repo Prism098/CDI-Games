@@ -3,13 +3,16 @@ from screens import game_screen
 from utils.styles import WHITE, BACKGROUND_COLOR, WIDTH, HEIGHT, OUTLIER_COLOR, MISSING_COLOR, INCORRECT_COLOR
 
 def show_menu():
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    # Maak het scherm fullscreen
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    WIDTH, HEIGHT = screen.get_size()
+
     pygame.display.set_caption("Dataset Cleaning Game - Menu")
 
     # Laad de afbeelding van de game
     assets_path = "assets"
-    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen2.png")
-    game_preview_image = pygame.transform.scale(game_preview_image, (700, 400))  # Schaal de afbeelding
+    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen4.png")
+    game_preview_image = pygame.transform.scale(game_preview_image, (1000, 550))  # Schaal de afbeelding
 
     running = True
     while running:
@@ -22,10 +25,10 @@ def show_menu():
 
         # Titel
         title = title_font.render("Welkom bij de Dataset Cleaning Game", True, WHITE)
-        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 20))
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 10))
 
         # Initialiseer explanation_start_y
-        explanation_start_y = HEIGHT // 5
+        explanation_start_y = HEIGHT // 4
 
         # Uitleg
         explanation_title = text_font.render("Hieronder volgt de uitleg over welke waarden je moet opruimen (op klikken):", True, WHITE)

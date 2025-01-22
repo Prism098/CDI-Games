@@ -2,6 +2,10 @@ import pygame
 from utils.styles import WIDTH, HEIGHT, BLACK, WHITE, OUTLIER_COLOR, MISSING_COLOR, INCORRECT_COLOR, ERROR_COLOR, BACKGROUND_COLOR
 
 def show_end_screen(screen, score, elapsed_time, found_outliers, total_outliers, found_missing, total_missing, found_incorrect, total_incorrect, wrong_clicks):
+    # Maak het scherm fullscreen
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    WIDTH, HEIGHT = screen.get_size()
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -16,10 +20,13 @@ def show_end_screen(screen, score, elapsed_time, found_outliers, total_outliers,
         title_font = pygame.font.SysFont(None, 80)
         text_font = pygame.font.SysFont(None, 50)
 
+        # Bereken resterende tijd
+        remaining_time = max(0, 30 - elapsed_time)  # Zorg dat het niet negatief wordt
+
         # Teksten voor het eindscherm
         title_text = title_font.render("Game Over", True, ERROR_COLOR)
         score_text = text_font.render(f"Eindscore: {score}", True, WHITE)
-        time_text = text_font.render(f"Tijd over: {elapsed_time}s", True, WHITE) if elapsed_time > 0 else text_font.render("Tijd over: 0s", True, WHITE)
+        time_text = text_font.render(f"Tijd over: {int(remaining_time)}s", True, WHITE)
         mistakes_text = text_font.render(f"Aantal fouten: {wrong_clicks}", True, WHITE)
 
         # Waarden in bijhorende kleuren
