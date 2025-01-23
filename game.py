@@ -199,12 +199,10 @@ def run_game():
                                 game_state.score_system.apply_penalty()
                                 game_state.deduction_amount = game_state.score_system.penalty
                                 game_state.deduction_timer = pygame.time.get_ticks()
-                                game_state.feedback_message = "Houd rekening\nmet de kenemerken \nvan de persona"
+                                game_state.feedback_message = "Houd rekening\nmet de kenmerken\nvan de persona!"
                                 ui_element.reset_position()
 
-        if not running:  # Exit loop if game is quit
-            break
-
+        # Rendering and game state updates
         screen.fill((26, 28, 44))  # Dark blue background
         screen.blit(browser_image, (400, -70))
         screen.blit(persona_border, (-50, 100))
@@ -240,10 +238,10 @@ def run_game():
                 ui_element.draw(screen)
         
         if any(element.dragging for element in current_elements):
-       # Draw a thick, bright yellow border around the canvas
-         border_width = 15
-         border_color = (4, 0, 255)  # Bright yellow
-         pygame.draw.rect(screen, border_color, canvas_rect, border_width)
+            # Draw a thick, bright yellow border around the canvas
+            border_width = 15
+            border_color = (4, 0, 255)  # Bright yellow
+            pygame.draw.rect(screen, border_color, canvas_rect, border_width)
 
         font = pygame.font.SysFont('Arial', 30)
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (255, 255, 255))
@@ -269,12 +267,19 @@ def run_game():
         if not game_state.showing_score:
             game_state.timer.draw(screen)
 
+        # Display the score screen if the game ends
         if game_state.showing_score:
             draw_score_screen(screen, game_state.score_system.get_score(), exit_button)
 
             if not game_state.score_printed:
-                print(f"Final score: {game_state.score_system.get_score()}")
+                final_score = game_state.score_system.get_score()
+                print(f"Final score: {final_score}")
                 game_state.score_printed = True
+            
+            # Handle exit button interaction
+            if exit_button.handle_event(event):
+                return final_score
 
         pygame.display.flip()
+        
     return "exit"
