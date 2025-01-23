@@ -16,7 +16,7 @@ games = [
     {"name": "Data Cleaning Game", "script": os.path.join(script_dir, "CDI-Games-DataEngineering", "DataMain.py")},
     {"name": "Website Interface Builder Game", "script": os.path.join(script_dir, "CDI-Games-HCI", "HCIMain.py")},
     {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI-Games-SecurityCloud", "SecurityMain.py")},
-    {"name": "Boolean Bakery", "script": os.path.join(script_dir, "CDI-Games-SoftwareDevelopment", "SoftwareMain.py")}
+    {"name": "Boolean Bakery", "script": os.path.join(script_dir, "CDI-Games-SoftwareDevelopment", "caride.py")}
 ]
 
 # Functie om een game te starten

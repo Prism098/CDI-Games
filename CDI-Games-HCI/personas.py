@@ -56,18 +56,18 @@ class Persona:
 
 def randomize_personas_positions(screen_height):
     """Place personas at fixed positions on the left side of the screen"""
-    BROWN = (77, 55, 50)
+    BROWN = (97, 62, 62)
     ORANGE = (255, 98, 40)
     GREY = (150, 150, 150)
 
     # Define the personas with characteristics (name, age, description)
     personas_list = [
-        Persona("assets/ChildPersona.png", 40, 200, 175, 175, 
-                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houd van kleur en \nrace auto's."),
-        Persona("assets/AdultPersona.png",  40, 200, 175, 175, 
-                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houd van professionaliteit, \nde kleur bruin en geld."),
-        Persona("assets/OldManPersona.png",  40, 200, 175, 175, 
-                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houd niet van felle kleuren. \nLuistert graag naar \nklassieke muziek.")
+        Persona("assets/ChildPersona.png", 130, 250, 230, 230, 
+                ORANGE, "assets/ToyCar.png", "comicsansms", "Timmy", 7, "Houdt van felle kleuren, \nrace auto's en \nspeelse lettertypes."),
+        Persona("assets/AdultPersona.png",  130, 250, 230, 230, 
+                BROWN, "assets/SuitcaseMoney.png", "timesnewroman", "John", 35, "Houdt van \nleesbare lettertypes, \nbruin is zijn lievelingskleur\nveel geld is zijn doel."),
+        Persona("assets/OldManPersona.png",  130, 250, 230, 230, 
+                GREY, "assets/Gramophone.png", "brushscript", "Albert", 75, "Houdt van zwart en grijs \nLuistert graag naar \nklassieke muziek.")
     ]
 
     # Randomly select and return a persona
