@@ -36,7 +36,7 @@ def show_demo_page():
     pygame.display.set_caption("HCI game - Tutorial")
 
     # Initialize video capture
-    video = cv2.VideoCapture("assets/DemoVideo.mp4")
+    video = cv2.VideoCapture("CDI_Games_HCI/assets/DemoVideo.mp4")
     if not video.isOpened():
         print("Error: Could not load video.")
         return
@@ -45,7 +45,7 @@ def show_demo_page():
     video_height = 300
 
     # Load and resize the tutorial image
-    tutorial_image = pygame.image.load("assets/TutorialHCI.png")
+    tutorial_image = pygame.image.load("CDI_Games_HCI/assets/TutorialHCI.png")
     new_width = 1500
     new_height = 840
     tutorial_image = pygame.transform.scale(tutorial_image, (new_width, new_height))
