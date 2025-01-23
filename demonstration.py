@@ -69,7 +69,7 @@ def show_demo_page():
 
     # Position video above the image
     video_x = (screen_width - video_width) - 350
-    video_y = image_rect.top - video_height + 250
+    video_y = image_rect.top - video_height + 300
 
     # Create Start Game button
     button_width = 200

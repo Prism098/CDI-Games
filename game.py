@@ -21,6 +21,7 @@ class GameState:
         self.feedback_timer = 0
         self.score_printed = False
         self.story_text = None
+        
 
         # Initialize the font for the timer
         self.timer_font = pygame.font.SysFont('Arial', 36)
@@ -237,6 +238,12 @@ def run_game():
             
             for ui_element in current_elements:
                 ui_element.draw(screen)
+        
+        if any(element.dragging for element in current_elements):
+       # Draw a thick, bright yellow border around the canvas
+         border_width = 15
+         border_color = (4, 0, 255)  # Bright yellow
+         pygame.draw.rect(screen, border_color, canvas_rect, border_width)
 
         font = pygame.font.SysFont('Arial', 30)
         score_text = font.render(f"Score: {game_state.score_system.get_score()}", True, (255, 255, 255))
