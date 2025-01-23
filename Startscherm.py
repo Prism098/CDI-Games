@@ -13,10 +13,10 @@ SERVER_URL = "http://localhost:4000"
 
 # Lijst van games met absolute paden
 games = [
-    {"name": "Data Cleaning Game", "script": os.path.join(script_dir, "CDI-Games-DataEngineering", "DataMain.py")},
     {"name": "Website Interface Builder Game", "script": os.path.join(script_dir, "CDI-Games-HCI", "HCIMain.py")},
-    {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI-Games-SecurityCloud", "SecurityMain.py")},
-    {"name": "Boolean Bakery", "script": os.path.join(script_dir, "CDI-Games-SoftwareDevelopment", "caride.py")}
+    {"name": "Data Cleaning Game", "script": os.path.join(script_dir, "CDI-Games-DataEngineering", "DataMain.py")},
+    {"name": "Code Racer", "script": os.path.join(script_dir, "CDI-Games-SoftwareDevelopment", "caride.py")},
+    {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI-Games-SecurityCloud", "SecurityMain.py")}
 ]
 
 # Functie om een game te starten

@@ -102,13 +102,13 @@ def run_game():
     canvas_height = 580
     canvas_rect = pygame.Rect(canvas_x, canvas_y, canvas_width, canvas_height)
 
-    browser_image = pygame.image.load("assets/Browser6.png")
+    browser_image = pygame.image.load("CDI-Games-HCI/assets/Browser6.png")
     browser_image = pygame.transform.scale(browser_image, (1400, 1000))
 
-    border_element = pygame.image.load("assets/BorderElement.png")
+    border_element = pygame.image.load("CDI-Games-HCI/assets/BorderElement.png")
     border_element = pygame.transform.scale(border_element, (200, 200))
 
-    persona_border = pygame.image.load("assets/PersonaBorder.png")
+    persona_border = pygame.image.load("CDI-Games-HCI/assets/PersonaBorder.png")
     persona_border = pygame.transform.scale(persona_border, (580, 690))
 
     ui_elements_color, ui_elements_photo, ui_elements_font = create_ui_elements(

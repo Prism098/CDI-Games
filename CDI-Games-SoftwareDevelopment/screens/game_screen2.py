@@ -5,7 +5,7 @@ import sys
 from utils.styles import WIDTH, HEIGHT, RED_BG, WHITE, BLACK, GREEN, YELLOW, BLUE, SCREEN, FONT, screen ,TITLE_FONT
 
 # Game settings
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Code Racer")
 GRID_SIZE = 5
 TILE_SIZE = 100

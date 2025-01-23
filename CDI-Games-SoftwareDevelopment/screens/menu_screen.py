@@ -3,7 +3,7 @@ import pygame
 from utils.styles import WIDTH, HEIGHT, WHITE, BACKGROUND_COLOR
 
 def show_menu():
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption("Code Racer - Menu")
 
     running = True

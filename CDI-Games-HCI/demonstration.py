@@ -45,7 +45,7 @@ def show_demo_page():
     video_height = 300
 
     # Load and resize the tutorial image
-    tutorial_image = pygame.image.load("assets/TutorialHCI.png")
+    tutorial_image = pygame.image.load("CDI-Games-HCI/assets/TutorialHCI.png")
     new_width = 1500
     new_height = 840
     tutorial_image = pygame.transform.scale(tutorial_image, (new_width, new_height))

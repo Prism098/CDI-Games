@@ -14,9 +14,9 @@ def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_eleme
     ]
     
     ui_elements_photo = [
-        DraggableUIElement(725, 825, 125, 125, "assets/SuitcaseMoney.png"),
-        DraggableUIElement(1040, 825, 125, 150, "assets/ToyCar.png"),
-        DraggableUIElement(1355, 825, 125, 125, "assets/Gramophone.png")
+        DraggableUIElement(725, 825, 125, 125, "CDI-Games-HCI/assets/SuitcaseMoney.png"),
+        DraggableUIElement(1040, 825, 125, 150, "CDI-Games-HCI/assets/ToyCar.png"),
+        DraggableUIElement(1355, 825, 125, 125, "CDI-Games-HCI/assets/Gramophone.png")
     ]
     
     ui_elements_font = [

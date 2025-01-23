@@ -10,7 +10,7 @@ def show_menu():
     pygame.display.set_caption("Dataset Cleaning Game - Menu")
 
     # Laad de afbeelding van de game
-    assets_path = "assets"
+    assets_path = "CDI-Games-DataEngineering/assets"
     game_preview_image = pygame.image.load(f"{assets_path}/gamescreen4.png")
     game_preview_image = pygame.transform.scale(game_preview_image, (1000, 550))  # Schaal de afbeelding
 
