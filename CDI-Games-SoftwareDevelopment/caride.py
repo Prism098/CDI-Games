@@ -100,7 +100,7 @@ square_height = background_height / grid_rows
 grid_start_x, grid_start_y = (50,200)
 
 # Drop Zone
-MAX_STEPS = 15  # Number of drop zones
+MAX_STEPS = 5  # Number of drop zones
 DROP_ZONE_PADDING = 140
 drop_zones = [pygame.Rect(DROP_ZONE_PADDING, 250 + i * 70, 250, 50) for i in range(MAX_STEPS)]
 memory_full = False  # Flag to track if memory is full
@@ -135,7 +135,7 @@ grid3 = (
     ("R", "R", "R", "G", "G"),  # Start point at (4, 2)
 )
 
-grids = [grid1, grid3]
+grids = [grid1, grid2, grid3]
 
 # Randomly select a grid
 grid = random.choice(grids)

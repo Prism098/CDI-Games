@@ -41,8 +41,8 @@ def run_game(game):
 pygame.init()
 
 # Scherminstellingen
-WIDTH, HEIGHT = 800, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+WIDTH, HEIGHT = 1920, 1080
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Super Game")
 font = pygame.font.Font(None, 36)
 title_font = pygame.font.Font(None, 64)
