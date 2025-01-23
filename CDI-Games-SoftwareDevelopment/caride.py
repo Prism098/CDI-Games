@@ -135,7 +135,7 @@ grid3 = (
     ("R", "R", "R", "G", "G"),  # Start point at (4, 2)
 )
 
-grids = [grid1, grid2, grid3]
+grids = [grid1, grid3]
 
 # Randomly select a grid
 grid = random.choice(grids)
