@@ -2,6 +2,9 @@ import pygame
 import sys
 import random
 import time
+# Import show_menu function
+from screens.menu_screen import show_menu
+
 from pygame.locals import *
 
 # Initialize Pygame
@@ -56,6 +59,7 @@ turn_right_img = pygame.transform.scale(turn_right_img, (120, 125))
 run_button_img = pygame.transform.scale(run_button_img, (245, 68))
 background = pygame.transform.scale(background, (561, 903))
 
+
 # Positions for the UI elements
 background_pos = (50, 50)
 turn_left_pos = (680 + image_right_padding, 75 + image_top_padding)
@@ -83,6 +87,8 @@ TIME_LIMIT = 60  # in seconds
 timer_start = time.time()
 score = 0
 final_score_displayed = False
+is_animation_complete = True  # Default to True, meaning no animation is in progress
+
 
 # Background grid details
 grid_rows, grid_cols = 3, 5
@@ -154,18 +160,22 @@ TURN_RIGHT_ICON = pygame.transform.flip(TURN_LEFT_ICON, True, False)  # Mirror t
 
 # List to store placed commands and their positions
 placed_commands = []
+memory_popup_start_time = None
+popup_duration = 2000  # Display for 3 seconds (3000 ms)
+
 
 # Add command to grid
 def add_command_to_grid(command_image):
-    global memory_full
+    global memory_full, memory_popup_start_time
 
     if len(placed_commands) >= grid_rows * grid_cols:
-        memory_full = True  # Set the flag
+        memory_full = True
+        memory_popup_start_time = pygame.time.get_ticks()  # Record popup start time
         return
 
     # Scale the image down by 10%
     scaled_image = pygame.transform.scale(
-        command_image, 
+        command_image,
         (int(square_width * 0.7), int(square_height * 0.7))
     )
 
@@ -174,9 +184,14 @@ def add_command_to_grid(command_image):
     row = grid_index // grid_cols
     col = grid_index % grid_cols
     x = grid_start_x + col * square_width + (square_width - scaled_image.get_width()) // 2
-    y = grid_start_y + row * (square_height + DROP_ZONE_PADDING) +(square_height - scaled_image.get_height()) // 2
+    y = grid_start_y + row * (square_height + DROP_ZONE_PADDING) + (square_height - scaled_image.get_height()) // 2
 
     placed_commands.append((scaled_image, (x, y)))
+    if len(placed_commands) >= 14:
+        memory_full = True
+        memory_popup_start_time = pygame.time.get_ticks()  # Record popup start time
+        return
+
 
 # Draw commands in the grid
 def draw_placed_commands():
@@ -311,10 +326,14 @@ def show_feedback(message, color):
     pygame.display.update()
     pygame.time.wait(1500)  # Pause to show feedback
 
-
-
 def move_forward():
-    global player_x, player_y, score
+    global player_x, player_y, score, is_animation_complete
+
+    # Prevent movement if animation is still running
+    if not is_animation_complete:
+        return
+
+    is_animation_complete = False  # Set flag to False while animating
 
     # Calculate the target position
     new_x, new_y = player_x, player_y
@@ -327,24 +346,53 @@ def move_forward():
     elif player_dir == "DOWN" and player_y < GRID_SIZE - 1:
         new_y += 1
 
-    # Check tile type
+    # Check the tile type BEFORE animation
     if grid[new_y][new_x] == "G":  # Grass
         show_feedback("Sensors Detect Lava...", RED)
         player_x, player_y = find_nearest_checkpoint()
+        is_animation_complete = True  # Allow further actions
         return
-    elif grid[new_y][new_x] == "C":  # Checkpoint
-        score += 500
-        show_feedback("Checkpoint! +500 points", GREEN)
+
+    # Animate the car movement
+    steps = 5  # Number of steps for smooth animation
+    start_x = GRID_OFFSET_X + player_x * TILE_SIZE + TILE_SIZE // 2
+    start_y = GRID_OFFSET_Y + player_y * TILE_SIZE + TILE_SIZE // 2
+    end_x = GRID_OFFSET_X + new_x * TILE_SIZE + TILE_SIZE // 2
+    end_y = GRID_OFFSET_Y + new_y * TILE_SIZE + TILE_SIZE // 2
+
+    for step in range(steps + 1):
+        interpolated_x = start_x + (end_x - start_x) * (step / steps)
+        interpolated_y = start_y + (end_y - start_y) * (step / steps)
+
+        # Redraw the screen
+        screen.fill(BLUE)
+        screen.blit(background, background_pos)
+        draw_grid()
+        draw_placed_commands()
+        draw_timer(screen)
+        draw_run_button()
+        draw_drop_zones()
+        draw_car_at_position(interpolated_x, interpolated_y)
+        pygame.display.update()
+        pygame.time.wait(10)  # Adjust animation speed
 
     # Update car's position
     player_x, player_y = new_x, new_y
 
-    # Handle finish line
-    if grid[new_y][new_x] == "D":  # Finish line
+    # Handle tile type AFTER animation completes
+    if grid[new_y][new_x] == "C":  # Checkpoint
+        score += 500
+        show_feedback("Checkpoint! +500 points", GREEN)
+    elif grid[new_y][new_x] == "D":  # Finish line
         score += 500
         show_feedback("Destination Reached! +500 points", YELLOW)
-        time_left = max(0, TIME_LIMIT - (time.time() - timer_start))  # Calculate remaining time
-        end_game(time_left)
+        is_animation_complete = True  # Allow game to end after animation
+        end_game(max(0, TIME_LIMIT - (time.time() - timer_start)))
+        return
+
+    # Allow next movement after animation finishes
+    is_animation_complete = True
+
 
 
 def draw_car_at_position(x, y):
@@ -390,21 +438,6 @@ def turn_right():
 
 
 #######################################adjust #############################
-
-def draw_drop_zones2():
-    for i, zone in enumerate(drop_zones):
-        pygame.draw.rect(SCREEN, WHITE, zone, border_radius=15)
-        pygame.draw.rect(SCREEN, BLACK, zone, 2, border_radius=15)
-        step_txt = FONT.render(f"S{i + 1}:  ", True, BLACK)
-        step_rect = step_txt.get_rect(midleft=(zone.left + 10, zone.centery))
-        SCREEN.blit(step_txt, step_rect)
-
-        if i < len(commands):
-            x_button_rect = pygame.Rect(zone.right - 40, zone.top + 10, 30, 30)
-            pygame.draw.rect(SCREEN, RED, x_button_rect, border_radius=5)
-            x_txt = FONT.render("X", True, WHITE)
-            x_txt_rect = x_txt.get_rect(center=x_button_rect.center)
-            SCREEN.blit(x_txt, x_txt_rect)
 
 def draw_drop_zones():
     DROP_ROWS, DROP_COLS = 3, 5  # Drop zone layout
@@ -463,61 +496,53 @@ def handle_mouse_click(pos):
         execute_commands()
 
 
-def handle_mouse_click2(pos):
-    global commands
+# Main Game Logic
+def main():
+    # Show the menu screen
+    menu_action = show_menu()
 
-    # Check if a command block image was clicked
-    if turn_left_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
-        commands.append("Turn Left")
-    elif move_forward_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
-        commands.append("Move Forward")
-    elif turn_right_rect.collidepoint(pos) and len(commands) < MAX_STEPS:
-        commands.append("Turn Right")
+    if menu_action == "quit":
+        pygame.quit()
+        sys.exit()  # Exit the program if the player chooses to quit
 
-    # Check if the run button image was clicked
-    if run_button_rect.collidepoint(pos):
-        execute_commands()
+    # Start the game
+    running = True
+    while running:
+        time_left = max(0, TIME_LIMIT - (time.time() - timer_start))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                handle_mouse_click(event.pos)
 
-    # Check if the delete (X) button was clicked in a drop zone
-    for i, zone in enumerate(drop_zones):
-        if i < len(commands):
-            x_button_rect = pygame.Rect(zone.right - 40, zone.top + 10, 30, 30)
-            if x_button_rect.collidepoint(pos):
-                commands.pop(i)
-                break
+        # End game if time runs out
+        if time_left <= 0:
+            end_game(time_left)
 
+        # Draw elements
+        screen.fill(BLUE)
+        screen.blit(background, background_pos)
+        draw_placed_commands()  # Draw scaled-down commands in the grid
+        screen.blit(turn_left_img, turn_left_pos)
+        screen.blit(move_forward_img, move_forward_pos)
+        screen.blit(turn_right_img, turn_right_pos)
+        draw_timer(screen)
+        draw_run_button()
+        draw_drop_zones()
+        draw_grid()
+        draw_car()
 
-running = True
-while running:
-    time_left = max(0, TIME_LIMIT - (time.time() - timer_start))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            handle_mouse_click(event.pos)
+        # Display the memory full popup if the flag is set
+        if memory_full:
+            popup_x = grid_start_x + (background_width - memory_full_img.get_width()) // 2
+            popup_y = grid_start_y + (background_height - memory_full_img.get_height()) // 2
+            screen.blit(memory_full_img, (popup_x, popup_y))
 
-    # End game if time runs out
-    if time_left <= 0:
-        end_game(time_left)
-    # Draw elements
-    screen.fill(BLUE)
-    screen.blit(background, background_pos)
-    draw_placed_commands()  # Draw scaled-down commands in the grid
-    screen.blit(turn_left_img, turn_left_pos)
-    screen.blit(move_forward_img, move_forward_pos)
-    screen.blit(turn_right_img, turn_right_pos)
-    draw_timer(screen)
-    draw_run_button()
-    draw_drop_zones()
-    draw_grid()
-    draw_car()
+        # Update the display
+        pygame.display.flip()
 
-    # Display the memory full popup if the flag is set
-    if memory_full:
-        popup_x = grid_start_x + (background_width - memory_full_img.get_width()) // 2
-        popup_y = grid_start_y + (background_height - memory_full_img.get_height()) // 2
-        screen.blit(memory_full_img, (popup_x, popup_y))
+    pygame.quit()
 
 
-    # Update the display
-    pygame.display.flip()
+if __name__ == "__main__":
+    main()
