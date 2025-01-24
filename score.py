@@ -16,8 +16,8 @@ class ScoreSystem:
         self.score = 0 
     
     def apply_bonus(self, time_remaining):
-        if time_remaining > 15:
+        if time_remaining > 20:
             self.score += 700
         else:
-            bonus = int(time_remaining * 43)  # 10 points per second remaining
+            bonus = int(time_remaining * 32)  # 10 points per second remaining
             self.score += bonus
