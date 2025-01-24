@@ -11,7 +11,7 @@ def show_menu():
 
     # Laad de afbeelding van de game
     assets_path = "assets"
-    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen4.png")
+    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen.png")
     game_preview_image = pygame.transform.scale(game_preview_image, (1000, 550))  # Schaal de afbeelding
 
     running = True
