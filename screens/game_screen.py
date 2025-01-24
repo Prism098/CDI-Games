@@ -18,6 +18,7 @@ def start_game():
 
     # Laad de checkmark-, cross- en brush-afbeeldingen
     assets_path = os.path.join(os.path.dirname(__file__), "..", "assets")
+    tick_sound = pygame.mixer.Sound(os.path.join(assets_path, "tick.wav"))
     checkmark_image = pygame.image.load(os.path.join(assets_path, "check.png"))
     cross_image = pygame.image.load(os.path.join(assets_path, "cross.png"))
     brush_image = pygame.image.load(os.path.join(assets_path, "brush.png"))
@@ -51,23 +52,30 @@ def start_game():
     clock = pygame.time.Clock()
     running = True
 
-    found_outliers = 0
     found_missing = 0
     found_incorrect = 0
 
-    total_outliers = sum(1 for row in dataset for cell in row if cell["status"] == "outlier")
     total_missing = sum(1 for row in dataset for cell in row if cell["status"] == "missing")
     total_incorrect = sum(1 for row in dataset for cell in row if cell["status"] == "incorrect")
-    total_errors = total_outliers + total_missing + total_incorrect
+    total_errors = total_missing + total_incorrect
 
     # Scorefactor berekenen
-    points_per_outlier = MAX_SCORE * 0.4 / total_outliers if total_outliers else 0
-    points_per_missing = MAX_SCORE * 0.2 / total_missing if total_missing else 0
-    points_per_incorrect = MAX_SCORE * 0.4 / total_incorrect if total_incorrect else 0
+    points_per_missing = MAX_SCORE * 0.4 / total_missing if total_missing else 0
+    points_per_incorrect = MAX_SCORE * 0.6 / total_incorrect if total_incorrect else 0
+
+    tick_playing = False  # Houdt bij of de tick speelt
 
     while running:
         dt = clock.tick(60) / 1000.0  # Delta tijd in seconden
         remaining_time -= dt  # Aftellen
+
+        # Controleer en speel de tick-sound tijdens de laatste 10 seconden
+        if remaining_time <= 10 and not tick_playing:
+            tick_sound.play(loops=-1)  # Herhaal het geluid
+            tick_playing = True
+        elif remaining_time > 10 and tick_playing:
+            tick_sound.stop()  # Stop het geluid als er meer dan 10 seconden over zijn
+            tick_playing = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -81,12 +89,7 @@ def start_game():
                         cell = dataset[row][col]
                         if not cell["clicked"]:
                             cell["clicked"] = True
-                            if cell["status"] == "outlier":
-                                score += points_per_outlier
-                                found_outliers += 1
-                                cell["mark"] = "check"
-                                cell["color"] = OUTLIER_COLOR
-                            elif cell["status"] == "missing":
+                            if cell["status"] == "missing":
                                 score += points_per_missing
                                 found_missing += 1
                                 cell["mark"] = "check"
@@ -106,13 +109,12 @@ def start_game():
                             score = max(0, score)
 
         # Controleer of het spel moet eindigen
-        if found_outliers == total_outliers and found_missing == total_missing and found_incorrect == total_incorrect:
+        if found_missing == total_missing and found_incorrect == total_incorrect:
+            tick_sound.stop()  # Stop de tick-sound
             show_end_screen(
                 screen,
                 round(score),
                 TIMER_SECONDS - int(remaining_time),
-                found_outliers,
-                total_outliers,
                 found_missing,
                 total_missing,
                 found_incorrect,
@@ -122,12 +124,11 @@ def start_game():
             return
 
         if remaining_time <= 0:
+            tick_sound.stop()  # Stop de tick-sound
             show_end_screen(
                 screen,
                 round(score),
                 TIMER_SECONDS,
-                found_outliers,
-                total_outliers,
                 found_missing,
                 total_missing,
                 found_incorrect,
@@ -186,22 +187,19 @@ def start_game():
 
         score_text = font_title.render(f"Score: {round(score)} / {MAX_SCORE}", True, WHITE)
         time_text = font_title.render(f"Tijd: {int(max(remaining_time, 0))}s", True, WHITE)
-        outliers_text = font_title.render(f"Outliers: {found_outliers}/{total_outliers}", True, OUTLIER_COLOR)
         missing_text = font_title.render(f"Missing: {found_missing}/{total_missing}", True, MISSING_COLOR)
         incorrect_text = font_title.render(f"Incorrect: {found_incorrect}/{total_incorrect}", True, INCORRECT_COLOR)
         wrong_text = font_title.render(f"Fouten: {wrong_clicks}", True, WHITE)
 
         screen.blit(score_text, (info_panel_x + 20, 20))
         screen.blit(time_text, (info_panel_x + 20, 60))
-        screen.blit(outliers_text, (info_panel_x + 20, 120))
-        screen.blit(missing_text, (info_panel_x + 20, 160))
-        screen.blit(incorrect_text, (info_panel_x + 20, 200))
-        screen.blit(wrong_text, (info_panel_x + 20, 260))
+        screen.blit(missing_text, (info_panel_x + 20, 120))
+        screen.blit(incorrect_text, (info_panel_x + 20, 160))
+        screen.blit(wrong_text, (info_panel_x + 20, 200))
 
         # Teken de bezem op de positie van de muis
         mouse_x, mouse_y = pygame.mouse.get_pos()
         screen.blit(brush_image, (mouse_x, mouse_y))
 
         pygame.display.flip()
-
     pygame.quit()

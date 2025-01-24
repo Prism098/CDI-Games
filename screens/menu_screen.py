@@ -1,6 +1,6 @@
 import pygame
 from screens import game_screen
-from utils.styles import WHITE, BACKGROUND_COLOR, WIDTH, HEIGHT, OUTLIER_COLOR, MISSING_COLOR, INCORRECT_COLOR
+from utils.styles import WHITE, BACKGROUND_COLOR, WIDTH, HEIGHT,MISSING_COLOR, INCORRECT_COLOR, ERROR_COLOR
 
 def show_menu():
     # Maak het scherm fullscreen
@@ -9,10 +9,12 @@ def show_menu():
 
     pygame.display.set_caption("Dataset Cleaning Game - Menu")
 
-    # Laad de afbeelding van de game
+    # Laad voorbeeldafbeeldingen
     assets_path = "assets"
-    game_preview_image = pygame.image.load(f"{assets_path}/gamescreen.png")
-    game_preview_image = pygame.transform.scale(game_preview_image, (1000, 550))  # Schaal de afbeelding
+    example_image = pygame.image.load(f"{assets_path}/gamescreen1.png")
+
+    # Schaal afbeelding
+    example_image = pygame.transform.scale(example_image, (1100, 650))
 
     running = True
     while running:
@@ -25,35 +27,47 @@ def show_menu():
 
         # Titel
         title = title_font.render("Welkom bij de Dataset Cleaning Game", True, WHITE)
-        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 10))
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 15))
 
         # Initialiseer explanation_start_y
-        explanation_start_y = HEIGHT // 4
+        explanation_start_y = HEIGHT // 6
 
         # Uitleg
-        explanation_title = text_font.render("Hieronder volgt de uitleg over welke waarden je moet opruimen (op klikken):", True, WHITE)
-        explanation1 = text_font.render("Missing Value: Geen waarde ingevuld in het vakje.", True, MISSING_COLOR)
-        explanation2 = text_font.render("Outlier: Waarde die significant buiten het bereik valt.", True, OUTLIER_COLOR)
-        explanation3 = text_font.render("Incorrect: Waarde die niet klopt (zoals een foutieve eenheid).", True, INCORRECT_COLOR)
+        explanation_title_part1 = text_font.render("Hieronder volgt de uitleg over welke waarden je moet opruimen (", True, WHITE)
+        explanation_title_part2 = text_font.render("op klikken", True, ERROR_COLOR)  # ERROR_COLOR = #b13e53
+        explanation_title_part3 = text_font.render("):", True, WHITE)
+        explanation1 = text_font.render("Missing Value: Het vakje is helemaal leeg. Er ontbreekt dus data! (zie voorbeelden hieronder!)", True, MISSING_COLOR)
+        explanation2 = text_font.render("Incorrect: Er staat data wat niet klopt. (zie voorbeelden hieronder!)", True, INCORRECT_COLOR)
 
-        explanation_gap = 40  # Afstand tussen uitlegregels
-        screen.blit(explanation_title, (WIDTH // 2 - explanation_title.get_width() // 2, explanation_start_y - 50))
+        # Positie van de gesplitste uitleg
+        title_x = WIDTH // 2 - (
+                explanation_title_part1.get_width()
+                + explanation_title_part2.get_width()
+                + explanation_title_part3.get_width()
+        ) // 2
+
+        # Render de uitleg met "op klikken" in een andere kleur
+        screen.blit(explanation_title_part1, (title_x, explanation_start_y - 50))
+        screen.blit(explanation_title_part2, (title_x + explanation_title_part1.get_width(), explanation_start_y - 50))
+        screen.blit(explanation_title_part3, (
+        title_x + explanation_title_part1.get_width() + explanation_title_part2.get_width(), explanation_start_y - 50))
+
+        # Posities en uitleg
+        gap = 40
         screen.blit(explanation1, (WIDTH // 2 - explanation1.get_width() // 2, explanation_start_y))
-        screen.blit(explanation2, (WIDTH // 2 - explanation2.get_width() // 2, explanation_start_y + explanation_gap))
-        screen.blit(explanation3, (WIDTH // 2 - explanation3.get_width() // 2, explanation_start_y + 2 * explanation_gap))
+        screen.blit(explanation2, (WIDTH // 2 - explanation2.get_width() // 2, explanation_start_y + gap))
 
-        # Afbeelding
-        preview_x = WIDTH // 2 - game_preview_image.get_width() // 2
-        preview_y = explanation_start_y + 3 * explanation_gap + 20
-        screen.blit(game_preview_image, (preview_x, preview_y))
+        # Voorbeeldafbeelding
+        example_y = explanation_start_y + 2 * gap + 40
+        screen.blit(example_image, (WIDTH // 2 - example_image.get_width() // 2, example_y))
 
         # Instructies met gekleurde woorden
         instruction_part1 = info_font.render("Druk op", True, WHITE)
         instruction_enter = info_font.render(" Enter ", True, (56, 183, 100))  # Groen (#38b764)
         instruction_part2 = info_font.render("om te starten. Je hebt 30 seconden.", True, WHITE)
 
-        # Bereken y-positie van de instructies
-        instructions_y = preview_y + game_preview_image.get_height() + 30
+        # Y-positie van de instructies
+        instructions_y = example_y + example_image.get_height() + 50
 
         # "Druk op Enter om te starten."
         total_width_start = instruction_part1.get_width() + instruction_enter.get_width() + instruction_part2.get_width()

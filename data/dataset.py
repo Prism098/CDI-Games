@@ -25,11 +25,9 @@ def generate_dataset():
         for c in range(COLUMNS):
             rnd = random.random()
 
-            # Bepaal status
+            # Bepaal status zonder outliers
             if rnd < 0.10:
                 status = "missing"
-            elif rnd < 0.25:
-                status = "outlier" if c not in [1, 2, 3] else "correct"  # Geen outliers voor kolommen 2 en 3
             elif rnd < 0.40:
                 status = "incorrect"
             else:
@@ -39,38 +37,44 @@ def generate_dataset():
             if c == 0:  # Distance (km)
                 if status == "missing":
                     value_str = ""
-                elif status == "outlier":
-                    value_str = str(random.randint(-100, -10)) + "km"  # Zeer negatieve afstand
                 elif status == "incorrect":
-                    value_str = str(random.randint(0, 20)) + "??"  # Foutieve eenheid
+                    value_str = random.choice([
+                        f"{random.randint(-50, -1)}km",  # Negatieve waarden
+                        f"{random.randint(100, 400)}km",
+                        "??"  # Foutieve eenheid
+                    ])
                 else:
-                    value_str = str(random.randint(10, 100)) + "km"
+                    value_str = f"{random.randint(1, 60)}km"  # Correcte waarden
             elif c == 1:  # Transport
                 if status == "missing":
                     value_str = ""
                 elif status == "incorrect":
-                    value_str = "Bezem"  # Onrealistisch
+                    value_str = random.choice([
+                        "Bezem",
+                        "Luchtballon",
+                        "Tapijt",
+                        "Kangoeroe",
+                        "Tijdmachine"
+                    ])
                 else:
                     value_str = random.choice(["Auto", "Trein", "Fiets", "Te voet"])
-            elif c == 2:  # Average Grade (Geen outliers)
+            elif c == 2:  # Average Grade
                 if status == "missing":
                     value_str = ""
                 elif status == "incorrect":
-                    value_str = str(random.randint(11, 15))  # Onrealistische hoge cijfers
+                    value_str = str(random.randint(11, 18))  # Onrealistische hoge cijfers
                 else:
                     value_str = str(random.randint(1, 10))  # Redelijke cijfers
-            elif c == 3:  # Highest Grade (Geen outliers)
+            elif c == 3:  # Highest Grade
                 if status == "missing":
                     value_str = ""
                 elif status == "incorrect":
-                    value_str = str(random.randint(11, 15))  # Onrealistisch hoog
+                    value_str = str(random.randint(11, 18))  # Onrealistisch hoog
                 else:
                     value_str = str(random.randint(5, 10))  # Redelijke hoogste score
             elif c == 4:  # Birth Date
                 if status == "missing":
                     value_str = ""
-                elif status == "outlier":
-                    value_str = "1800-01-01"  # Onrealistische datum
                 elif status == "incorrect":
                     value_str = "2025-12-31"  # Toekomstige datum
                 else:
@@ -78,10 +82,8 @@ def generate_dataset():
             elif c == 5:  # Start Date
                 if status == "missing":
                     value_str = ""
-                elif status == "outlier":
-                    value_str = "1900-01-01"  # Te oude datum
                 elif status == "incorrect":
-                    value_str = "2026-01-01"  # Onrealistische toekomstige datum
+                    value_str = "1945-01-01"
                 else:
                     value_str = generate_random_start_date()
 
