@@ -21,12 +21,12 @@ class Timer:
         # Render the remaining time as text
         timer_text = str(int(self.time_left))  # Convert time_left to an integer (seconds)
         text_surface = self.font.render(timer_text, True, (255, 0, 0))  # Red color for the timer text
-        screen.blit(text_surface, (self.x-1540, self.y+850))
+        screen.blit(text_surface, (self.x-16, self.y+80))
 
          # Draw the circular countdown timer
         angle = 360 * (self.time_left / self.total_time)  # Calculate the angle for the arc
         end_angle = math.radians(angle)
-        pygame.draw.arc(screen, (255, 255, 255), (self.x - 1650, self.y+750, self.radius * 5, self.radius * 5), 0, end_angle, 5)
+        pygame.draw.arc(screen, (255, 255, 255), (self.x - 50, self.y+50, self.radius * 2, self.radius * 2), 0, end_angle, 5)
 
     def is_time_up(self):
         # Check if the timer has finished (i.e., time_left is 0)
