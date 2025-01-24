@@ -13,7 +13,7 @@ class GameState:
         self.canvas_image = None
         self.canvas_font = None
         self.round = 1
-        self.score_system = ScoreSystem(initial_score=2500, penalty=300)
+        self.score_system = ScoreSystem(initial_score=0, penalty=300)
         self.selected_persona = None
         self.showing_score = False
         self.score_screen_timer = 0
@@ -137,7 +137,7 @@ def run_game():
 
         if game_state.timer.time_left <= 0 and not game_state.showing_score:
             game_state.showing_score = True
-            game_state.score_system.reset_score()  # Reset the score to 0 when the timer ends
+            #game_state.score_system.reset_score()  # Reset the score to 0 when the timer ends
             game_state.score_screen_timer = pygame.time.get_ticks()
 
         for event in pygame.event.get():
@@ -156,6 +156,7 @@ def run_game():
                         if color:
                             if color == game_state.selected_persona.correct_color:
                                 game_state.canvas_color = color
+                                ScoreSystem.add_score(game_state.score_system, 600)
                                 game_state.round = 2
                                 game_state.feedback_message = None
                             else:
@@ -169,6 +170,7 @@ def run_game():
                     for ui_element in ui_elements_photo:
                         if ui_element.handle_event(event, canvas_rect):
                             if ui_element.color_or_image == game_state.selected_persona.correct_image:
+                                ScoreSystem.add_score(game_state.score_system, 600)
                                 image = pygame.image.load(ui_element.color_or_image)
                                 image = pygame.transform.scale(image, (200, 200))
                                 image_rect = image.get_rect()
@@ -190,6 +192,8 @@ def run_game():
                             if ui_element.font_name == game_state.selected_persona.correct_font:
                                 game_state.canvas_font = ui_element.font_name
                                 game_state.story_text = get_story_for_persona(ui_element.font_name)
+                                ScoreSystem.add_score(game_state.score_system, 600)
+                                ScoreSystem.apply_bonus(game_state.score_system, game_state.timer.time_left)
                            
                                 game_state.timer.stop()
                                 game_state.showing_score = True
