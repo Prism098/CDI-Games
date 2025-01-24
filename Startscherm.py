@@ -172,6 +172,8 @@ while running:
     elif state == "finished":
         finish_text = font.render(f"All games finished! Total Score: {total_score}", True, BLACK)
         screen.blit(finish_text, (WIDTH // 2 - finish_text.get_width() // 2, HEIGHT // 2))
+        pygame.time.wait(10000)
+        state = "login"
 
     pygame.display.flip()
 

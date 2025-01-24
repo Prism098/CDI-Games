@@ -1,4 +1,4 @@
-from UI_element import DraggableUIElement
+from ui_element import DraggableUIElement
 import pygame 
 
 def create_ui_elements(canvas_x, canvas_y, canvas_width, canvas_height, ui_element_height):
