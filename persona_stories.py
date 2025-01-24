@@ -19,36 +19,30 @@ def draw_story_text(screen, story, font_name, canvas_rect, color=(0, 0, 0)):
         canvas_rect: Pygame Rect object defining the canvas area
         color: RGB tuple for text color (default: black)
     """
+    # Load font and calculate text line properties
     story_font = pygame.font.SysFont(font_name, 24)
-
     words = story.split()
     lines = []
     current_line = []
+    max_width = int(canvas_rect.width * 0.8)  # Add padding to avoid clipping text
 
-    # Adjust max_width to allow some padding inside the canvas
-    max_width = int(canvas_rect.width * 0.8)
-
-    # Wrap the text into lines
+    # Create wrapped lines of text
     for word in words:
         test_line = " ".join(current_line + [word])
-        test_surface = story_font.render(test_line, True, color)
-        if test_surface.get_width() <= max_width:
+        if story_font.size(test_line)[0] <= max_width:
             current_line.append(word)
         else:
             lines.append(" ".join(current_line))
             current_line = [word]
-    lines.append(" ".join(current_line))  # Add the last line
+    lines.append(" ".join(current_line))  # Add the final line
 
-    line_height = story_font.get_linesize()  # Get the height of each line of text
+    # Draw each line at appropriate vertical positions
+    line_height = story_font.get_linesize()
+    start_y = canvas_rect.top + 20  # Start with a margin at the top
 
-    # Set the starting Y position to near the top of the canvas
-    start_y = canvas_rect.top + 20  # 20 pixels margin from the top of the canvas
-
-    # Draw each line of text
     for i, line in enumerate(lines):
         text_surface = story_font.render(line, True, color)
-        text_rect = text_surface.get_rect()
-        text_rect.centerx = canvas_rect.centerx
+        text_rect = text_surface.get_rect(centerx=canvas_rect.centerx)
         text_rect.top = start_y + (i * line_height)
         screen.blit(text_surface, text_rect)
 
@@ -61,6 +55,7 @@ def get_story_for_persona(font_name):
         font_name: String name of the font
 
     Returns:
-        String containing the story
+        String containing the story, or a default message if no match is found
     """
-    return PERSONA_STORIES.get(font_name)
+    return PERSONA_STORIES.get(font_name, "Geen verhaal beschikbaar voor deze persona.")
+
