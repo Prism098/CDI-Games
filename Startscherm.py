@@ -33,7 +33,7 @@ def run_game(game):
         print(result.stdout)
         for line in result.stdout.splitlines():
             if "Score:" in line:
-                return int(line.split(":")[1].strip())
+                return int(float(line.split(":")[1].strip()))
     except Exception as e:
         print(f"Error running {game['name']}: {e}")
     return 0
@@ -91,9 +91,14 @@ def save_user_data(first_name, last_name, email):
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
 
-def update_total_score(total_score):
+def update_total_score(email, total_score):
     try:
-        response = requests.post(f"{SERVER_URL}/add-score", json={"totalScore": total_score})
+        # Voeg email en totalScore toe aan de JSON payload
+        payload = {"email": email, "totalScore": total_score}
+        print(f"Verzonden payload: {payload}")  # Debugging: Bekijk wat er wordt verzonden
+
+        response = requests.post(f"{SERVER_URL}/add-score", json=payload)
+        
         if response.status_code == 200:
             print("Totaalscore succesvol toegevoegd aan de database.")
         else:
@@ -145,7 +150,7 @@ while running:
         elif state == "running":
             for game in games:
                 total_score += run_game(game)
-            update_total_score(total_score)
+            update_total_score(email, total_score)
             state = "finished"
 
     # Login scherm tekenen

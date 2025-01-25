@@ -57,6 +57,67 @@ app.post('/save', async (req, res) => {
     }
 });
 
+// Endpoint om de score te koppelen aan een ingelogde gebruiker
+app.post('/add-score', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        const { email, name, totalScore } = req.body;
+
+        if (!email || !name || typeof totalScore !== 'number') {
+            console.error('Ongeldige gegevens:', req.body);
+            res.status(400).send('Ongeldige gegevens: email, name en totalScore zijn vereist.');
+            return;
+        }
+
+        // Update de gebruiker of voeg toe als ze nog niet bestaan
+        const result = await collection.updateOne(
+            { email: email }, // Zoek gebruiker op basis van email
+            {
+                $set: { name: name, email: email }, // Werk naam en email bij
+                $inc: { totalScore: totalScore } // Verhoog de totalScore
+            },
+            { upsert: true } // Voeg document toe als het niet bestaat
+        );
+
+        console.log('Score succesvol gekoppeld aan gebruiker:', result);
+        res.status(200).send('Score succesvol gekoppeld aan gebruiker!');
+    } catch (err) {
+        console.error('Fout bij koppelen van score:', err);
+        res.status(500).send('Er is een fout opgetreden bij het koppelen van de score.');
+    } finally {
+        await client.close();
+    }
+});
+
+
+
+
+
+app.get('/top-scores', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        const topScores = await collection
+            .find({}, { projection: { name: 1, totalScore: 1 } }) // Haal alleen naam en score op
+            .sort({ totalScore: -1 }) // Sorteer op totalScore (aflopend)
+            .limit(10) // Beperk tot de top 10
+            .toArray();
+
+        res.status(200).json(topScores);
+    } catch (err) {
+        console.error('Fout bij ophalen van scores:', err);
+        res.status(500).send('Er is een fout opgetreden bij het ophalen van de scores.');
+    } finally {
+        await client.close();
+    }
+});
+
+
 // Nieuw: Endpoint om data naar een tekstbestand te exporteren
 app.get('/export-data', async (req, res) => {
     try {
