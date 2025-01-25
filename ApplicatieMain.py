@@ -1,42 +1,56 @@
 import subprocess
 import sys
 import os
-import requests
+import pygame
 
+# Lijst van games met paden naar de submappen
 games = [
+    {"name": "Startscherm", "script": "Startscherm.py"},
     {"name": "Data Cleaning Game", "script": "CDI-Games-DataEngineering/DataMain.py"},
     {"name": "Website Interface Builder Game", "script": "CDI-Games-HCI/HCIMain.py"},
     {"name": "Network Invaders", "script": "CDI-Games-SecurityCloud/SecurityMain.py"},
     {"name": "Boolean Bakery", "script": "CDI-Games-SoftwareDevelopment/SoftwareMain.py"}
 ]
 
+# Totale score
 total_score = 0
 
+# Functie om een game te starten en score op te halen
 def run_game(game):
     global total_score
     try:
         print(f"Starting {game['name']}...")
 
+        # Controleer of het script bestaat
         if not os.path.exists(game["script"]):
             print(f"Error: Script {game['script']} not found!")
             return
 
+        # Set display mode to fullscreen
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
+        os.environ['SDL_VIDEO_CENTERED'] = '0'
+        pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+        # Voer de game uit als subprocess
         result = subprocess.run(
             [sys.executable, game["script"]],
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60  # Maximaal 60 seconden wachten
         )
 
+        # Debug-uitvoer
         print(f"Output from {game['name']}:")
         print(result.stdout)
         print(result.stderr)
 
+        # Score verwerken vanuit de uitvoer
         score_found = False
         final_score = 0
         for line in result.stdout.splitlines():
             if "Score:" in line:
                 try:
+                    # Probeer de score als float of int te verwerken
                     final_score = float(line.split(":")[1].strip())
                     score_found = True
                 except ValueError:
@@ -53,31 +67,14 @@ def run_game(game):
     except Exception as e:
         print(f"Error running {game['name']}: {e}")
 
-# Functie om de totale score naar de backend te sturen
-def send_score_to_last_user(total_score):
-    url = "http://localhost:4000/add-score"
-    data = {"totalScore": total_score}
-    try:
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            print("Score succesvol toegevoegd aan de laatste gebruiker!")
-        else:
-            print(f"Fout bij het versturen van de score: {response.status_code}, {response.text}")
-    except Exception as e:
-        print(f"Kan geen verbinding maken met de server: {e}")
-
 # Hoofdprogramma om alle games te spelen
 def main():
-    global total_score
     print("Welcome to the CDI Game Runner!")
 
     for game in games:
         run_game(game)
 
     print(f"All games completed! Total Score: {total_score}")
-
-    # Verstuur de totale score naar de backend
-    send_score_to_last_user(total_score)
 
 if __name__ == "__main__":
     main()
