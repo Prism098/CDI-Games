@@ -18,7 +18,6 @@ games = [
     {"name": "Data Cleaning Game", "script": os.path.join(script_dir, "CDI_Games_DataEngineering", "main.py")},
     {"name": "Code Racer", "script": os.path.join(script_dir, "CDI_Games_SoftwareDevelopment", "caride.py")},
     {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI_Games_SecurityCloud", "SecurityMain.py")},
-    {"name": "QR Code", "script": os.path.join(script_dir, "", "QR-code.py")}
 ]
 
 # Functie om een game te starten
@@ -80,7 +79,7 @@ def save_user_data(first_name, last_name, email):
     data = {
         "name": f"{first_name} {last_name}",
         "email": email.strip().lower(),  # Normalize de e-mail
-        "status": "active",
+        "status": "not started",
         "totalScore": 0
     }
     print(f"Opslaan gebruiker: {data}")  # Debuggen
@@ -212,11 +211,11 @@ while running:
         with open("user_data.txt", "w") as user_file:
             user_file.write(f"{email}\n")  # Schrijf de e-mail van de gebruiker
             user_file.write(f"{total_score}\n")  # Schrijf de totalScore van de gebruiker
-        update_total_score(email, total_score, first_name, last_name)
+        
 
 
         pygame.quit()  # Sluit huidige Pygame-instantie
-        subprocess.run([sys.executable, "QR-code.py"])  # Start het eindscherm
+        subprocess.run([sys.executable, os.path.join(script_dir, "QR-code.py")])
         state = "login"  # Keer terug naar login voor de volgende gebruiker
 
     # Toggle cursor visibility
