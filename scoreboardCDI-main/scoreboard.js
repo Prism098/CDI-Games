@@ -114,7 +114,7 @@ function animateSingleUpdate(added, removed, newScores) {
     if (element) {
       timeline.to(element, {
         top: (i + 1) * SLOT_HEIGHT,
-        duration: 0.8,
+        duration: 3,
         ease: "power2.out"
       }, i === newIndex ? "+=0.1" : "<0.1");
     }
@@ -131,7 +131,7 @@ function animateSingleUpdate(added, removed, newScores) {
   timeline.to(newEl, {
     opacity: 1,
     y: 0,
-    duration: 0.8,
+    duration: 3,
     ease: "power2.out"
   }, "-=0.4");
 
@@ -160,10 +160,11 @@ function initialRender(scores) {
     li.style.opacity = '0';
     scoreList.appendChild(li);
 
+    //snelheid van nieuwe plaatsingen en snelheid verschijnen van persoon
     gsap.to(li, {
       opacity: 1,
-      delay: i * 0.1,
-      duration: 0.6
+      delay: i * 0.5,
+      duration: 0.5
     });
   });
 }
