@@ -4,8 +4,6 @@ const cors = require('cors');
 const fs = require('fs'); // Nodig voor bestandsschrijfbewerkingen
 const { MongoClient } = require('mongodb');
 
-
-// http://localhost:4000/export-data
 // MongoDB Configuratie
 const username = "ZuydGebruiker";
 const password = encodeURIComponent("3258hnajsidfb302914::__!!");
@@ -43,7 +41,7 @@ app.post('/save', async (req, res) => {
         const collection = database.collection(collectionName);
 
         const { name, email, status } = req.body;
-        const dataToSave = { name, email, status };
+        const dataToSave = { name, email: email.trim().toLowerCase(), status, totalScore: 0 };
 
         await collection.insertOne(dataToSave);
 
@@ -57,6 +55,40 @@ app.post('/save', async (req, res) => {
     }
 });
 
+
+// Endpoint om een score op te halen
+app.get('/get-score', async (req, res) => {
+    try {
+        const email = req.query.email;
+        if (!email) {
+            res.status(400).send('Email is verplicht.');
+            return;
+        }
+
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        const user = await collection.findOne({ email: email.trim().toLowerCase() });
+
+        console.log(`Ophalen van gebruiker: ${email}`);
+        if (user) {
+            console.log(`Gevonden gebruiker: ${JSON.stringify(user)}`);
+            res.status(200).json({ totalScore: user.totalScore || 0 });
+        } else {
+            console.log(`Gebruiker niet gevonden: ${email}`);
+            res.status(404).send('Gebruiker niet gevonden.');
+        }
+    } catch (err) {
+        console.error('Fout bij ophalen van score:', err);
+        res.status(500).send('Er is een fout opgetreden bij het ophalen van de score.');
+    } finally {
+        await client.close();
+    }
+});
+
+
+
 // Endpoint om de score te koppelen aan een ingelogde gebruiker
 app.post('/add-score', async (req, res) => {
     try {
@@ -67,22 +99,36 @@ app.post('/add-score', async (req, res) => {
         const { email, name, totalScore } = req.body;
 
         if (!email || !name || typeof totalScore !== 'number') {
-            console.error('Ongeldige gegevens:', req.body);
+            console.error('Ongeldige gegevens ontvangen:', req.body);
             res.status(400).send('Ongeldige gegevens: email, name en totalScore zijn vereist.');
             return;
         }
 
-        // Update de gebruiker of voeg toe als ze nog niet bestaan
-        const result = await collection.updateOne(
-            { email: email }, // Zoek gebruiker op basis van email
-            {
-                $set: { name: name, email: email }, // Werk naam en email bij
-                $inc: { totalScore: totalScore } // Verhoog de totalScore
-            },
-            { upsert: true } // Voeg document toe als het niet bestaat
-        );
+        console.log(`Ontvangen payload: ${JSON.stringify(req.body)}`);
 
-        console.log('Score succesvol gekoppeld aan gebruiker:', result);
+        // Controleer of gebruiker al bestaat
+        const userExists = await collection.findOne({ email: email.trim().toLowerCase() });
+
+        if (userExists) {
+            // Verhoog de score als de gebruiker al bestaat
+            const result = await collection.updateOne(
+                { email: email.trim().toLowerCase() },
+                {
+                    $set: { name: name, email: email.trim().toLowerCase() },
+                    $inc: { totalScore: totalScore }
+                }
+            );
+            console.log('Gebruiker gevonden. Score bijgewerkt:', result);
+        } else {
+            // Voeg een nieuwe gebruiker toe als deze niet bestaat
+            const result = await collection.insertOne({
+                name: name,
+                email: email.trim().toLowerCase(),
+                totalScore: totalScore
+            });
+            console.log('Nieuwe gebruiker toegevoegd:', result);
+        }
+
         res.status(200).send('Score succesvol gekoppeld aan gebruiker!');
     } catch (err) {
         console.error('Fout bij koppelen van score:', err);
@@ -94,8 +140,7 @@ app.post('/add-score', async (req, res) => {
 
 
 
-
-
+// Endpoint om de top 10 scores op te halen
 app.get('/top-scores', async (req, res) => {
     try {
         await client.connect();
@@ -116,7 +161,6 @@ app.get('/top-scores', async (req, res) => {
         await client.close();
     }
 });
-
 
 // Nieuw: Endpoint om data naar een tekstbestand te exporteren
 app.get('/export-data', async (req, res) => {

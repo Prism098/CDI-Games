@@ -78,10 +78,11 @@ submit_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 140, 200, 50)
 def save_user_data(first_name, last_name, email):
     data = {
         "name": f"{first_name} {last_name}",
-        "email": email,
+        "email": email.strip().lower(),  # Normalize de e-mail
         "status": "active",
         "totalScore": 0
     }
+    print(f"Opslaan gebruiker: {data}")  # Debuggen
     try:
         response = requests.post(f"{SERVER_URL}/save", json=data)
         if response.status_code == 201:
@@ -91,20 +92,30 @@ def save_user_data(first_name, last_name, email):
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
 
-def update_total_score(email, total_score):
-    try:
-        # Voeg email en totalScore toe aan de JSON payload
-        payload = {"email": email, "totalScore": total_score}
-        print(f"Verzonden payload: {payload}")  # Debugging: Bekijk wat er wordt verzonden
 
+def update_total_score(email, total_score, first_name, last_name):
+    try:
+        # Payload voorbereiden
+        payload = {"email": email, "name": f"{first_name} {last_name}", "totalScore": total_score}
+        print(f"Verzonden payload naar server: {payload}")  # Debugging
+
+        # Score updaten in de database
         response = requests.post(f"{SERVER_URL}/add-score", json=payload)
-        
+
         if response.status_code == 200:
             print("Totaalscore succesvol toegevoegd aan de database.")
+
+            # Schrijf ook naar user_data.txt
+            with open("user_data.txt", "w") as user_file:
+                user_file.write(f"{email}\n")  # Schrijf de e-mail van de gebruiker
+                user_file.write(f"{total_score}\n")  # Schrijf de totalScore van de gebruiker
+            print("Totaalscore ook succesvol naar user_data.txt geschreven.")
         else:
             print(f"Fout bij toevoegen van totaalscore: {response.text}")
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
+
+
 
 # Hoofdloop
 running = True
@@ -150,7 +161,7 @@ while running:
         elif state == "running":
             for game in games:
                 total_score += run_game(game)
-            update_total_score(email, total_score)
+            update_total_score(email, total_score, first_name, last_name)
             state = "finished"
 
     # Login scherm tekenen
@@ -195,10 +206,17 @@ while running:
         screen.blit(zuyd_surface, (WIDTH - 70, HEIGHT - 30))
 
     elif state == "finished":
-        finish_text = font.render(f"All games finished! Total Score: {total_score}", True, (255, 255, 255))
-        screen.blit(finish_text, (WIDTH // 2 - finish_text.get_width() // 2, HEIGHT // 2))
-        pygame.time.wait(10000)
-        state = "login"
+        # Schrijf de e-mail naar een bestand
+        # Schrijf e-mail en totalScore naar het bestand
+        with open("user_data.txt", "w") as user_file:
+            user_file.write(f"{email}\n")  # Schrijf de e-mail van de gebruiker
+            user_file.write(f"{total_score}\n")  # Schrijf de totalScore van de gebruiker
+        update_total_score(email, total_score, first_name, last_name)
+
+
+        pygame.quit()  # Sluit huidige Pygame-instantie
+        subprocess.run([sys.executable, "QR-code.py"])  # Start het eindscherm
+        state = "login"  # Keer terug naar login voor de volgende gebruiker
 
     # Toggle cursor visibility
     if pygame.time.get_ticks() - cursor_timer > 500:
