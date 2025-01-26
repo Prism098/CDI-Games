@@ -276,7 +276,7 @@ def run_game():
 
             if not game_state.score_printed:
                 final_score = game_state.score_system.get_score()
-                print(f"Final score: {final_score}")
+                print(f"Score: {final_score}")
                 game_state.score_printed = True
 
             if exit_button.handle_event(event):
