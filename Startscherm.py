@@ -17,7 +17,8 @@ games = [
     {"name": "Website Interface Builder Game", "script": os.path.join(script_dir, "CDI_Games_HCI", "HCIMain.py")},
     {"name": "Data Cleaning Game", "script": os.path.join(script_dir, "CDI_Games_DataEngineering", "main.py")},
     {"name": "Code Racer", "script": os.path.join(script_dir, "CDI_Games_SoftwareDevelopment", "caride.py")},
-    {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI_Games_SecurityCloud", "SecurityMain.py")}
+    {"name": "Network Invaders", "script": os.path.join(script_dir, "CDI_Games_SecurityCloud", "SecurityMain.py")},
+    {"name": "QR Code", "script": os.path.join(script_dir, "", "QR-code.py")}
 ]
 
 # Functie om een game te starten
