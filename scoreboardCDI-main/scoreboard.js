@@ -61,7 +61,7 @@ function animateSimpleAddition(added, newScores) {
   // Create and animate new entry
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
-  newEl.textContent = `${newIndex + 1}. ${added.name} - ${added.totalScore}`;
+  newEl.textContent = `${added.name} - ${added.totalScore}`;
   newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
@@ -124,7 +124,7 @@ function animateSingleUpdate(added, removed, newScores) {
   // 3. Create and animate new entry
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
-  newEl.textContent = `${newIndex + 1}. ${added.name} - ${added.totalScore}`;
+  newEl.textContent = `${added.name} - ${added.totalScore}`;
   newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
@@ -140,7 +140,7 @@ function animateSingleUpdate(added, removed, newScores) {
   newScores.forEach((player, index) => {
     const el = scoreList.querySelector(`[data-name="${player.name}"]`);
     if (el && el !== newEl) {
-      el.textContent = `${index + 1}. ${player.name} - ${player.totalScore}`;
+      el.textContent = `${player.name} - ${player.totalScore}`;
     }
   });
 }
@@ -156,7 +156,7 @@ function initialRender(scores) {
   scores.forEach((p, i) => {
     const li = document.createElement('li');
     li.dataset.name = p.name;
-    li.textContent = `${i + 1}. ${p.name} - ${p.totalScore}`;
+    li.textContent = `${p.name} - ${p.totalScore}`;
     li.style.top = `${i * SLOT_HEIGHT}px`;
     li.style.opacity = '0';
     scoreList.appendChild(li);
