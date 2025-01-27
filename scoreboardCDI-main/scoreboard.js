@@ -1,7 +1,8 @@
 // scoreboard.js
+
 let currentScores = [];
 const MAX_PLAYERS = 10;
-const SLOT_HEIGHT = 60;
+const SLOT_HEIGHT = 70;
 const scoreList = document.getElementById('scoreList');
 
 // Update the window.onload function
@@ -15,7 +16,7 @@ window.onload = function() {
   });
   
   setInterval(fetchScores, 3000);
-  confetti.start();
+  // Remove confetti.start() from here because we only want it for new entries.
 };
 
 async function fetchScores() {
@@ -32,7 +33,7 @@ async function fetchScores() {
     }
 
     // Subsequent updates
-    if(JSON.stringify(currentScores) !== JSON.stringify(trimmedScores)) {
+    if (JSON.stringify(currentScores) !== JSON.stringify(trimmedScores)) {
       processScoreUpdate(currentScores, trimmedScores);
       currentScores = trimmedScores;
     }
@@ -54,7 +55,21 @@ function processScoreUpdate(oldScores, newScores) {
   }
 }
 
+// ========== ADD THIS CONFETTI BLOCK TO RUN FOR 5s ==========
+function startConfettiForNewEntry() {
+  // Start confetti
+  confetti.start();
+
+  // Stop after 5 seconds
+  setTimeout(() => {
+    confetti.stop();
+  }, 5000);
+}
+
 function animateSimpleAddition(added, newScores) {
+  // Call confetti for new entry
+  startConfettiForNewEntry();
+
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
   
@@ -76,7 +91,7 @@ function animateSimpleAddition(added, newScores) {
     const element = scoreList.children[i];
     if (element) {
       timeline.to(element, {
-        top: i * SLOT_HEIGHT,
+        top: i * SLOT_HEIGHT, // also 65
         duration: 0.6,
         ease: "power2.out"
       }, "<0.2");
@@ -84,17 +99,10 @@ function animateSimpleAddition(added, newScores) {
   }
 }
 
-function getListChanges(oldList, newList) {
-  const oldSet = new Set(oldList.map(p => p.name));
-  const newSet = new Set(newList.map(p => p.name));
-  
-  return {
-    added: newList.find(p => !oldSet.has(p.name)),
-    removed: oldList.find(p => !newSet.has(p.name))
-  };
-}
-
 function animateSingleUpdate(added, removed, newScores) {
+  // Call confetti for new entry
+  startConfettiForNewEntry();
+
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
   const removedIndex = MAX_PLAYERS - 1; // Always last position
@@ -145,6 +153,16 @@ function animateSingleUpdate(added, removed, newScores) {
   });
 }
 
+function getListChanges(oldList, newList) {
+  const oldSet = new Set(oldList.map(p => p.name));
+  const newSet = new Set(newList.map(p => p.name));
+  
+  return {
+    added: newList.find(p => !oldSet.has(p.name)),
+    removed: oldList.find(p => !newSet.has(p.name))
+  };
+}
+
 // Initial render
 function initialRender(scores) {
   // Clear existing elements
@@ -161,7 +179,7 @@ function initialRender(scores) {
     li.style.opacity = '0';
     scoreList.appendChild(li);
 
-    //snelheid van nieuwe plaatsingen en snelheid verschijnen van persoon
+    // fade-in effect
     gsap.to(li, {
       opacity: 1,
       delay: i * 0.5,
@@ -173,9 +191,9 @@ function initialRender(scores) {
 
 
 
-
-
-// -------------------- Background Shapes --------------------
+/**************************************************************
+    Background Shapes remain unchanged below
+**************************************************************/
 const canvas = document.getElementById('backgroundCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -278,7 +296,7 @@ class Shape {
 setCanvasSize();
 const shapes = [];
 ["circle","half-circle","right-triangle","triangle"].forEach(type => {
-  for (let i=0;i<2;i++){
+  for (let i=0; i<2; i++){
     shapes.push(new Shape(type,"#FFFFFF","#E4E4E4"));
   }
 });
