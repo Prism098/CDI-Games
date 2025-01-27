@@ -15,6 +15,7 @@ window.onload = function() {
   });
   
   setInterval(fetchScores, 3000);
+  confetti.start();
 };
 
 async function fetchScores() {
@@ -168,6 +169,9 @@ function initialRender(scores) {
     });
   });
 }
+
+
+
 
 
 

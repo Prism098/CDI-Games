@@ -1,10 +1,29 @@
 body {
   font-family: 'IBM Plex Sans', sans-serif;
-  background: linear-gradient(to bottom right, #5f0c16, #fc4157);
   overflow: hidden;
   position: relative;
   min-height: 100vh;
+  margin: 0;
+
+  animation: gradient 10s ease infinite;
+  /* background: linear-gradient(135deg, #5f0c16, #ee2020); */
+background: #770f1b;
+background: linear-gradient(135deg, #770f1b 0%, #e81a32 50%, #db1129 100%);  
+background-size: 400% 400%;
 }
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 /* Pattern layer */
 #patternLayer {
@@ -21,39 +40,41 @@ body {
   opacity: 5%;
 }
 
-/* Canvas for animations behind scoreboard */
-#backgroundCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2;
-}
+
 
 /* Scoreboard container pinned near top center */
 .scoreboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: absolute;
-  top: 40px;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   width: 400px;
   z-index: 3;
 }
 
+.scoreboard h1 {
+  margin: 10px;
+  font-size: 72px;
+  color: #fff;
+  text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
+}
+
+
 /* Container for top 10 slots */
 .slots-container {
   position: relative;
   width: 100%;
-  height: 600px; /* for 10 slots, each ~60px tall */
-  overflow: hidden;
-  border: 1px solid #fff; /* optional */
+  height: 800px; /* for 10 slots, each ~60px tall */
+  /* overflow: hidden; */
   perspective: 1000px;
 }
 
 #scoreList {
   position: relative;
-  list-style: none;
+  /* list-style: none; */
   width: 100%;
   height: 100%;
   margin: 0;
@@ -63,24 +84,28 @@ body {
 /* Each slot is absolutely positioned */
 #scoreList li {
   position: absolute;
-  left: 0;
   width: 100%;
   height: 60px;
   line-height: 60px;
   color: #fff;
   background-color: rgba(0,0,0,0.7);
   border-bottom: 1px solid #fff;
-  padding-left: 10px;
+  padding: 0 10px; 
   /* turn off built-in CSS transitions so GSAP can handle them */
-  transition: none;
 
   transition: none !important;
   will-change: transform, opacity;
 }
 
-.scoreboard h1 {
-  margin: 0;
-  font-size: 72px;
-  color: #fff;
-  text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
+
+
+
+/* Canvas for animations behind scoreboard */
+#backgroundCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
 }
