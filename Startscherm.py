@@ -3,7 +3,6 @@ import subprocess
 import sys
 import os
 import requests
-import time
 
 # Stel de werkmap in
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -79,7 +78,7 @@ submit_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 140, 200, 50)
 def save_user_data(first_name, last_name, email):
     data = {
         "name": f"{first_name} {last_name}",
-        "email": email.strip().lower(),  # Normalize de e-mail
+        "email": email.strip().lower(),
         "status": "not started",
         "totalScore": 0,
         "qrScanned": False
@@ -88,35 +87,48 @@ def save_user_data(first_name, last_name, email):
     try:
         response = requests.post(f"{SERVER_URL}/save", json=data)
         if response.status_code == 201:
-            print("Gebruikersgegevens succesvol opgeslagen in MongoDB.")
+            user_id = response.json().get("id")  # Ontvang het ObjectId
+            print(f"Gebruikersgegevens succesvol opgeslagen. ObjectId: {user_id}")
+
+            # Schrijf ObjectId, e-mail en score naar user_data.txt
+            with open("user_data.txt", "w") as user_file:
+                user_file.write(f"{user_id}\n")  # ObjectId opslaan
+                user_file.write(f"{email}\n")   # E-mail opslaan
+                user_file.write(f"0\n")         # Startscore 0
+            return user_id
         else:
             print(f"Fout bij opslaan in MongoDB: {response.text}")
+            return None
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
+        return None
 
 
-def update_total_score(email, total_score, first_name, last_name):
+def update_total_score(user_id, email, total_score, first_name, last_name):
     try:
-        # Payload voorbereiden
-        payload = {"email": email, "name": f"{first_name} {last_name}", "totalScore": total_score}
-        print(f"Verzonden payload naar server: {payload}")  # Debugging
+        payload = {
+            "email": email,
+            "name": f"{first_name} {last_name}",
+            "totalScore": total_score
+        }
+        print(f"Verzonden payload naar server: {payload}")
 
-        # Score updaten in de database
         response = requests.post(f"{SERVER_URL}/add-score", json=payload)
 
         if response.status_code == 200:
             print("Totaalscore succesvol toegevoegd aan de database.")
 
-            # Schrijf ook naar user_data.txt
+            # ObjectId, e-mail en score opslaan in user_data.txt
             with open("user_data.txt", "w") as user_file:
-                user_file.write(f"{email}\n")  # Schrijf de e-mail van de gebruiker
-                user_file.write(f"{total_score}\n")  # Schrijf de totalScore van de gebruiker
+                user_file.write(f"{user_id}\n")  # Schrijf ObjectId
+                user_file.write(f"{email}\n")   # Schrijf e-mail
+                user_file.write(f"{total_score}\n")  # Schrijf de totalScore
             print("Totaalscore ook succesvol naar user_data.txt geschreven.")
-            
         else:
             print(f"Fout bij toevoegen van totaalscore: {response.text}")
     except Exception as e:
         print(f"Kan geen verbinding maken met de server: {e}")
+
 
 
 
@@ -162,11 +174,17 @@ while running:
                     input_text[active_box] += event.unicode
 
         elif state == "running":
+            user_id = None
+            with open("user_data.txt", "r") as user_file:
+                user_id = user_file.readline().strip()  # Lees ObjectId
+                email = user_file.readline().strip()  # Lees e-mail
+
             for game in games:
                 total_score += run_game(game)
-            update_total_score(email, total_score, first_name, last_name)
+
+            update_total_score(user_id, email, total_score, first_name, last_name)
             state = "finished"
-            
+
 
     # Login scherm tekenen
     if state == "login":
@@ -213,8 +231,11 @@ while running:
         # Schrijf de e-mail naar een bestand
         # Schrijf e-mail en totalScore naar het bestand
         with open("user_data.txt", "w") as user_file:
-            user_file.write(f"{email}\n")  # Schrijf de e-mail van de gebruiker
-            user_file.write(f"{total_score}\n")  # Schrijf de totalScore van de gebruiker
+            with open("user_data.txt", "w") as user_file:
+                user_file.write(f"{user_id}\n")  # Schrijf ObjectId
+                user_file.write(f"{email}\n")   # Schrijf e-mail
+                user_file.write(f"{total_score}\n")  # Schrijf score
+        # Schrijf de totalScore van de gebruiker
         # update_total_score(email, total_score, first_name, last_name)
 
 

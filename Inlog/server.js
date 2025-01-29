@@ -34,6 +34,7 @@ app.listen(PORT, async () => {
 });
 
 // Endpoint om data op te slaan in MongoDB
+// Endpoint om data op te slaan in MongoDB en ObjectId terug te sturen
 app.post('/save', async (req, res) => {
     try {
         await client.connect();
@@ -41,12 +42,21 @@ app.post('/save', async (req, res) => {
         const collection = database.collection(collectionName);
 
         const { name, email, status } = req.body;
-        const dataToSave = { name, email: email.trim().toLowerCase(), status, totalScore: 0, qrScanned: true};
+        const dataToSave = { 
+            name, 
+            email: email.trim().toLowerCase(), 
+            status, 
+            totalScore: 0, 
+            qrScanned: false 
+        };
 
-        await collection.insertOne(dataToSave);
+        const result = await collection.insertOne(dataToSave);
 
         console.log('Data succesvol opgeslagen:', dataToSave);
-        res.status(201).send('Data succesvol opgeslagen in MongoDB!');
+        res.status(201).json({ 
+            message: 'Data succesvol opgeslagen in MongoDB!', 
+            id: result.insertedId  // Het unieke ObjectId teruggeven
+        });
     } catch (err) {
         console.error('Fout bij opslaan in MongoDB:', err);
         res.status(500).send('Er is een fout opgetreden bij het opslaan.');
@@ -54,6 +64,7 @@ app.post('/save', async (req, res) => {
         await client.close();
     }
 });
+
 
 // Endpoint om een score op te halen
 app.get('/get-score', async (req, res) => {

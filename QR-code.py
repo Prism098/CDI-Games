@@ -49,10 +49,12 @@ except Exception as e:
 # Gebruikersdata ophalen
 try:
     with open("user_data.txt", "r") as user_file:
-        user_email = user_file.readline().strip()
-        total_score = user_file.readline().strip()
-    print(f"Gebruiker geladen: {user_email}, Score: {total_score}")
+        user_id = user_file.readline().strip()  # Lees het ObjectId
+        user_email = user_file.readline().strip()  # Lees de e-mail
+        total_score = user_file.readline().strip()  # Lees de score
+    print(f"Gebruiker geladen: ID: {user_id}, E-mail: {user_email}, Score: {total_score}")
 except FileNotFoundError:
+    user_id = None
     user_email = None
     total_score = "Onbekend"
     print("Fout: user_data.txt niet gevonden.")
@@ -61,29 +63,30 @@ except FileNotFoundError:
 # QR-code genereren
 # =========================
 
-if user_email:
-    qr_data = "http://20.86.37.173"
-    qr = qrcode.QRCode(version=1, box_size=10, border=0)
+if user_id:
+    qr_data = f"http://20.86.37.173/api/scan/{user_id}"  # Link met ObjectId
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(qr_data)
     qr.make(fit=True)
-    qr_image = qr.make_image(fill_color="white", back_color="black")
+    qr_image = qr.make_image(fill_color="black", back_color="white")
 
     qr_buffer = io.BytesIO()
     qr_image.save(qr_buffer, format="PNG")
     qr_buffer.seek(0)
     qr_surface = pygame.image.load(qr_buffer, 'PNG')
-    print("QR-code succesvol gegenereerd.")
+    print(f"QR-code succesvol gegenereerd: {qr_data}")
 else:
-    print("Geen gebruiker. QR-code niet gegenereerd.")
+    qr_surface = None
+    print("Geen ObjectId beschikbaar. QR-code niet gegenereerd.")
 
 # =========================
 # Functies
 # =========================
 
-def update_qr_scanned_status(email):
+def update_qr_scanned_status(user_id):
     """Update de status van de QR-scan in de server."""
     try:
-        response = requests.post(f"{SERVER_URL}/update-qr", json={"email": email, "qrScanned": True})
+        response = requests.post(f"{SERVER_URL}/qr-scanned", json={"id": user_id})
         if response.status_code == 200:
             print("QR-scanstatus succesvol bijgewerkt.")
         else:
@@ -106,14 +109,26 @@ def vertical_center_group(elements, spacing=50):
 # Layout en Posities
 # =========================
 
-if user_email:
-    text1 = FONT.render(f"Eindscore: {total_score}", True, TEXT_COLOR)
-    text2 = FONT.render("Scan de QR-code om verder te gaan", True, TEXT_COLOR)
+# =========================
+# Layout en Posities
+# =========================
 
-    text1_pos, text2_pos, qr_pos = vertical_center_group(
-        [text1, text2, qr_surface],
+if user_id and total_score != "Onbekend":
+    text1 = FONT.render(f"Eindscore: {total_score}", True, TEXT_COLOR)
+    text2 = FONT.render("Scan de QR-code om het scorebord te volgen!", True, TEXT_COLOR)
+    text3 = FONT.render("Ga nu door naar replay voor deel 2!", True, TEXT_COLOR)  # Nieuwe tekst
+
+    elements = [text1, text2]
+    if qr_surface:
+        elements.append(qr_surface)
+    elements.append(text3)  # Voeg de nieuwe tekst toe
+
+    # Posities berekenen
+    text1_pos, text2_pos, qr_pos, text3_pos = vertical_center_group(
+        elements,
         spacing=int(SCREEN_HEIGHT * 0.03)
     )
+
 
 # =========================
 # Hoofdprogramma
@@ -127,8 +142,8 @@ while running:
 
         # Simuleer QR-scan met Enter-toets
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            if user_email:
-                update_qr_scanned_status(user_email)
+            if user_id:
+                update_qr_scanned_status(user_id)
 
     # Achtergrond
     if bg_image:
@@ -146,10 +161,14 @@ while running:
     screen.blit(box_surface, box_rect)
 
     # Teken elementen
-    if user_email:
+      # Teken elementen
+    if user_id and total_score != "Onbekend":
         screen.blit(text1, text1_pos)
         screen.blit(text2, text2_pos)
-        screen.blit(qr_surface, qr_pos)
+        if qr_surface:
+            screen.blit(qr_surface, qr_pos)
+        screen.blit(text3, text3_pos)  # Nieuwe tekst weergeven
+
 
     pygame.display.flip()
 
