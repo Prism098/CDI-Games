@@ -52,6 +52,8 @@ body {
   transform: translateX(-50%);
   width: 400px;
   z-index: 3;
+
+  width: 600px; /* Was 400px */
 }
 
 .scoreboard h1 {
@@ -78,7 +80,41 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
 }
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.score-name {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-right: 20px;
+
+  font-size: 24px;
+}
+
+.score-value {
+  font-weight: bold;
+  min-width: 60px;
+  text-align: right;
+
+  font-size: 28px;
+}
+
+
+
+
+
 
 /* Each slot is absolutely positioned */
 #scoreList li {
@@ -93,9 +129,10 @@ body {
   font-size: 20px;
   font-weight: 400;
   /* turn off built-in CSS transitions so GSAP can handle them */
-
   transition: none !important;
   will-change: transform, opacity;
+
+  padding: 0 30px;
 }
 
 ::marker {

@@ -76,7 +76,22 @@ function animateSimpleAddition(added, newScores) {
   // Create and animate new entry
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
-  newEl.textContent = `${added.name} - ${added.totalScore}`;
+
+  const nameSpan = document.createElement('span');
+nameSpan.className = 'score-name';
+nameSpan.textContent = added.name;
+
+const scoreSpan = document.createElement('span');
+scoreSpan.className = 'score-value';
+scoreSpan.textContent = added.totalScore;
+
+const wrapper = document.createElement('div');
+wrapper.className = 'score-item';
+wrapper.appendChild(nameSpan);
+wrapper.appendChild(scoreSpan);
+
+newEl.appendChild(wrapper);
+
   newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
@@ -148,7 +163,10 @@ function animateSingleUpdate(added, removed, newScores) {
   newScores.forEach((player, index) => {
     const el = scoreList.querySelector(`[data-name="${player.name}"]`);
     if (el && el !== newEl) {
-      el.textContent = `${player.name} - ${player.totalScore}`;
+
+      const wrapper = el.querySelector('.score-item');
+wrapper.querySelector('.score-name').textContent = player.name;
+wrapper.querySelector('.score-value').textContent = player.totalScore;
     }
   });
 }
@@ -163,7 +181,7 @@ function getListChanges(oldList, newList) {
   };
 }
 
-// Initial render
+// Initial render (corrected version)
 function initialRender(scores) {
   // Clear existing elements
   while (scoreList.firstChild) {
@@ -174,7 +192,23 @@ function initialRender(scores) {
   scores.forEach((p, i) => {
     const li = document.createElement('li');
     li.dataset.name = p.name;
-    li.textContent = `${p.name} - ${p.totalScore}`;
+
+    // Fixed variable names (was using 'added' instead of 'p')
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'score-name';
+    nameSpan.textContent = p.name; // Changed from added.name
+    
+    const scoreSpan = document.createElement('span');
+    scoreSpan.className = 'score-value';
+    scoreSpan.textContent = p.totalScore; // Changed from added.totalScore
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'score-item';
+    wrapper.appendChild(nameSpan);
+    wrapper.appendChild(scoreSpan);
+    
+    li.appendChild(wrapper); // Changed from newEl to li
+
     li.style.top = `${i * SLOT_HEIGHT}px`;
     li.style.opacity = '0';
     scoreList.appendChild(li);
