@@ -1,52 +1,72 @@
-// scoreboard.js
+/**************************************************************
+  scoreboard.js
+**************************************************************/
 
-let currentScores = [];
+// =================== ARRAYS & CONSTANTS ===================
+let currentScores = []; // For the Top Scores (from server)
+let localRecent = [];   // For the Recent scoreboard (client-only)
+
 const MAX_PLAYERS = 10;
-const SLOT_HEIGHT = 70;
-const scoreList = document.getElementById('scoreList');
+const SLOT_HEIGHT_TOP = 70;
+const SLOT_HEIGHT_RECENT = 70;
 
-// Update the window.onload function
+// DOM elements for the two lists
+const scoreList = document.getElementById('scoreList');     // top scoreboard <ol>
+const recentList = document.getElementById('recentList');   // local "recent" <ol>
+
+// =================== ON LOAD ===================
 window.onload = function() {
-  // Initial load
-  fetchScores().then(() => {
-    // After first fetch, render initial list
+  // (Optional) load localRecent from localStorage
+  const savedLocal = localStorage.getItem('localRecent');
+  if (savedLocal) {
+    localRecent = JSON.parse(savedLocal);
+    initialRenderLocalRecent(localRecent);
+  }
+
+  // Fetch top scores, then render
+  fetchTopScores().then(() => {
     if (currentScores.length > 0) {
-      initialRender(currentScores);
+      initialRenderTop(currentScores);
     }
   });
-  
-  setInterval(fetchScores, 3000);
-  // Remove confetti.start() from here because we only want it for new entries.
+
+  // Poll top scores every 3s
+  setInterval(fetchTopScores, 3000);
+
+  // If you want background shapes or confetti always on load, do it here
 };
 
-async function fetchScores() {
+// =================== FETCH & UPDATE: TOP SCORES ===================
+async function fetchTopScores() {
   try {
-    const res = await fetch('http://localhost:4000/top-scores?_=' + Date.now()); // Cache busting
+    const res = await fetch('http://localhost:4000/top-scores?_=' + Date.now());
     const newScores = await res.json();
     const trimmedScores = newScores.slice(0, MAX_PLAYERS);
-    
-    // First load handling
+
+    // First load
     if (currentScores.length === 0) {
-      initialRender(trimmedScores);
       currentScores = trimmedScores;
+      initialRenderTop(currentScores);
       return;
     }
 
-    // Subsequent updates
+    // Compare old vs. new
     if (JSON.stringify(currentScores) !== JSON.stringify(trimmedScores)) {
-      processScoreUpdate(currentScores, trimmedScores);
+      processTopScoreUpdate(currentScores, trimmedScores);
       currentScores = trimmedScores;
     }
   } catch (err) {
-    console.error('Error fetching scores:', err);
+    console.error("Error fetching top scores:", err);
   }
 }
 
-function processScoreUpdate(oldScores, newScores) {
+function processTopScoreUpdate(oldScores, newScores) {
   const changes = getListChanges(oldScores, newScores);
-  
-  // Handle both add-only and add+remove scenarios
   if (changes.added) {
+    // Also store the new entry in localRecent (to simulate "recent" scoreboard)
+    addToLocalRecent(changes.added);
+
+    // Then handle the top scoreboard animations
     if (changes.removed) {
       animateSingleUpdate(changes.added, changes.removed, newScores);
     } else {
@@ -55,58 +75,69 @@ function processScoreUpdate(oldScores, newScores) {
   }
 }
 
-// ========== ADD THIS CONFETTI BLOCK TO RUN FOR 5s ==========
-function startConfettiForNewEntry() {
-  // Start confetti
-  confetti.start();
+// =================== INITIAL RENDER: TOP SCORES ===================
+function initialRenderTop(scores) {
+  scoreList.innerHTML = '';
 
-  // Stop after 5 seconds
-  setTimeout(() => {
-    confetti.stop();
-  }, 5000);
+  scores.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.dataset.name = p.name;
+    li.style.top = (i * SLOT_HEIGHT_TOP) + 'px';
+    li.style.opacity = '0';
+
+    // Inner layout
+    const wrapper = document.createElement('div');
+    wrapper.className = 'score-item';
+    wrapper.innerHTML = `
+      <span class="score-name">${p.name}</span>
+      <span class="score-value">${p.totalScore}</span>
+    `;
+    li.appendChild(wrapper);
+
+    scoreList.appendChild(li);
+
+    // Fade-in
+    gsap.to(li, { opacity: 1, delay: i * 0.3, duration: 0.5 });
+  });
 }
 
+// =================== ANIMATION: TOP SCORES ===================
+
+// If a new user is added (no one removed)
 function animateSimpleAddition(added, newScores) {
-  // Call confetti for new entry
   startConfettiForNewEntry();
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
-  
-  // Create and animate new entry
+
+  // Create the new <li>
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
 
-  const nameSpan = document.createElement('span');
-nameSpan.className = 'score-name';
-nameSpan.textContent = added.name;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'score-item';
+  wrapper.innerHTML = `
+    <span class="score-name">${added.name}</span>
+    <span class="score-value">${added.totalScore}</span>
+  `;
+  newEl.appendChild(wrapper);
 
-const scoreSpan = document.createElement('span');
-scoreSpan.className = 'score-value';
-scoreSpan.textContent = added.totalScore;
-
-const wrapper = document.createElement('div');
-wrapper.className = 'score-item';
-wrapper.appendChild(nameSpan);
-wrapper.appendChild(scoreSpan);
-
-newEl.appendChild(wrapper);
-
-  newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
+  newEl.style.top = (newIndex * SLOT_HEIGHT_TOP) + 'px';
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
-  timeline.fromTo(newEl, 
+  // Fade in from above
+  timeline.fromTo(newEl,
     { opacity: 0, y: -20 },
     { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
   );
 
-  // Update positions below new entry
+  // Shift items below it
   for (let i = newIndex + 1; i < newScores.length; i++) {
-    const element = scoreList.children[i];
-    if (element) {
-      timeline.to(element, {
-        top: i * SLOT_HEIGHT, // also 65
+    const el = scoreList.children[i];
+    if (el) {
+      timeline.to(el, {
+        top: i * SLOT_HEIGHT_TOP,
         duration: 0.6,
         ease: "power2.out"
       }, "<0.2");
@@ -114,15 +145,15 @@ newEl.appendChild(wrapper);
   }
 }
 
+// If a new user is added AND one user is removed
 function animateSingleUpdate(added, removed, newScores) {
-  // Call confetti for new entry
   startConfettiForNewEntry();
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
   const removedIndex = MAX_PLAYERS - 1;
 
-  // 1. Fade out removed element (0.6s)
+  // 1) Fade out old #10
   timeline.to(scoreList.children[removedIndex], {
     opacity: 0,
     y: 20,
@@ -133,34 +164,208 @@ function animateSingleUpdate(added, removed, newScores) {
     }
   });
 
-  // 2. Animate positions moving down (0.8s each with 0.1s stagger)
+  // 2) Shift items from newIndex downward
   for (let i = newIndex; i < MAX_PLAYERS - 1; i++) {
     timeline.to(scoreList.children[i], {
-      top: (i + 1) * SLOT_HEIGHT,
+      top: (i + 1) * SLOT_HEIGHT_TOP,
       duration: 0.8,
       ease: "power2.out"
     }, i === newIndex ? ">0.2" : "<0.1");
   }
 
-  // 3. Create and animate new entry (0.8s)
+  // 3) Insert new item
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
-  
-  // Create split layout
+
   const wrapper = document.createElement('div');
   wrapper.className = 'score-item';
   wrapper.innerHTML = `
     <span class="score-name">${added.name}</span>
     <span class="score-value">${added.totalScore}</span>
   `;
-  
   newEl.appendChild(wrapper);
-  newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
+
+  newEl.style.top = (newIndex * SLOT_HEIGHT_TOP) + 'px';
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
-  // Add highlight effect
+  // highlight effect
   gsap.set(newEl, { backgroundColor: "rgba(255,255,255,0.8)" });
+
+  timeline.fromTo(newEl,
+    { opacity: 0, y: -30 },
+    { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)", immediateRender: false },
+    ">0.2"
+  )
+  .to(newEl, {
+    backgroundColor: "rgba(0,0,0,0.8)",
+    duration: 2,
+    ease: "power4.out",
+    delay: 0.5
+  });
+}
+
+// =================== LOCAL "RECENT" SCOREBOARD ===================
+
+// 1) Add a new entry to the local array
+function addToLocalRecent(newEntry) {
+  // We store oldLocal to diff with new
+  const oldLocal = [...localRecent];
+
+  // Insert at front
+  localRecent.unshift(newEntry);
+
+  // Keep only 10
+  if (localRecent.length > 10) {
+    localRecent.pop();
+  }
+
+  // Save to localStorage if you wish
+  localStorage.setItem('localRecent', JSON.stringify(localRecent));
+
+  // Animate changes
+  processLocalRecentUpdate(oldLocal, localRecent);
+}
+
+// 2) On page load, we do an initialRenderLocalRecent (no animation)
+function initialRenderLocalRecent(scores) {
+  recentList.innerHTML = '';
+  scores.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.dataset.name = p.name;
+    li.style.top = (i * SLOT_HEIGHT_RECENT) + 'px';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'score-item';
+    wrapper.innerHTML = `
+      <span class="score-name">${p.name}</span>
+      <span class="score-value">${p.totalScore}</span>
+    `;
+    li.appendChild(wrapper);
+
+    recentList.appendChild(li);
+  });
+}
+
+// 3) We do a diff of old vs new to see if there's an added or removed
+function processLocalRecentUpdate(oldArr, newArr) {
+  const changes = getListChanges(oldArr, newArr);
+
+  if (changes.added) {
+    if (changes.removed) {
+      animateLocalSingleUpdate(changes.added, changes.removed, newArr);
+    } else {
+      animateLocalSimpleAddition(changes.added, newArr);
+    }
+  } else {
+    // if no changes, do nothing
+  }
+}
+
+// 4) "Simple addition" for the local scoreboard
+function animateLocalSimpleAddition(added, newArr) {
+  // We do the same approach as animateSimpleAddition, but for recentList
+  const timeline = gsap.timeline();
+
+  // newIndex = 0 because we always insert the new item at the top
+  const newIndex = 0;
+
+  // Shift existing items down by 1
+  for (let i = 0; i < newArr.length - 1; i++) {
+    const el = recentList.children[i];
+    if (el) {
+      timeline.to(el, {
+        top: (i + 1) * SLOT_HEIGHT_RECENT,
+        duration: 0.6,
+        ease: "power2.out"
+      }, i === 0 ? 0 : "<0.1");
+    }
+  }
+
+  // Create new <li> at index 0
+  const newEl = document.createElement('li');
+  newEl.dataset.name = added.name;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'score-item';
+  wrapper.innerHTML = `
+    <span class="score-name">${added.name}</span>
+    <span class="score-value">${added.totalScore}</span>
+  `;
+  newEl.appendChild(wrapper);
+
+  newEl.style.top = (newIndex * SLOT_HEIGHT_RECENT) + 'px';
+  newEl.style.opacity = '0';
+  recentList.insertBefore(newEl, recentList.firstChild);
+
+  // Fade in from above
+  timeline.fromTo(newEl,
+    { opacity: 0, y: -20 },
+    { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
+    ">0.1"
+  );
+
+  // If list grew beyond 10, remove the last item
+  if (newArr.length > MAX_PLAYERS) {
+    const lastIndex = MAX_PLAYERS; // index 10 if length=11
+    timeline.to(recentList.children[lastIndex], {
+      opacity: 0,
+      y: 20,
+      duration: 0.6,
+      ease: "power2.in",
+      onComplete() {
+        this.targets()[0].remove();
+      }
+    }, ">0.1");
+  }
+}
+
+// 5) "Single update" for local scoreboard
+function animateLocalSingleUpdate(added, removed, newArr) {
+  // This is the scenario where we also remove an old item at the bottom
+  const timeline = gsap.timeline();
+
+  // remove the old item at the bottom (index=9?), if that's your logic
+  const removedIndex = MAX_PLAYERS - 1;
+  if (recentList.children[removedIndex]) {
+    timeline.to(recentList.children[removedIndex], {
+      opacity: 0,
+      y: 20,
+      duration: 0.6,
+      ease: "power2.in",
+      onComplete() {
+        this.targets()[0].remove();
+      }
+    });
+  }
+
+  // Shift others down
+  for (let i = 0; i < MAX_PLAYERS - 1; i++) {
+    const el = recentList.children[i];
+    if (el) {
+      timeline.to(el, {
+        top: (i + 1) * SLOT_HEIGHT_RECENT,
+        duration: 0.8,
+        ease: "power2.out"
+      }, i === 0 ? ">0.2" : "<0.1");
+    }
+  }
+
+  // Insert new item at index 0
+  const newEl = document.createElement('li');
+  newEl.dataset.name = added.name;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'score-item';
+  wrapper.innerHTML = `
+    <span class="score-name">${added.name}</span>
+    <span class="score-value">${added.totalScore}</span>
+  `;
+  newEl.appendChild(wrapper);
+
+  newEl.style.top = "0px";
+  newEl.style.opacity = '0';
+  recentList.insertBefore(newEl, recentList.firstChild);
 
   timeline.fromTo(newEl, {
     opacity: 0,
@@ -171,33 +376,10 @@ function animateSingleUpdate(added, removed, newScores) {
     duration: 0.8,
     ease: "back.out(1.5)",
     immediateRender: false
-  }, ">0.2")
-  .to(newEl, {
-    backgroundColor: "rgba(0,0,0,0.8)",
-    duration: 2,
-    ease: "power4.out",
-    delay: 0.5
-  });
-
-  // 4. Update ranks with highlight effect (0.4s)
-  newScores.forEach((player, index) => {
-    const el = scoreList.querySelector(`[data-name="${player.name}"]`);
-    if (el && el !== newEl) {
-      timeline.to(el.querySelector('.score-value'), {
-        keyframes: [
-          { color: "#ffd700", duration: 0.2 },
-          { color: "#ffffff", duration: 0.2 }
-        ]
-      }, "<");
-      
-      const nameSpan = el.querySelector('.score-name');
-      const scoreSpan = el.querySelector('.score-value');
-      nameSpan.textContent = player.name;
-      scoreSpan.textContent = player.totalScore;
-    }
-  });
+  }, ">0.2");
 }
 
+// =================== UTILS & CONFETTI ===================
 function getListChanges(oldList, newList) {
   const oldSet = new Set(oldList.map(p => p.name));
   const newSet = new Set(newList.map(p => p.name));
@@ -208,52 +390,13 @@ function getListChanges(oldList, newList) {
   };
 }
 
-// Initial render (corrected version)
-function initialRender(scores) {
-  // Clear existing elements
-  while (scoreList.firstChild) {
-    scoreList.removeChild(scoreList.firstChild);
-  }
-
-  // Create and animate initial entries
-  scores.forEach((p, i) => {
-    const li = document.createElement('li');
-    li.dataset.name = p.name;
-
-    // Fixed variable names (was using 'added' instead of 'p')
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'score-name';
-    nameSpan.textContent = p.name; // Changed from added.name
-    
-    const scoreSpan = document.createElement('span');
-    scoreSpan.className = 'score-value';
-    scoreSpan.textContent = p.totalScore; // Changed from added.totalScore
-    
-    const wrapper = document.createElement('div');
-    wrapper.className = 'score-item';
-    wrapper.appendChild(nameSpan);
-    wrapper.appendChild(scoreSpan);
-    
-    li.appendChild(wrapper); // Changed from newEl to li
-
-    li.style.top = `${i * SLOT_HEIGHT}px`;
-    li.style.opacity = '0';
-    scoreList.appendChild(li);
-
-    // fade-in effect
-    gsap.to(li, {
-      opacity: 1,
-      delay: i * 0.5,
-      duration: 0.5
-    });
-  });
+function startConfettiForNewEntry() {
+  confetti.start();
+  setTimeout(() => confetti.stop(), 5000);
 }
 
-
-
-
 /**************************************************************
-    Background Shapes remain unchanged below
+    BACKGROUND SHAPES - UNCHANGED
 **************************************************************/
 const canvas = document.getElementById('backgroundCanvas');
 const ctx = canvas.getContext('2d');
@@ -262,7 +405,6 @@ function setCanvasSize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-
 class Shape {
   constructor(type, color1, color2) {
     this.type = type;
@@ -271,11 +413,9 @@ class Shape {
     this.size = Math.random() * 200 + 75;
     this.respawnOffScreen();
   }
-
   respawnOffScreen() {
     const spawnSides = ["top", "bottom", "left", "right"];
     const side = spawnSides[Math.floor(Math.random() * spawnSides.length)];
-
     switch (side) {
       case "top":
         this.x = Math.random() * canvas.width;
@@ -294,13 +434,11 @@ class Shape {
         this.y = Math.random() * canvas.height;
         break;
     }
-
     const angle = Math.random() * Math.PI * 2;
     const speed = Math.random() * 1 + 0.3;
     this.speedX = Math.cos(angle) * speed;
     this.speedY = Math.sin(angle) * speed;
   }
-
   createGradient(ctx) {
     const gradient = ctx.createLinearGradient(
       this.x - this.size,
@@ -312,7 +450,6 @@ class Shape {
     gradient.addColorStop(1, this.color2);
     return gradient;
   }
-
   draw() {
     ctx.beginPath();
     switch (this.type) {
@@ -338,7 +475,6 @@ class Shape {
     ctx.fillStyle = this.createGradient(ctx);
     ctx.fill();
   }
-
   update() {
     this.x += this.speedX;
     this.y += this.speedY;
@@ -354,6 +490,7 @@ class Shape {
   }
 }
 
+// init shapes
 setCanvasSize();
 const shapes = [];
 ["circle","half-circle","right-triangle","triangle"].forEach(type => {
@@ -361,12 +498,10 @@ const shapes = [];
     shapes.push(new Shape(type,"#FFFFFF","#E4E4E4"));
   }
 });
-
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   shapes.forEach(shape => shape.update());
   requestAnimationFrame(animate);
 }
 animate();
-
 window.addEventListener('resize', setCanvasSize);

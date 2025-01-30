@@ -9,22 +9,30 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-
   <div id="patternLayer"></div>
 
-  <div class="scoreboard">
-    <h1>Top Scores</h1>
-    <div class="slots-container">
-      <ol id="scoreList"></ol>
+  <div class="scoreboards-container">
+    <!-- Left: Top Scores -->
+    <div class="scoreboard scoreboard-top">
+      <h1>Top Scores</h1>
+      <div class="slots-container">
+        <ol id="scoreList"></ol>
+      </div>
+    </div>
+
+    <!-- Right: Recent Entries -->
+    <div class="scoreboard scoreboard-recent">
+      <h1>Recent Scores</h1>
+      <div class="slots-container">
+        <ol id="recentList"></ol>
+      </div>
     </div>
   </div>
 
   <canvas id="backgroundCanvas"></canvas>
 
-
-    <!-- scoreboard script -->
+  <!-- scoreboard script -->
   <script src="scoreboard.js"></script>
-  <script  class="confetti" src="confetti/confetti.js"></script>
-
+  <script class="confetti" src="confetti/confetti.js"></script>
 </body>
 </html>
