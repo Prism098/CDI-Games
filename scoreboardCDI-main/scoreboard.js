@@ -2,41 +2,39 @@
   scoreboard.js
 **************************************************************/
 
-// =================== ARRAYS & CONSTANTS ===================
-let currentScores = []; // For the Top Scores (from server)
-let localRecent = [];   // For the Recent scoreboard (client-only)
+/** ============ GLOBALS & CONSTANTS ============ **/
+let currentScores = [];    // For the Top Scores (from server)
+let localRecent = [];      // For the Recent scoreboard (client-only)
 
 const MAX_PLAYERS = 10;
 const SLOT_HEIGHT_TOP = 70;
 const SLOT_HEIGHT_RECENT = 70;
 
-// DOM elements for the two lists
-const scoreList = document.getElementById('scoreList');     // top scoreboard <ol>
-const recentList = document.getElementById('recentList');   // local "recent" <ol>
+// DOM elements for the two <ol> boards
+const scoreList = document.getElementById('scoreList');     // top scoreboard
+const recentList = document.getElementById('recentList');   // local "recent"
 
-// =================== ON LOAD ===================
+// =============== ON LOAD ===============
 window.onload = function() {
   // (Optional) load localRecent from localStorage
   const savedLocal = localStorage.getItem('localRecent');
   if (savedLocal) {
     localRecent = JSON.parse(savedLocal);
-    initialRenderLocalRecent(localRecent);
+    initialRenderLocalRecent(localRecent); // fade in each item
   }
 
-  // Fetch top scores, then render
+  // Fetch top scores & do an initial render
   fetchTopScores().then(() => {
     if (currentScores.length > 0) {
       initialRenderTop(currentScores);
     }
   });
 
-  // Poll top scores every 3s
+  // Re-poll top scores every 3 seconds
   setInterval(fetchTopScores, 3000);
-
-  // If you want background shapes or confetti always on load, do it here
 };
 
-// =================== FETCH & UPDATE: TOP SCORES ===================
+// ============ FETCH & UPDATE: TOP SCORES ============
 async function fetchTopScores() {
   try {
     const res = await fetch('http://localhost:4000/top-scores?_=' + Date.now());
@@ -50,7 +48,7 @@ async function fetchTopScores() {
       return;
     }
 
-    // Compare old vs. new
+    // If scoreboard changed, process updates
     if (JSON.stringify(currentScores) !== JSON.stringify(trimmedScores)) {
       processTopScoreUpdate(currentScores, trimmedScores);
       currentScores = trimmedScores;
@@ -62,11 +60,13 @@ async function fetchTopScores() {
 
 function processTopScoreUpdate(oldScores, newScores) {
   const changes = getListChanges(oldScores, newScores);
+
+  // If there's a newly added top-10 user:
   if (changes.added) {
-    // Also store the new entry in localRecent (to simulate "recent" scoreboard)
+    // Also store that new entry in localRecent
     addToLocalRecent(changes.added);
 
-    // Then handle the top scoreboard animations
+    // Then animate for top scoreboard
     if (changes.removed) {
       animateSingleUpdate(changes.added, changes.removed, newScores);
     } else {
@@ -75,17 +75,19 @@ function processTopScoreUpdate(oldScores, newScores) {
   }
 }
 
-// =================== INITIAL RENDER: TOP SCORES ===================
+// ============ INITIAL RENDER: TOP SCORES ============
 function initialRenderTop(scores) {
   scoreList.innerHTML = '';
 
   scores.forEach((p, i) => {
     const li = document.createElement('li');
     li.dataset.name = p.name;
+
+    // position & initial opacity
     li.style.top = (i * SLOT_HEIGHT_TOP) + 'px';
     li.style.opacity = '0';
 
-    // Inner layout
+    // create inner structure
     const wrapper = document.createElement('div');
     wrapper.className = 'score-item';
     wrapper.innerHTML = `
@@ -93,15 +95,18 @@ function initialRenderTop(scores) {
       <span class="score-value">${p.totalScore}</span>
     `;
     li.appendChild(wrapper);
-
     scoreList.appendChild(li);
 
-    // Fade-in
-    gsap.to(li, { opacity: 1, delay: i * 0.3, duration: 0.5 });
+    // fade in each item
+    gsap.to(li, {
+      opacity: 1,
+      delay: i * 0.3,
+      duration: 0.5
+    });
   });
 }
 
-// =================== ANIMATION: TOP SCORES ===================
+// ======= ANIMATIONS: TOP SCORES =======
 
 // If a new user is added (no one removed)
 function animateSimpleAddition(added, newScores) {
@@ -110,7 +115,7 @@ function animateSimpleAddition(added, newScores) {
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
 
-  // Create the new <li>
+  // create new <li>
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
 
@@ -126,13 +131,13 @@ function animateSimpleAddition(added, newScores) {
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
-  // Fade in from above
+  // fade in from above
   timeline.fromTo(newEl,
     { opacity: 0, y: -20 },
     { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
   );
 
-  // Shift items below it
+  // shift items below
   for (let i = newIndex + 1; i < newScores.length; i++) {
     const el = scoreList.children[i];
     if (el) {
@@ -153,7 +158,7 @@ function animateSingleUpdate(added, removed, newScores) {
   const newIndex = newScores.findIndex(p => p.name === added.name);
   const removedIndex = MAX_PLAYERS - 1;
 
-  // 1) Fade out old #10
+  // 1) fade out old #10
   timeline.to(scoreList.children[removedIndex], {
     opacity: 0,
     y: 20,
@@ -164,7 +169,7 @@ function animateSingleUpdate(added, removed, newScores) {
     }
   });
 
-  // 2) Shift items from newIndex downward
+  // 2) shift items from newIndex downward
   for (let i = newIndex; i < MAX_PLAYERS - 1; i++) {
     timeline.to(scoreList.children[i], {
       top: (i + 1) * SLOT_HEIGHT_TOP,
@@ -189,15 +194,14 @@ function animateSingleUpdate(added, removed, newScores) {
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
-  // highlight effect
+  // highlight & fade in
   gsap.set(newEl, { backgroundColor: "rgba(255,255,255,0.8)" });
 
   timeline.fromTo(newEl,
     { opacity: 0, y: -30 },
     { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)", immediateRender: false },
     ">0.2"
-  )
-  .to(newEl, {
+  ).to(newEl, {
     backgroundColor: "rgba(0,0,0,0.8)",
     duration: 2,
     ease: "power4.out",
@@ -205,35 +209,35 @@ function animateSingleUpdate(added, removed, newScores) {
   });
 }
 
-// =================== LOCAL "RECENT" SCOREBOARD ===================
 
-// 1) Add a new entry to the local array
+// ======= RECENT SCORES (client-only) =======
+
 function addToLocalRecent(newEntry) {
-  // We store oldLocal to diff with new
-  const oldLocal = [...localRecent];
-
-  // Insert at front
+  // Insert at front of array
   localRecent.unshift(newEntry);
 
-  // Keep only 10
-  if (localRecent.length > 10) {
+  // If we exceed 10, remove last from array
+  if (localRecent.length > MAX_PLAYERS) {
     localRecent.pop();
   }
 
-  // Save to localStorage if you wish
+  // Save to localStorage
   localStorage.setItem('localRecent', JSON.stringify(localRecent));
 
-  // Animate changes
-  processLocalRecentUpdate(oldLocal, localRecent);
+  // Animate the insertion in the DOM
+  animateLocalAddOrUpdate();
 }
 
-// 2) On page load, we do an initialRenderLocalRecent (no animation)
+// 1) On page load, render each item with a fade in
 function initialRenderLocalRecent(scores) {
   recentList.innerHTML = '';
+
   scores.forEach((p, i) => {
     const li = document.createElement('li');
     li.dataset.name = p.name;
+
     li.style.top = (i * SLOT_HEIGHT_RECENT) + 'px';
+    li.style.opacity = '0';
 
     const wrapper = document.createElement('div');
     wrapper.className = 'score-item';
@@ -244,91 +248,25 @@ function initialRenderLocalRecent(scores) {
     li.appendChild(wrapper);
 
     recentList.appendChild(li);
+
+    // fade in each item
+    gsap.to(li, {
+      opacity: 1,
+      delay: i * 0.3,
+      duration: 0.5
+    });
   });
 }
 
-// 3) We do a diff of old vs new to see if there's an added or removed
-function processLocalRecentUpdate(oldArr, newArr) {
-  const changes = getListChanges(oldArr, newArr);
-
-  if (changes.added) {
-    if (changes.removed) {
-      animateLocalSingleUpdate(changes.added, changes.removed, newArr);
-    } else {
-      animateLocalSimpleAddition(changes.added, newArr);
-    }
-  } else {
-    // if no changes, do nothing
-  }
-}
-
-// 4) "Simple addition" for the local scoreboard
-function animateLocalSimpleAddition(added, newArr) {
-  // We do the same approach as animateSimpleAddition, but for recentList
+// 2) Each time we add a new item, do the step-by-step "fade out → shift → fade in new"
+function animateLocalAddOrUpdate() {
   const timeline = gsap.timeline();
 
-  // newIndex = 0 because we always insert the new item at the top
-  const newIndex = 0;
-
-  // Shift existing items down by 1
-  for (let i = 0; i < newArr.length - 1; i++) {
-    const el = recentList.children[i];
-    if (el) {
-      timeline.to(el, {
-        top: (i + 1) * SLOT_HEIGHT_RECENT,
-        duration: 0.6,
-        ease: "power2.out"
-      }, i === 0 ? 0 : "<0.1");
-    }
-  }
-
-  // Create new <li> at index 0
-  const newEl = document.createElement('li');
-  newEl.dataset.name = added.name;
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'score-item';
-  wrapper.innerHTML = `
-    <span class="score-name">${added.name}</span>
-    <span class="score-value">${added.totalScore}</span>
-  `;
-  newEl.appendChild(wrapper);
-
-  newEl.style.top = (newIndex * SLOT_HEIGHT_RECENT) + 'px';
-  newEl.style.opacity = '0';
-  recentList.insertBefore(newEl, recentList.firstChild);
-
-  // Fade in from above
-  timeline.fromTo(newEl,
-    { opacity: 0, y: -20 },
-    { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
-    ">0.1"
-  );
-
-  // If list grew beyond 10, remove the last item
-  if (newArr.length > MAX_PLAYERS) {
-    const lastIndex = MAX_PLAYERS; // index 10 if length=11
-    timeline.to(recentList.children[lastIndex], {
-      opacity: 0,
-      y: 20,
-      duration: 0.6,
-      ease: "power2.in",
-      onComplete() {
-        this.targets()[0].remove();
-      }
-    }, ">0.1");
-  }
-}
-
-// 5) "Single update" for local scoreboard
-function animateLocalSingleUpdate(added, removed, newArr) {
-  // This is the scenario where we also remove an old item at the bottom
-  const timeline = gsap.timeline();
-
-  // remove the old item at the bottom (index=9?), if that's your logic
-  const removedIndex = MAX_PLAYERS - 1;
-  if (recentList.children[removedIndex]) {
-    timeline.to(recentList.children[removedIndex], {
+  // 1) If we already have 10 <li> in the DOM, fade out the last one
+  if (recentList.children.length === MAX_PLAYERS + 1) {
+    // We grew to 11; remove the old #10
+    const removed = recentList.children[MAX_PLAYERS];
+    timeline.to(removed, {
       opacity: 0,
       y: 20,
       duration: 0.6,
@@ -337,36 +275,46 @@ function animateLocalSingleUpdate(added, removed, newArr) {
         this.targets()[0].remove();
       }
     });
+  } else if (recentList.children.length === MAX_PLAYERS) {
+    // If we are exactly 10 but we inserted a new item in the array, 
+    // we want to fade out the old last item. 
+    // Actually, we handle that AFTER we insert the new item at top. 
+    // So let's handle the "move down" logic first in that scenario. 
   }
 
-  // Shift others down
-  for (let i = 0; i < MAX_PLAYERS - 1; i++) {
+  // 2) Shift every <li> from index 0..(length-1) down 1 slot
+  for (let i = 0; i < recentList.children.length; i++) {
     const el = recentList.children[i];
-    if (el) {
-      timeline.to(el, {
-        top: (i + 1) * SLOT_HEIGHT_RECENT,
-        duration: 0.8,
-        ease: "power2.out"
-      }, i === 0 ? ">0.2" : "<0.1");
-    }
+    timeline.to(el, {
+      top: (i + 1) * SLOT_HEIGHT_RECENT,
+      duration: 0.8,
+      ease: "power2.out"
+    }, i === 0 ? ">0.2" : "<0.1");
   }
 
-  // Insert new item at index 0
+  // 3) Insert new item at index=0 & fade in
+  // The new item is localRecent[0]
+  const newEntry = localRecent[0];
   const newEl = document.createElement('li');
-  newEl.dataset.name = added.name;
+  newEl.dataset.name = newEntry.name;
 
   const wrapper = document.createElement('div');
   wrapper.className = 'score-item';
   wrapper.innerHTML = `
-    <span class="score-name">${added.name}</span>
-    <span class="score-value">${added.totalScore}</span>
+    <span class="score-name">${newEntry.name}</span>
+    <span class="score-value">${newEntry.totalScore}</span>
   `;
   newEl.appendChild(wrapper);
 
+  // put it in the DOM at the top
   newEl.style.top = "0px";
   newEl.style.opacity = '0';
+  // highlight effect if you like:
+  gsap.set(newEl, { backgroundColor: "rgba(255,255,255,0.8)" });
+
   recentList.insertBefore(newEl, recentList.firstChild);
 
+  // 4) fade in the new top item
   timeline.fromTo(newEl, {
     opacity: 0,
     y: -30
@@ -376,10 +324,17 @@ function animateLocalSingleUpdate(added, removed, newArr) {
     duration: 0.8,
     ease: "back.out(1.5)",
     immediateRender: false
-  }, ">0.2");
+  }, ">0.2")
+  .to(newEl, {
+    backgroundColor: "rgba(0,0,0,0.8)",
+    duration: 2,
+    ease: "power4.out",
+    delay: 0.5
+  });
 }
 
-// =================== UTILS & CONFETTI ===================
+
+// =============== UTILS & CONFETTI ===============
 function getListChanges(oldList, newList) {
   const oldSet = new Set(oldList.map(p => p.name));
   const newSet = new Set(newList.map(p => p.name));
@@ -489,8 +444,6 @@ class Shape {
     this.draw();
   }
 }
-
-// init shapes
 setCanvasSize();
 const shapes = [];
 ["circle","half-circle","right-triangle","triangle"].forEach(type => {
