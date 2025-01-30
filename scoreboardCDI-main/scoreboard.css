@@ -39,7 +39,7 @@ body {
   gap: 10%; 
   position: relative;
   z-index: 3;
-  margin-top: 8%;
+  margin-top: 5%;
 }
 
 
@@ -48,7 +48,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 600px; /* same width for both boards */
+  width: 500px; /* same width for both boards */
   z-index: 3;
 }
 
@@ -63,10 +63,8 @@ body {
 
 .slots-container {
   position: relative;
-  width: 100%;
-  height: 800px; /* enough space for 10 items at ~60-70px each */
-  perspective: 1000px;
-  /* overflow: hidden; optional */
+  width: 80%;
+  height: auto;
 }
 
 
@@ -90,7 +88,7 @@ body {
   background-color: rgba(0,0,0,0.8);
   border: 1px solid #fff;
   margin: 5px 0; /* vertical spacing */
-  padding: 0 30px;
+  padding: 0 1em;
   font-size: 20px;
   font-weight: 400;
   will-change: transform, opacity;
@@ -137,7 +135,6 @@ body {
 }
 
 
-/* Canvas for animations behind scoreboard */
 #backgroundCanvas {
   position: fixed;
   top: 0;
@@ -150,6 +147,51 @@ body {
 
 
 
+@media (max-width: 900px) {
+  body {
+    overflow-y: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .scoreboards-container {
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+  }
+
+  .scoreboard {
+    width: 90%;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .scoreboard h1 {
+    font-size: 30px;
+  }
+
+  .scoreboard:first-child {
+    order: -1;
+  }
 
 
+  #scoreList li,
+  #recentList li {
+    height: 60px;
+    line-height: 60px;
+    font-size: 16px;
+  }
 
+  .score-name {
+    font-size: 18px;
+  }
+
+  .score-value {
+    font-size: 18px;
+  }
+}

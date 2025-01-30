@@ -1,49 +1,45 @@
-/**************************************************************
-  scoreboard.js
-**************************************************************/
-
-/** ============ GLOBALS & CONSTANTS ============ **/
-// TOP scores from server
+// TOP scores van server
 let currentScores = [];
-// RECENT scores from server
+// RECENT scores van server
 let currentRecent = [];
 
 const MAX_PLAYERS = 10;
 const SLOT_HEIGHT_TOP = 70;
 const SLOT_HEIGHT_RECENT = 70;
 
-// DOM elements for the two <ol> boards
-const scoreList = document.getElementById('scoreList');     // Top scoreboard
-const recentList = document.getElementById('recentList');   // Recent scoreboard
+// DOM elementen voor de 2 scoreboards
+const scoreList = document.getElementById('scoreList');
+const recentList = document.getElementById('recentList');
 
-// =============== ON LOAD ===============
+
+
+// -------- ON LOAD ----------
 window.onload = function() {
-  // 1) Fetch top & recent scores immediately
+
   fetchTopScores();
   fetchRecentScores();
 
-  // 2) Re-poll both boards every 3 seconds
   setInterval(fetchTopScores, 3000);
   setInterval(fetchRecentScores, 3000);
 };
 
-/**************************************************************
-  TOP SCORES
-**************************************************************/
+
+
+  // TOP SCORES
 async function fetchTopScores() {
   try {
     const res = await fetch('http://localhost:4000/top-scores?_=' + Date.now());
     const newScores = await res.json();
     const trimmed = newScores.slice(0, MAX_PLAYERS);
 
-    // If first load
+    // eerste keer laden
     if (currentScores.length === 0) {
       currentScores = trimmed;
       initialRenderTop(currentScores);
       return;
     }
 
-    // If scoreboard changed, process updates
+    // verandering scoreboard
     if (JSON.stringify(currentScores) !== JSON.stringify(trimmed)) {
       processTopScoreUpdate(currentScores, trimmed);
       currentScores = trimmed;
@@ -56,7 +52,7 @@ async function fetchTopScores() {
 function processTopScoreUpdate(oldScores, newScores) {
   const changes = getListChanges(oldScores, newScores);
 
-  // If there's a newly added top-10 user:
+  // nieuwe top 10 speler
   if (changes.added) {
     if (changes.removed) {
       animateSingleUpdate(changes.added, changes.removed, newScores);
@@ -66,7 +62,7 @@ function processTopScoreUpdate(oldScores, newScores) {
   }
 }
 
-/** Initial one-time render of the top scoreboard */
+// eerste keer laden van scoreboard
 function initialRenderTop(scores) {
   scoreList.innerHTML = '';
 
@@ -86,7 +82,7 @@ function initialRenderTop(scores) {
 
     scoreList.appendChild(li);
 
-    // Fade in each item
+    // Fade in animatie
     gsap.to(li, {
       opacity: 1,
       delay: i * 0.3,
@@ -95,10 +91,10 @@ function initialRenderTop(scores) {
   });
 }
 
-/** Animate a simple new addition (no one removed) */
+/** Animatie a simple new addition */
 function animateSimpleAddition(added, newScores) {
   startConfettiForNewEntry();
-  playScoreSound(); // NEW: play sound also
+  playScoreSound();
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
@@ -141,13 +137,13 @@ function animateSimpleAddition(added, newScores) {
 /** Animate single update (added & removed) */
 function animateSingleUpdate(added, removed, newScores) {
   startConfettiForNewEntry();
-  playScoreSound(); // NEW: play sound also
+  playScoreSound();
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
   const removedIndex = MAX_PLAYERS - 1;
 
-  // 1) Fade out old #10
+  // 1) Fade out huidige #10
   timeline.to(scoreList.children[removedIndex], {
     opacity: 0,
     y: 20,
@@ -158,7 +154,7 @@ function animateSingleUpdate(added, removed, newScores) {
     }
   });
 
-  // 2) Shift items from newIndex downward
+  // 2) hele lijst 1 naar onder
   for (let i = newIndex; i < MAX_PLAYERS - 1; i++) {
     timeline.to(scoreList.children[i], {
       top: (i + 1) * SLOT_HEIGHT_TOP,
@@ -167,7 +163,7 @@ function animateSingleUpdate(added, removed, newScores) {
     }, i === newIndex ? ">0.2" : "<0.1");
   }
 
-  // 3) Insert new item
+  // 3) toevoegen nieuwe speler
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
 
@@ -199,16 +195,15 @@ function animateSingleUpdate(added, removed, newScores) {
 }
 
 
-/**************************************************************
-  RECENT SCORES (FROM SERVER)
-**************************************************************/
+  // RECENT SCORES (FROM SERVER)
+
 async function fetchRecentScores() {
   try {
     const res = await fetch('http://localhost:4000/recent-scores?_=' + Date.now());
     const newScores = await res.json();
     const trimmed = newScores.slice(0, MAX_PLAYERS);
 
-    // First load
+    // eerste keer laden van scoreboard
     if (currentRecent.length === 0) {
       currentRecent = trimmed;
       initialRenderRecent(currentRecent);
@@ -258,7 +253,7 @@ function initialRenderRecent(scores) {
 
     recentList.appendChild(li);
 
-    // fade in each item
+    // fade in animatie
     gsap.to(li, {
       opacity: 1,
       delay: i * 0.3,
@@ -291,13 +286,13 @@ function animateSimpleAdditionRecent(added, newScores) {
   newEl.style.opacity = '0';
   recentList.insertBefore(newEl, recentList.children[newIndex]);
 
-  // fade in from above
+  // fade in vanuit bovenste
   timeline.fromTo(newEl,
     { opacity: 0, y: -20 },
     { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
   );
 
-  // shift items below
+  // shift items 1 naar onder
   for (let i = newIndex + 1; i < newScores.length; i++) {
     const el = recentList.children[i];
     if (el) {
@@ -313,13 +308,13 @@ function animateSimpleAdditionRecent(added, newScores) {
 /** Animate a single update in "recent" scoreboard (new & removed doc) */
 function animateSingleUpdateRecent(added, removed, newScores) {
   startConfettiForNewEntry();
-  playScoreSound(); // NEW: play sound also
+  playScoreSound();
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
   const removedIndex = MAX_PLAYERS - 1;
 
-  // 1) fade out old #10
+  // 1) fade out huidige #10
   timeline.to(recentList.children[removedIndex], {
     opacity: 0,
     y: 20,
@@ -330,7 +325,7 @@ function animateSingleUpdateRecent(added, removed, newScores) {
     }
   });
 
-  // 2) shift items from newIndex downward
+  // 2) shift items 1 naar onder
   for (let i = newIndex; i < MAX_PLAYERS - 1; i++) {
     timeline.to(recentList.children[i], {
       top: (i + 1) * SLOT_HEIGHT_RECENT,
@@ -339,7 +334,7 @@ function animateSingleUpdateRecent(added, removed, newScores) {
     }, i === newIndex ? ">0.2" : "<0.1");
   }
 
-  // 3) Insert new item
+  // 3) Insert nieuwe speler
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
 
@@ -370,9 +365,9 @@ function animateSingleUpdateRecent(added, removed, newScores) {
   });
 }
 
-/**************************************************************
-  UTILS & CONFETTI
-**************************************************************/
+
+
+
 function getListChanges(oldList, newList) {
   const oldSet = new Set(oldList.map(p => p.name));
   const newSet = new Set(newList.map(p => p.name));
@@ -388,12 +383,12 @@ function startConfettiForNewEntry() {
   setTimeout(() => confetti.stop(), 5000);
 }
 
-// NEW: function to play the MP3 in scoreboard.html
+
 function playScoreSound() {
   console.log("Attempting to play sound...");
   
-  const audio = new Audio('assets/scoresound.mp3'); // Create a new instance each time
-  audio.volume = 1; // Ensure full volume
+  const audio = new Audio('assets/scoresound.mp3');
+  audio.volume = 0.8;
   audio.currentTime = 0;
   
   audio.play().then(() => {
@@ -403,9 +398,8 @@ function playScoreSound() {
   });
 }
 
-/**************************************************************
-  BACKGROUND SHAPES - UNCHANGED
-**************************************************************/
+
+  // BACKGROUND SHAPES
 const canvas = document.getElementById('backgroundCanvas');
 const ctx = canvas.getContext('2d');
 

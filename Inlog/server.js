@@ -20,7 +20,8 @@ const PORT = 4000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ================== 1) CONNECT ONCE AT SERVER START  ==================
+
+// ================== Verbinden aan de server  ==================
 app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
   try {
@@ -63,7 +64,6 @@ app.post('/save', async (req, res) => {
     console.error('Fout bij opslaan in MongoDB:', err);
     res.status(500).send('Er is een fout opgetreden bij het opslaan.');
   }
-  // DO NOT close client here
 });
 
 // Endpoint om een score op te halen
@@ -155,11 +155,11 @@ app.get('/top-scores', async (req, res) => {
 // GET /recent-scores
 app.get('/recent-scores', async (req, res) => {
     try {
-      // Use the existing open client connection (no connect/close per request)
+      
       const db = client.db(databaseName);
       const collection = db.collection(collectionName);
   
-      // Filter out docs with totalScore = 0
+      //resultaten eruit filteren met een score van 0 om te voorkomen dat bij spelen meteen een speler met score 0 toegevoegd wordt
       const recentScores = await collection
         .find({ totalScore: { $gt: 0 } }, { projection: { name: 1, totalScore: 1, createdAt: 1 } })
         .sort({ createdAt: -1 })
@@ -208,7 +208,7 @@ app.post('/qr-scanned', async (req, res) => {
   }
 });
 
-// Nieuw: Endpoint om data naar een tekstbestand te exporteren
+// Endpoint om data naar een tekstbestand te exporteren
 app.get('/export-data', async (req, res) => {
   try {
     const db = client.db(databaseName);
