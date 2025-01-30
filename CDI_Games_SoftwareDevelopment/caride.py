@@ -286,7 +286,8 @@ def end_game(time_left):
         bonus_points = int(500 - (500 / max(1, time_left)))  # Avoid division by zero
 
     total_score = score + bonus_points
-
+    
+    
     # Display final score
     if not final_score_displayed:
         SCREEN.fill(BLACK)
@@ -304,6 +305,7 @@ def end_game(time_left):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
+                    print("Score:", total_score)
                     pygame.quit()
                     return total_score  # Return the final score
 

@@ -86,7 +86,7 @@ kaboem_spawner = KaboemSpawner()
 
 def game_over_screen(final_score):
     print(f"Score: {final_score}")
-    font = pygame.font.Font(custom_font_path, 74)  # Use custom font for game over screen
+    font = pygame.font.SysFont("Arial", 74)  # Use custom font for game over screen
     text = font.render("Game Over", True, ("#b13e53"))
     text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 100))
 
@@ -123,12 +123,12 @@ def game_over_screen(final_score):
 
 def you_survived_screen(final_score):
     print(f"Score: {final_score}")
-    font = pygame.font.Font(custom_font_path, 74)  # Use custom font for "You Survived" screen
+    font = pygame.font.SysFont("Arial", 74)  # Use custom font for "You Survived" screen
     text = font.render("Router Beschermd!", True, ("#38b764"))
     text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 100))
 
     # New text
-    message_font = pygame.font.Font(custom_font_path, 50)  # Use custom font for message
+    message_font = pygame.font.SysFont("Arial", 50)  # Use custom font for message
     message_text = message_font.render("Hmm, er lijkt toch wat van je data te zijn gelekt...", True, (255, 255, 255))
     message_rect = message_text.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 - 50))
 
@@ -199,32 +199,29 @@ while Startscherm:
     display.fill("#1a1c2c")
 
     # make the standard text with game explanation
-    font = pygame.font.Font(custom_font_path, 50)
+    font = pygame.font.SysFont("Arial", 72)
     text = font.render("Welkom bij Network Invaders!", True, ("#41a6f6"))
     text_rect = text.get_rect(center=(c.DISPLAY_WIDTH // 2, 50))
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 36)
     text2 = font.render("In dit spel ga jij ons netwerk verdedigen van het kwaadaardige team scraper!", True, (255, 255, 255))
-    text2_rect = text2.get_rect(center=(c.DISPLAY_WIDTH // 2, 100))
+    text2_rect = text2.get_rect(center=(c.DISPLAY_WIDTH // 2, 180))
 
-    font = pygame.font.Font(custom_font_path, 26)
-    text3 = font.render("De bedoeling is dat je de Firewalls aan sterkt met pakketjes om zo de hackers te kunnen verslaan.", True, (255, 255, 255))
-    text3_rect = text3.get_rect(center=(c.DISPLAY_WIDTH // 2, 126))    
+    font = pygame.font.SysFont("Arial", 36)
+    text3 = font.render("De bedoeling is dat je de Firewalls aan sterkt door er met pakketjes op te schieten en zo de hackers te verslaan.", True, (255, 255, 255))
+    text3_rect = text3.get_rect(center=(c.DISPLAY_WIDTH // 2, 220))    
 
-    font = pygame.font.Font(custom_font_path, 26)
-    text4 = font.render("Dit doe je door op de Firewalls te schieten.", True, (255, 255, 255))
-    text4_rect = text4.get_rect(center=(c.DISPLAY_WIDTH // 2, 152)) 
-
-    font = pygame.font.Font(custom_font_path, 26)
+ 
+    font = pygame.font.SysFont("Arial", 36)
     text5 = font.render("De Controls zijn: ", True, (255, 255, 255))
-    text5_rect = text5.get_rect(center=(c.DISPLAY_WIDTH // 2, 200)) 
+    text5_rect = text5.get_rect(center=(c.DISPLAY_WIDTH // 2, 300)) 
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 36)
     text6 = font.render("Gebruik de pijltjes toetsen om te bewegen en de spatiebalk om te schieten.", True, (255, 255, 255))
-    text6_rect = text6.get_rect(center=(c.DISPLAY_WIDTH // 2, 226))
+    text6_rect = text6.get_rect(center=(c.DISPLAY_WIDTH // 2, 500))
 
     if time.time() - start_time >= 5:
-        font = pygame.font.Font(custom_font_path, 36)
+        font = pygame.font.SysFont("Arial", 48)
         text7 = font.render("Druk op SPATIE om te beginnen", True, (255, 255, 255))
         text7_rect = text7.get_rect(center=(c.DISPLAY_WIDTH // 2, c.DISPLAY_HEIGHT // 2 + 100))
         display.blit(text7, text7_rect)
@@ -233,7 +230,7 @@ while Startscherm:
     display.blit(text, text_rect)
     display.blit(text2, text2_rect)
     display.blit(text3, text3_rect)
-    display.blit(text4, text4_rect)
+
     display.blit(text5, text5_rect)
     display.blit(text6, text6_rect)
 
@@ -241,19 +238,19 @@ while Startscherm:
 
 
     # make the standard text with sprite explanation
-    font = pygame.font.Font(custom_font_path, 26)
-    text8 = font.render("De sprites in dit spel zijn: ", True, (255, 255, 255))
+    font = pygame.font.SysFont("Arial", 26)
+    text8 = font.render("De figuren in dit spel zijn: ", True, (255, 255, 255))
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 26)
     text9 = font.render("De Hacker", True, (255, 255, 255))
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 26)
     text10 = font.render("De Firewall", True, (255, 255, 255))
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 26)
     text11 = font.render("De Router", True, (255, 255, 255))
 
-    font = pygame.font.Font(custom_font_path, 26)
+    font = pygame.font.SysFont("Arial", 26)
     text12 = font.render("De Laptop", True, (255, 255, 255))
 
     # display the standard text with sprite explanation
@@ -268,10 +265,10 @@ while Startscherm:
 
 
     # Display the controls image
-    controls_image_rect = controls_image_arrows.get_rect(center=(700, 300))
+    controls_image_rect = controls_image_arrows.get_rect(center=(700, 400))
     display.blit(controls_image_arrows, controls_image_rect)
 
-    controls_image2_rect = controls_image_spatie.get_rect(center=(1100, 250))
+    controls_image2_rect = controls_image_spatie.get_rect(center=(1100, 350))
     display.blit(controls_image_spatie, controls_image2_rect)
 
 

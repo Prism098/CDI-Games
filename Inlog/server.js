@@ -34,6 +34,7 @@ app.listen(PORT, async () => {
 });
 
 // Endpoint om data op te slaan in MongoDB
+// Endpoint om data op te slaan in MongoDB en ObjectId terug te sturen
 app.post('/save', async (req, res) => {
     try {
         await client.connect();
@@ -41,12 +42,21 @@ app.post('/save', async (req, res) => {
         const collection = database.collection(collectionName);
 
         const { name, email, status } = req.body;
-        const dataToSave = { name, email: email.trim().toLowerCase(), status, totalScore: 0 };
+        const dataToSave = { 
+            name, 
+            email: email.trim().toLowerCase(), 
+            status, 
+            totalScore: 0, 
+            qrScanned: false 
+        };
 
-        await collection.insertOne(dataToSave);
+        const result = await collection.insertOne(dataToSave);
 
         console.log('Data succesvol opgeslagen:', dataToSave);
-        res.status(201).send('Data succesvol opgeslagen in MongoDB!');
+        res.status(201).json({ 
+            message: 'Data succesvol opgeslagen in MongoDB!', 
+            id: result.insertedId  // Het unieke ObjectId teruggeven
+        });
     } catch (err) {
         console.error('Fout bij opslaan in MongoDB:', err);
         res.status(500).send('Er is een fout opgetreden bij het opslaan.');
@@ -86,8 +96,6 @@ app.get('/get-score', async (req, res) => {
         await client.close();
     }
 });
-
-
 
 // Endpoint om de score te koppelen aan een ingelogde gebruiker
 app.post('/add-score', async (req, res) => {
@@ -138,8 +146,6 @@ app.post('/add-score', async (req, res) => {
     }
 });
 
-
-
 // Endpoint om de top 10 scores op te halen
 app.get('/top-scores', async (req, res) => {
     try {
@@ -157,6 +163,49 @@ app.get('/top-scores', async (req, res) => {
     } catch (err) {
         console.error('Fout bij ophalen van scores:', err);
         res.status(500).send('Er is een fout opgetreden bij het ophalen van de scores.');
+    } finally {
+        await client.close();
+    }
+});
+
+// Endpoint om qrScanned op true te zetten en eventueel een score toe te voegen
+app.post('/qr-scanned', async (req, res) => {
+    try {
+        const { email, scoreToAdd } = req.body;
+
+        if (!email) {
+            res.status(400).send('Email is verplicht.');
+            return;
+        }
+
+        const scoreIncrement = typeof scoreToAdd === 'number' ? scoreToAdd : 0;
+
+        console.log(`Zet qrScanned op true en voeg ${scoreIncrement} toe aan totalScore voor gebruiker met email: ${email}`);
+
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        // Update qrScanned naar true en verhoog de score
+        const result = await collection.updateOne(
+            { email: email.trim().toLowerCase() },
+            {
+                $set: { qrScanned: true },
+                $inc: { totalScore: scoreIncrement }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            console.log('Geen gebruiker gevonden met dat emailadres.');
+            res.status(404).send('Gebruiker niet gevonden.');
+            return;
+        }
+
+        console.log('qrScanned succesvol bijgewerkt en score toegevoegd.');
+        res.status(200).send(`qrScanned succesvol bijgewerkt en ${scoreIncrement} toegevoegd aan totalScore!`);
+    } catch (err) {
+        console.error('Fout bij het bijwerken van qrScanned en totalScore:', err);
+        res.status(500).send('Er is een fout opgetreden bij het bijwerken van qrScanned en totalScore.');
     } finally {
         await client.close();
     }

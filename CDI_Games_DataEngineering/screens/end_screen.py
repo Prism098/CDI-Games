@@ -55,6 +55,6 @@ def show_end_screen(screen, score, elapsed_time, found_missing, total_missing, f
         screen.blit(instruction_text, (WIDTH // 2 - instruction_text.get_width() // 2, instruction_y))
 
         pygame.display.flip()
-
+    print("Score:" , score)
     pygame.quit()
     sys.exit()
