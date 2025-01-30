@@ -1,75 +1,155 @@
-/* Background color with gradient */
 body {
-  margin: 0;
-  padding: 0;
   font-family: 'IBM Plex Sans', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(to bottom right, #5f0c16, #fc4157); /* Base gradient background */
-  overflow: hidden; /* Prevent scrollbars if layers extend outside */
+  overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+  margin: 0;
+
+  animation: gradient 10s ease infinite;
+  background: #94101f;
+  background: linear-gradient(135deg, #85101e 0%, #eb1932 50%, #85101e 100%);  
+  background-size: 300% 300%;
 }
 
-/* Pattern layer for shapes.png */
+@keyframes gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
 #patternLayer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 1; /* Above the gradient background but below canvas and scoreboard */
-  background-image: url('./assets/shapes.png'); /* Path to your PNG */
-  background-size: 400px 400px; /* Adjust size of the repeated pattern */
-  background-repeat: repeat; /* Repeat pattern */
-  pointer-events: none; /* Prevent it from blocking interactions */
-  opacity: 5%;
+  z-index: 1;
+  background-image: url('./assets/shapes.png');
+  background-size: 400px 400px;
+  background-repeat: repeat;
+  pointer-events: none;
+  opacity: 7%;
 }
 
-/* Canvas for animations */
+.scoreboards-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10%; 
+  position: relative;
+  z-index: 3;
+  margin-top: 8%;
+}
+
+
+
+.scoreboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 600px; /* same width for both boards */
+  z-index: 3;
+}
+
+.scoreboard h1 {
+  margin: 1rem;
+  font-size: 72px;
+  color: #fff;
+  text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
+}
+
+
+
+.slots-container {
+  position: relative;
+  width: 100%;
+  height: 800px; /* enough space for 10 items at ~60-70px each */
+  perspective: 1000px;
+  /* overflow: hidden; optional */
+}
+
+
+
+#scoreList,
+#recentList {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#scoreList li,
+#recentList li {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  color: #fff;
+  background-color: rgba(0,0,0,0.8);
+  border: 1px solid #fff;
+  margin: 5px 0; /* vertical spacing */
+  padding: 0 30px;
+  font-size: 20px;
+  font-weight: 400;
+  will-change: transform, opacity;
+  transition: none !important; /* let GSAP handle transitions */
+  transform-origin: center;
+
+  /* for highlight color fade: */
+  transition: background-color 0.5s ease !important;
+}
+::marker {
+  text-shadow: 3px 3px 15px rgba(0, 0, 0, 1);
+  font-size: 30px;
+  font-weight: bold;
+}
+
+
+#recentList {
+  list-style: none; /* or keep them with bullets if you want. */
+}
+
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.score-name {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-right: 20px;
+  font-size: 24px;
+  transition: color 1s ease;
+}
+
+.score-value {
+  font-weight: bold;
+  min-width: 60px;
+  text-align: right;
+  font-size: 28px;
+  transition: color 1s ease;
+}
+
+
+/* Canvas for animations behind scoreboard */
 #backgroundCanvas {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 2; /* Above the pattern layer */
+  z-index: 2;
 }
 
-/* Scoreboard styles */
-.scoreboard {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  text-align: center;
-  box-sizing: border-box;
-  z-index: 3; /* Above all background layers */
-}
 
-.scoreboard h1 {
-  margin: 0;
-  font-size: 72px;
-  color: #fff;
-  text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
-}
 
-#scoreList {
-  list-style-type: none;
-  padding: 0px;
-  margin: 20px 0;
-  width: 80%;
-  max-width: 800px;
-  font-size: 30px;
-}
 
-#scoreList li {
-  padding: 5px;
-  background-color: rgba(0, 0, 0, 0.7);
-  margin: 10px 0;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-  color: white;
-  border: 1px solid rgb(255, 255, 255);
-}
+
+
+
