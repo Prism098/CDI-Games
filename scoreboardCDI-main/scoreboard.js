@@ -120,53 +120,71 @@ function animateSingleUpdate(added, removed, newScores) {
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
-  const removedIndex = MAX_PLAYERS - 1; // Always last position
+  const removedIndex = MAX_PLAYERS - 1;
 
-  // 1. Fade out removed element
-  const removedEl = scoreList.children[removedIndex];
-  timeline.to(removedEl, {
+  // 1. Fade out removed element (0.6s)
+  timeline.to(scoreList.children[removedIndex], {
     opacity: 0,
     y: 20,
     duration: 0.6,
     ease: "power2.in",
-    onComplete: () => removedEl.remove()
+    onComplete() {
+      this.targets()[0].remove();
+    }
   });
 
-  // 2. Animate positions moving down
+  // 2. Animate positions moving down (0.8s each with 0.1s stagger)
   for (let i = newIndex; i < MAX_PLAYERS - 1; i++) {
-    const element = scoreList.children[i];
-    if (element) {
-      timeline.to(element, {
-        top: (i + 1) * SLOT_HEIGHT,
-        duration: 3,
-        ease: "power2.out"
-      }, i === newIndex ? "+=0.1" : "<0.1");
-    }
+    timeline.to(scoreList.children[i], {
+      top: (i + 1) * SLOT_HEIGHT,
+      duration: 0.8,
+      ease: "power2.out"
+    }, i === newIndex ? ">0.2" : "<0.1");
   }
 
-  // 3. Create and animate new entry
+  // 3. Create and animate new entry (0.8s)
   const newEl = document.createElement('li');
   newEl.dataset.name = added.name;
-  newEl.textContent = `${added.name} - ${added.totalScore}`;
+  
+  // Create split layout
+  const wrapper = document.createElement('div');
+  wrapper.className = 'score-item';
+  wrapper.innerHTML = `
+    <span class="score-name">${added.name}</span>
+    <span class="score-value">${added.totalScore}</span>
+  `;
+  
+  newEl.appendChild(wrapper);
   newEl.style.top = `${newIndex * SLOT_HEIGHT}px`;
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
-  timeline.to(newEl, {
+  timeline.fromTo(newEl, {
+    opacity: 0,
+    y: -30
+  }, {
     opacity: 1,
     y: 0,
-    duration: 3,
-    ease: "power2.out"
-  }, "-=0.4");
+    duration: 0.8,
+    ease: "back.out(1.5)",
+    immediateRender: false
+  }, ">0.2");
 
-  // Update displayed ranks
+  // 4. Update ranks with highlight effect (0.4s)
   newScores.forEach((player, index) => {
     const el = scoreList.querySelector(`[data-name="${player.name}"]`);
     if (el && el !== newEl) {
-
-      const wrapper = el.querySelector('.score-item');
-wrapper.querySelector('.score-name').textContent = player.name;
-wrapper.querySelector('.score-value').textContent = player.totalScore;
+      timeline.to(el.querySelector('.score-value'), {
+        keyframes: [
+          { color: "#ffd700", duration: 0.2 },
+          { color: "#ffffff", duration: 0.2 }
+        ]
+      }, "<");
+      
+      const nameSpan = el.querySelector('.score-name');
+      const scoreSpan = el.querySelector('.score-value');
+      nameSpan.textContent = player.name;
+      scoreSpan.textContent = player.totalScore;
     }
   });
 }

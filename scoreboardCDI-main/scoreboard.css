@@ -101,6 +101,7 @@ body {
   padding-right: 20px;
 
   font-size: 24px;
+  transition: color 1s ease;
 }
 
 .score-value {
@@ -109,6 +110,7 @@ body {
   text-align: right;
 
   font-size: 28px;
+  transition: color 1s ease;
 }
 
 
@@ -133,6 +135,9 @@ body {
   will-change: transform, opacity;
 
   padding: 0 30px;
+
+  margin: 5px 0; /* Add vertical spacing */
+  transform-origin: center; /* Better for animations */
 }
 
 ::marker {
