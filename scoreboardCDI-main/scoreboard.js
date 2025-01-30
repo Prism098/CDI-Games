@@ -159,6 +159,9 @@ function animateSingleUpdate(added, removed, newScores) {
   newEl.style.opacity = '0';
   scoreList.insertBefore(newEl, scoreList.children[newIndex]);
 
+  // Add highlight effect
+  gsap.set(newEl, { backgroundColor: "rgba(255,255,255,0.8)" });
+
   timeline.fromTo(newEl, {
     opacity: 0,
     y: -30
@@ -168,7 +171,13 @@ function animateSingleUpdate(added, removed, newScores) {
     duration: 0.8,
     ease: "back.out(1.5)",
     immediateRender: false
-  }, ">0.2");
+  }, ">0.2")
+  .to(newEl, {
+    backgroundColor: "rgba(0,0,0,0.8)",
+    duration: 2,
+    ease: "power4.out",
+    delay: 0.5
+  });
 
   // 4. Update ranks with highlight effect (0.4s)
   newScores.forEach((player, index) => {

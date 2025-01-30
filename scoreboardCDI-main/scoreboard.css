@@ -138,6 +138,8 @@ body {
 
   margin: 5px 0; /* Add vertical spacing */
   transform-origin: center; /* Better for animations */
+
+  transition: background-color 0.5s ease !important; /* Allow GSAP to control this */
 }
 
 ::marker {
