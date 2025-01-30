@@ -58,7 +58,6 @@ function processTopScoreUpdate(oldScores, newScores) {
 
   // If there's a newly added top-10 user:
   if (changes.added) {
-    // Then animate for top scoreboard
     if (changes.removed) {
       animateSingleUpdate(changes.added, changes.removed, newScores);
     } else {
@@ -99,6 +98,7 @@ function initialRenderTop(scores) {
 /** Animate a simple new addition (no one removed) */
 function animateSimpleAddition(added, newScores) {
   startConfettiForNewEntry();
+  playScoreSound(); // NEW: play sound also
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
@@ -141,6 +141,7 @@ function animateSimpleAddition(added, newScores) {
 /** Animate single update (added & removed) */
 function animateSingleUpdate(added, removed, newScores) {
   startConfettiForNewEntry();
+  playScoreSound(); // NEW: play sound also
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
@@ -268,8 +269,8 @@ function initialRenderRecent(scores) {
 
 /** Animate a simple new addition in the "recent" scoreboard */
 function animateSimpleAdditionRecent(added, newScores) {
-  // If you want confetti here, do it:
   startConfettiForNewEntry();
+  playScoreSound(); // NEW: play sound also
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
@@ -311,8 +312,8 @@ function animateSimpleAdditionRecent(added, newScores) {
 
 /** Animate a single update in "recent" scoreboard (new & removed doc) */
 function animateSingleUpdateRecent(added, removed, newScores) {
-  // If you want confetti
   startConfettiForNewEntry();
+  playScoreSound(); // NEW: play sound also
 
   const timeline = gsap.timeline();
   const newIndex = newScores.findIndex(p => p.name === added.name);
@@ -387,6 +388,21 @@ function startConfettiForNewEntry() {
   setTimeout(() => confetti.stop(), 5000);
 }
 
+// NEW: function to play the MP3 in scoreboard.html
+function playScoreSound() {
+  console.log("Attempting to play sound...");
+  
+  const audio = new Audio('assets/scoresound.mp3'); // Create a new instance each time
+  audio.volume = 1; // Ensure full volume
+  audio.currentTime = 0;
+  
+  audio.play().then(() => {
+      console.log("Sound played successfully.");
+  }).catch(err => {
+      console.warn("Audio playback error:", err);
+  });
+}
+
 /**************************************************************
   BACKGROUND SHAPES - UNCHANGED
 **************************************************************/
@@ -407,7 +423,7 @@ class Shape {
     this.respawnOffScreen();
   }
   respawnOffScreen() {
-    const spawnSides = ["top", "bottom", "left", "right"];
+    const spawnSides = ["top","bottom","left","right"];
     const side = spawnSides[Math.floor(Math.random() * spawnSides.length)];
     switch (side) {
       case "top":
@@ -434,10 +450,8 @@ class Shape {
   }
   createGradient(ctx) {
     const gradient = ctx.createLinearGradient(
-      this.x - this.size,
-      this.y - this.size,
-      this.x + this.size,
-      this.y + this.size
+      this.x - this.size, this.y - this.size,
+      this.x + this.size, this.y + this.size
     );
     gradient.addColorStop(0, this.color1);
     gradient.addColorStop(1, this.color2);
@@ -485,13 +499,13 @@ class Shape {
 setCanvasSize();
 const shapes = [];
 ["circle","half-circle","right-triangle","triangle"].forEach(type => {
-  for (let i=0; i<2; i++){
+  for (let i=0;i<2;i++){
     shapes.push(new Shape(type,"#FFFFFF","#E4E4E4"));
   }
 });
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  shapes.forEach(shape => shape.update());
+  shapes.forEach(s => s.update());
   requestAnimationFrame(animate);
 }
 animate();

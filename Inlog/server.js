@@ -32,11 +32,7 @@ app.listen(PORT, async () => {
   }
 });
 
-/*
-  =========== 2) Remove await client.connect() + client.close() in each route  ===========
-  We only do “await client.connect()” once in the listen callback above.
-  So we do not do it again in each route.
-*/
+
 
 // Endpoint om data op te slaan in MongoDB
 app.post('/save', async (req, res) => {
