@@ -1,31 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Scoreboard</title>
-  <link rel="stylesheet" href="scoreboard.css"> <!-- Link naar de externe CSS -->
-  <link href="https://fonts.cdnfonts.com/css/ibm-plex-sans" rel="stylesheet">
+  <link rel="stylesheet" href="scoreboard.css" />
+  <link href="https://fonts.cdnfonts.com/css/ibm-plex-sans" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-
-
-
 <body>
-  
-  <div id="patternLayer"></div> <!-- Layer for the repeated pattern -->
-  <div class="scoreboard">
-    <h1>Top Scores</h1>
-    <ol id="scoreList"></ol>
-  </div>
 
+  <div id="patternLayer"></div>
+
+  <div class="scoreboards-container">
+    <!-- Top Scores -->
+    <div class="scoreboard scoreboard-top">
+      <h1>Top Scores</h1>
+      <div class="slots-container">
+        <ol id="scoreList"></ol>
+      </div>
+    </div>
+
+    <!-- Laatste Scores -->
+    <div class="scoreboard scoreboard-recent">
+      <h1>Laatste 10</h1>
+      <div class="slots-container">
+        <ol id="recentList"></ol>
+      </div>
+    </div>
+  </div>
 
   <canvas id="backgroundCanvas"></canvas>
 
-
-  <!-- Confetti JS -->
-  <!-- <script src="confetti/confetti.js"></script> -->
-  <script src="testScoreboard.js"></script>
-
+  <audio id="scoreSound" src="/assets/scoresound.mp3" preload="auto"></audio>
   
+  <!-- scoreboard script -->
+  <script src="index.js"></script>
+  <script class="confetti" src="confetti/confetti.js"></script>
 </body>
 </html>
