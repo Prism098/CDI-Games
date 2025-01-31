@@ -117,17 +117,21 @@ if user_id and total_score != "Onbekend":
     text1 = FONT.render(f"Eindscore: {total_score}", True, TEXT_COLOR)
     text2 = FONT.render("Scan de QR-code om het scorebord te volgen!", True, TEXT_COLOR)
     text3 = FONT.render("Ga nu door naar replay voor deel 2!", True, TEXT_COLOR)  # Nieuwe tekst
+    text4 = FONT.render("Druk op ESC om af te sluiten.", True, (255, 0, 0))  # Rode tekst
+    
 
     elements = [text1, text2]
     if qr_surface:
         elements.append(qr_surface)
     elements.append(text3)  # Voeg de nieuwe tekst toe
+    elements.append(text4)  # Voeg de nieuwe tekst toe
 
     # Posities berekenen
-    text1_pos, text2_pos, qr_pos, text3_pos = vertical_center_group(
-        elements,
-        spacing=int(SCREEN_HEIGHT * 0.03)
+    text1_pos, text2_pos, qr_pos, text3_pos, text4_pos = vertical_center_group(
+    elements,
+    spacing=int(SCREEN_HEIGHT * 0.03)
     )
+
 
 
 # =========================
@@ -165,9 +169,12 @@ while running:
     if user_id and total_score != "Onbekend":
         screen.blit(text1, text1_pos)
         screen.blit(text2, text2_pos)
+        screen.blit(text4, text4_pos)  # ESC melding weergeven
+
         if qr_surface:
             screen.blit(qr_surface, qr_pos)
         screen.blit(text3, text3_pos)  # Nieuwe tekst weergeven
+        
 
 
     pygame.display.flip()

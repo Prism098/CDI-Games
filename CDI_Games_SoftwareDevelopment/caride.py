@@ -147,6 +147,10 @@ CAR_IMAGE = pygame.transform.rotate(CAR_IMAGE, 180)  # Rotate to face RIGHT
 FINISHLINE_IMAGE = pygame.image.load("CDI_Games_SoftwareDevelopment\\images\\FinishLine.png")
 FINISHLINE_IMAGE = pygame.transform.scale(FINISHLINE_IMAGE, (TILE_SIZE , TILE_SIZE - 1))
 
+DIAMOND_IMAGE = pygame.image.load("CDI_Games_SoftwareDevelopment\\images\\diamond.png")
+DIAMOND_IMAGE = pygame.transform.scale(DIAMOND_IMAGE, (TILE_SIZE // 2, TILE_SIZE // 2))  # 50% van TILE_SIZE
+
+
 GRASS_IMAGE = pygame.image.load("CDI_Games_SoftwareDevelopment\\images\\Lava_CodeRacer.png")
 GRASS_IMAGE = pygame.transform.scale(GRASS_IMAGE, (TILE_SIZE, TILE_SIZE - 1))
 
@@ -227,8 +231,16 @@ def draw_grid():
                     ROAD_IMAGE,
                     (GRID_OFFSET_X + x * TILE_SIZE + 2, GRID_OFFSET_Y + y * TILE_SIZE + 2)
                 )
+            
+            # Als het een checkpoint is, voeg de diamant toe
+            if tile_type == "C" and (x, y) not in collected_checkpoints:
+                diamond_x = GRID_OFFSET_X + x * TILE_SIZE + (TILE_SIZE - DIAMOND_IMAGE.get_width()) // 2
+                diamond_y = GRID_OFFSET_Y + y * TILE_SIZE + (TILE_SIZE - DIAMOND_IMAGE.get_height()) // 2
+                screen.blit(DIAMOND_IMAGE, (diamond_x, diamond_y))
 
-    # Draw border around the grid
+
+
+    # Tekent een border rond het raster
     border_rect = pygame.Rect(GRID_OFFSET_X - 10, GRID_OFFSET_Y - 10, GRID_SIZE * TILE_SIZE + 20, GRID_SIZE * TILE_SIZE + 20)
     pygame.draw.rect(screen, BLACK, border_rect, 10)
 
@@ -392,14 +404,15 @@ def move_forward():
 
     # Handle tile type AFTER animation completes
     if grid[new_y][new_x] == "C":  # Checkpoint
-        if (new_x, new_y) not in collected_checkpoints:  # Check if uncollected
-            collected_checkpoints.add((new_x, new_y))  # Mark checkpoint as collected
+        if (new_x, new_y) not in collected_checkpoints:  # Check of het nog niet is opgepakt
+            collected_checkpoints.add((new_x, new_y))  # Voeg het toe aan verzamelde checkpoints
             global last_checkpoint
-            last_checkpoint =(new_x,new_y)
+            last_checkpoint = (new_x, new_y)
             score += 500
             show_feedback("Gems found! +500 points", GREEN)
         else:
             show_feedback("Gems already collected!", YELLOW)
+
     elif grid[new_y][new_x] == "D":  # Finish line
         score += 500
         show_feedback("Destination Reached! +500 points", YELLOW)

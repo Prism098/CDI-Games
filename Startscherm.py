@@ -241,7 +241,8 @@ while running:
 
         pygame.quit()  # Sluit huidige Pygame-instantie
         subprocess.run([sys.executable, "QR-code.py"])  # Start het eindscherm
-        state = "login"  # Keer terug naar login voor de volgende gebruiker
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
     # Toggle cursor visibility
     if pygame.time.get_ticks() - cursor_timer > 500:
